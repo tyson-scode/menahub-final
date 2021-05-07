@@ -86,7 +86,8 @@ class _MyCartScreenState extends State<MyCartScreen> {
       });
     } else {
       setState(() {
-        errorMessage = responseData["message"];
+        //errorMessage = responseData["message"];
+        errorMessage = "Cart is Empty.Please Add Items....";
         loaderStatus = true;
       });
     }
@@ -143,7 +144,8 @@ class _MyCartScreenState extends State<MyCartScreen> {
       });
     } else {
       setState(() {
-        errorMessage = responseData["message"];
+        //errorMessage = responseData["message"];
+        errorMessage = "Cart is Empty.Please Add Items....";
         loaderStatus = true;
       });
     }
