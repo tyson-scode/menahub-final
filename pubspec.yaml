@@ -1,21 +1,7 @@
-name: flutter_app_selectaddress_new
-description: A new Flutter application.
-
-# The following line prevents the package from being accidentally published to
-# pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+name: menahub
+description: ecommerce app
+publish_to: 'none' 
+version: 1.0.0+2
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -23,94 +9,67 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  email_validator: '^1.0.0'
-  dotted_line: ^2.0.2
-  pinput: ^0.2.0
-  carousel_slider: ^3.0.0
-  badges: ^1.2.0
+
+  cupertino_icons: ^1.0.2
+  hexcolor: ^1.0.6
+  badges: ^1.1.6
+  modal_bottom_sheet: ^1.0.0+1
+  carousel_slider: ^2.3.1
   dotted_border: ^1.0.7
-  http: ^0.12.0+1
-  favorite_button: ^0.0.3
+  http: ^0.13.0
+  flutter_rating_bar: ^4.0.0
+  #pagination
+  flutter_paginator: ^0.0.6
+  shared_preferences: ^2.0.4
+  #drop down
+  flutter_dropdown: ^0.0.8
+  # get system path
+  path_provider: ^2.0.1
+  #file download from path 
+  flutter_downloader: ^1.5.2
+  open_file: ^3.1.0
+  #loader 
+  flutter_progress_hud: ^2.0.0
+  #Toast
+  fluttertoast: ^7.1.8
+  #language change 
+  easy_localization: ^3.0.0
+  smooth_star_rating: ^1.1.1
+  #alert box 
+  rflutter_alert: ^2.0.2
+  awesome_dialog: ^1.3.2
+  #remove html element 
+  html: 
+  #load html tag 
+  flutter_html: 
+  #location 
+  google_map_location_picker: ^4.1.7
+  google_maps_flutter: ^2.0.1
+  flutter_localizations:
+    sdk: flutter
+  #vicky
+  pinput: ^1.1.0
+  #sahana
+  email_validator: '^1.0.5'
+  dotted_line: ^2.0.2
+  otp_text_field: ^1.1.0
+  pin_entry_text_field: ^0.1.4
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.0
-
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter.
 flutter:
 
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
   assets:
-    - asset/image/
-    - asset/order/
-    - asset/Socialmedia/
-    - asset/List/
-    - asset/
-    - asset/orderlist/
-    - asset/images/
-    - asset/Home/
-    - asset/navigation/
-    - asset/sample2/
-    - asset/sample3/
-    - asset/sample05/
-    - asset/topbrands/
-
-
-
-
-
-
-
-
-  #   - images/a_dot_ham.jpeg
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware.
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+    - assets/
+    - assets/icon/
+    - assets/image/
+    - assets/gif/
+    - assets/order/
+    - assets/Socialmedia/
+    - assets/List/
+    - assets/orderlist/
+    - assets/language/

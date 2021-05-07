@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "782923906108",
+    "project_id": "menahub",
+    "storage_bucket": "menahub.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:782923906108:android:895359ae0b025441d45739",
+        "android_client_info": {
+          "package_name": "com.scodes.menahub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "782923906108-8pfq361ath35ae6np9idlqb30kjc9dhn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6LaxE4ZkpLBTwBp1IOPtVl1pwuyrPrGA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "782923906108-8pfq361ath35ae6np9idlqb30kjc9dhn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
