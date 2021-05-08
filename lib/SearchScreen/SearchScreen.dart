@@ -58,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
     };
     ApiResponseModel response = await getApiCall(
       getUrl:
-          "https://magento2blog.thestagings.com/rest/default/V1/products?searchCriteria[filter_groups][1][filters][0][field]=name&searchCriteria[filter_groups][1][filters][0][condition_type]=like&searchCriteria[filter_groups][1][filters][0][value]=%25${searchTextField.text}%25&searchCriteria[filter_groups][1][filters][1][field]=sku&searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
+          "https://uat2.menahub.com/rest/default/V1/products?searchCriteria[filter_groups][1][filters][0][field]=name&searchCriteria[filter_groups][1][filters][0][condition_type]=like&searchCriteria[filter_groups][1][filters][0][value]=%25${searchTextField.text}%25&searchCriteria[filter_groups][1][filters][1][field]=sku&searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
       headers: headers,
       context: context,
     );
@@ -113,7 +113,7 @@ class _SearchScreenState extends State<SearchScreen> {
       };
       ApiResponseModel response = await getApiCall(
         getUrl:
-            "https://magento2blog.thestagings.com/rest/default/V1/products?searchCriteria[filter_groups][1][filters][0][field]=name&searchCriteria[filter_groups][1][filters][0][condition_type]=like&searchCriteria[filter_groups][1][filters][0][value]=%25${searchTextField.text}%25&searchCriteria[filter_groups][1][filters][1][field]=sku&searchCriteria[currentPage]=1&searchCriteria[pageSize]=$page",
+            "https://uat2.menahub.com/rest/default/V1/products?searchCriteria[filter_groups][1][filters][0][field]=name&searchCriteria[filter_groups][1][filters][0][condition_type]=like&searchCriteria[filter_groups][1][filters][0][value]=%25${searchTextField.text}%25&searchCriteria[filter_groups][1][filters][1][field]=sku&searchCriteria[currentPage]=1&searchCriteria[pageSize]=$page",
         headers: headers,
         context: context,
       );

@@ -207,7 +207,7 @@ class _ProductsDetailsScreenState extends State<ProductsDetailsScreen> {
       };
       ApiResponseModel response = await getApiCall(
         getUrl:
-            "https://magento2blog.thestagings.com/rest/default/V1/products?searchCriteria[filter_groups][0][filters][0][field]=category_id&searchCriteria[filter_groups][0][filters][0][condition_type]=eq&searchCriteria[pageSize]=20&searchCriteria[filter_groups][0][filters][0][value]=${widget.productId}&searchCriteria[current_page]=$page$sortAppend",
+            "https://uat2.menahub.com/rest/default/V1/products?searchCriteria[filter_groups][0][filters][0][field]=category_id&searchCriteria[filter_groups][0][filters][0][condition_type]=eq&searchCriteria[pageSize]=20&searchCriteria[filter_groups][0][filters][0][value]=${widget.productId}&searchCriteria[current_page]=$page$sortAppend",
         headers: headers,
         context: context,
       );
