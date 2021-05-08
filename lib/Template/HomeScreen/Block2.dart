@@ -20,7 +20,10 @@ class _Block2State extends State<Block2> {
   bool wishlistStatus = false;
   @override
   Widget build(BuildContext context) {
-    double productPrice = double.parse(widget.productDetails['price']);
+    double productPrice = widget.productDetails["price"] == null
+        ? 0.0
+        : double.parse(widget.productDetails['price']);
+    // print('product price = $productPrice');
     return InkWell(
       onTap: () {
         widget.onstate(widget.productDetails['sku'].toString(), false);

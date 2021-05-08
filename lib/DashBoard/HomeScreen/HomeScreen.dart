@@ -229,6 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
         sampleBlockList1 = item["items"];
         v1 = item["viewmore_link"];
         blockName1 = item["name"];
+        apiLoader = false;
       });
     } else {}
     if (block2.statusCode == 200) {
@@ -246,6 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
         sampleBlockList3 = item["items"];
         v3 = item["viewmore_link"];
         blockName3 = item["name"];
+        apiLoader = false;
       });
     } else {}
   }
@@ -629,6 +631,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         scrollDirection: Axis.horizontal,
                                         itemCount: sampleBlockList2.length,
                                         itemBuilder: (context, index) {
+                                          int len = sampleBlockList2.length;
+                                          // print('Length =  $len');
+                                          // print('block2 = $sampleBlockList2');
+
                                           return Block2(
                                             productDetails:
                                                 sampleBlockList2[index],

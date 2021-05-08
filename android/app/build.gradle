@@ -48,7 +48,7 @@ android {
             keyAlias 'key'
             keyPassword '123456'
             storePassword '123456'
-            storeFile file('C:\\lokesh\\menahubKey.jks')
+            storeFile file('C:\\menahub\\menahubKey.jks')
         }
     }
 
