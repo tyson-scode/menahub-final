@@ -78,7 +78,7 @@ class _ProductListState extends State<ProductList> {
                       widget.productDetails["name"],
                       softWrap: true,
                       maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      overflow: TextOverflow.clip,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
