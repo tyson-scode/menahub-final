@@ -316,7 +316,13 @@ class _ResetPasswordState extends State<ResetPassword> {
                       style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                     ),
                     GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SignIn(),
+                              ));
+                        },
                         child: new Text(
                           '  sign in',
                           style: new TextStyle(

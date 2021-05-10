@@ -32,7 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController mobileTextfield = TextEditingController();
   TextEditingController otpTextfield = TextEditingController();
   bool _autoValidate = false;
-  String countryCode = "+91";
+  String countryCode = "+ 91";
   String otp = "";
   BuildContext context;
   createCart(BuildContext _context) async {
@@ -143,15 +143,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
         } else {
           Map response = responseData.responseValue;
           String errorMessage = response["message"];
-          AlertDialog alert = AlertDialog(
-            content: Text(errorMessage),
+          Fluttertoast.showToast(
+            msg: errorMessage,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
           );
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return alert;
-            },
-          );
+          // AlertDialog alert = AlertDialog(
+          //   content: Text(errorMessage),
+          // );
+          // showDialog(
+          //   context: context,
+          //   builder: (BuildContext context) {
+          //     return alert;
+          //   },
+          // );
         }
       } else {
         print("verify OTP: failed" + response.toString());
@@ -349,10 +358,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                               underline: Container(),
                                               value: countryCode,
                                               items: <String>[
-                                                '+91',
-                                                '+971',
-                                                '+61',
-                                                '+974'
+                                                '+ 91',
+                                                '+ 971',
+                                                '+ 974'
                                               ].map((String value) {
                                                 return new DropdownMenuItem<
                                                     String>(

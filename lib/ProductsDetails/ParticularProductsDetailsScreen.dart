@@ -169,6 +169,8 @@ class _ParticularProductsDetailsScreenState
           if (userType == true) {
             getGuestCartCount();
           } else {
+            progress.dismiss();
+
             getCartCount();
           }
         });
@@ -307,6 +309,8 @@ class _ParticularProductsDetailsScreenState
         if (userType == true) {
           getGuestCartCount();
         } else {
+          progress.dismiss();
+
           getCartCount();
         }
       });

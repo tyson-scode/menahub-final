@@ -10,6 +10,8 @@ import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/CustomBackground.dart';
 
+import 'SignInScreen/SignInScreen.dart';
+
 class ForgotPasswordScreen extends StatefulWidget {
   @override
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
@@ -176,11 +178,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                       DropdownButton<String>(
                                         underline: Container(),
                                         value: countryCode,
-                                        items: <String>[
-                                          '+91',
-                                          '+1',
-                                          '+61',
-                                        ].map((String value) {
+                                        items: <String>['+ 91', '+ 1', '+ 974']
+                                            .map((String value) {
                                           return new DropdownMenuItem<String>(
                                             value: value,
                                             child: new Text(
@@ -284,7 +283,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 style: TextStyle(fontSize: 13, color: Colors.grey[600]),
               ),
               GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SignIn(),
+                        ));
+                  },
                   child: new Text(
                     '  Sign in',
                     style: new TextStyle(

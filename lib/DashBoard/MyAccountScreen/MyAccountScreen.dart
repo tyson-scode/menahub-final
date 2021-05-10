@@ -62,6 +62,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       if (responseData.statusCode == 200) {
         Map data = responseData.responseValue;
         List customAttributes = data["custom_attributes"];
+        Map extensionAttributes = data["extension_attributes"];
+
         int mobilenumberIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "mobilenumber");
         int mobilenumberCodeIndex = customAttributes
@@ -72,6 +74,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           accountDetails = data;
           mobileNumber = mobilenumberIndexMap["value"];
           countryCode = mobilenumberCodeIndexMap["value"];
+          print("GET PROFILE");
+          print("Account Details = $accountDetails");
+          print("extensionAttributes Details = $extensionAttributes");
         });
       } else {
         print(responseData);

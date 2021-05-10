@@ -28,7 +28,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   TextEditingController passwordTextfield = TextEditingController();
   TextEditingController mobileTextfield = TextEditingController();
   bool _autoValidate = false;
-  String countryCode = "91";
+  String countryCode = "+ 91";
   String gender;
   int genderID;
 
@@ -78,11 +78,17 @@ class _UpdateProfileState extends State<UpdateProfile> {
         headers: headers,
         context: context);
     Navigator.of(context).pop();
-
+    Map data = responseData.responseValue;
+    List customAttributes = data["custom_attributes"];
+    Map extensionAttributes = data["extension_attributes"];
     if (responseData.statusCode == 200) {
       // print(responseData.responseValue);
 
       overlay.hide();
+      print("Update Profile");
+      print("Account Details = $data");
+      print("extensionAttributes Details = $extensionAttributes");
+
       // Navigator.of(context).push(
       //   MaterialPageRoute(
       //     builder: (BuildContext context) => MyAccountScreen(),
@@ -111,6 +117,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
       gender = 'Male';
     }
     List customAttributes = widget.userProfile["custom_attributes"];
+    Map extensionAttributes = widget.userProfile["extension_attributes"];
+
     int mobilenumberIndex = customAttributes
         .indexWhere((f) => f['attribute_code'] == "mobilenumber");
     int mobilenumberCodeIndex = customAttributes
@@ -123,6 +131,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
     emailTextfield.text = widget.userProfile["email"].toString();
     mobileTextfield.text = mobileNumber;
     countryCode = mobilenumberCodeIndexMap["value"];
+    print("init = $extensionAttributes");
   }
 
   @override
@@ -273,11 +282,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                     DropdownButton<String>(
                                       underline: Container(),
                                       value: countryCode,
-                                      items: <String>[
-                                        '91',
-                                        '1',
-                                        '61',
-                                      ].map((String value) {
+                                      items: <String>['+ 91', '+ 974']
+                                          .map((String value) {
                                         return new DropdownMenuItem<String>(
                                           value: value,
                                           child: new Text(

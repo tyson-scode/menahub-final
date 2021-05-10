@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:menahub/CustomAlertBox/CustomAlertBox.dart';
 import 'package:menahub/CustomWidget/CustomButton.dart';
@@ -136,15 +137,24 @@ class _SignInState extends State<SignIn> {
       progress.dismiss();
       Map response = responseData;
       String errorMessage = response["message"];
-      AlertDialog alert = AlertDialog(
-        content: Text('$errorMessage'),
+      Fluttertoast.showToast(
+        msg: errorMessage,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
       );
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        },
-      );
+      // AlertDialog alert = AlertDialog(
+      //   content: Text('$errorMessage'),
+      // );
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return alert;
+      //   },
+      // );
       print(errorMessage);
     }
   }

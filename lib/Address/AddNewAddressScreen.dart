@@ -72,7 +72,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
 
   //user profile details from api
   Map accountDetails;
-  String countryCode = '91';
+  String countryCode = '+ 91';
   String userType;
 
   @override
@@ -709,16 +709,12 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                   },
                                                   items: [
                                                     DropdownMenuItem(
-                                                      child: Text('91'),
-                                                      value: '91',
+                                                      child: Text('+ 91'),
+                                                      value: '+ 91',
                                                     ),
                                                     DropdownMenuItem(
-                                                      child: Text('61'),
-                                                      value: '61',
-                                                    ),
-                                                    DropdownMenuItem(
-                                                      child: Text('974'),
-                                                      value: '974',
+                                                      child: Text('+ 974'),
+                                                      value: '+ 974',
                                                     ),
                                                   ],
                                                 ),
@@ -1612,16 +1608,12 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                       node.requestFocus(),
                                                   items: [
                                                     DropdownMenuItem(
-                                                      child: Text('91'),
-                                                      value: '91',
+                                                      child: Text('+ 91'),
+                                                      value: '+ 91',
                                                     ),
                                                     DropdownMenuItem(
-                                                      child: Text('61'),
-                                                      value: '61',
-                                                    ),
-                                                    DropdownMenuItem(
-                                                      child: Text('974'),
-                                                      value: '974',
+                                                      child: Text('+ 974'),
+                                                      value: '+ 974',
                                                     ),
                                                   ],
                                                 ),
