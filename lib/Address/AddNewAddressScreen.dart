@@ -423,7 +423,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         0, 10, 40, 0),
                                                 child: Text(
-                                                  'Please enter Address Title',
+                                                  'Please Enter Address Title',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),
@@ -544,7 +544,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         0, 10, 40, 0),
                                                 child: Text(
-                                                  'Please enter Name',
+                                                  'Please Enter Name',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),
@@ -601,7 +601,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         25, 5, 25, 0),
                                                 child: Text(
-                                                  'Please enter Company Name',
+                                                  'Please Enter Company Name',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),
@@ -665,7 +665,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         0, 10, 40, 0),
                                                 child: Text(
-                                                  'Please enter Valid Email',
+                                                  'Please Enter Valid Email',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),
@@ -796,7 +796,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         0, 10, 40, 0),
                                                 child: Text(
-                                                  'Please enter Mobile No',
+                                                  'Please Enter Mobile No',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),
@@ -851,7 +851,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         25, 5, 25, 0),
                                                 child: Text(
-                                                  'Please enter Building Name and No',
+                                                  'Please Enter Building Name and No',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),
@@ -949,7 +949,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         40, 10, 0, 0),
                                                 child: Text(
-                                                  'Please enter Street No',
+                                                  'Please Enter Street No',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),
@@ -963,7 +963,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         0, 10, 40, 0),
                                                 child: Text(
-                                                  'Please enter Zone No',
+                                                  'Please Enter Zone No',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),
@@ -1014,7 +1014,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     const EdgeInsets.fromLTRB(
                                                         25, 5, 25, 0),
                                                 child: Text(
-                                                  'Please enter City',
+                                                  'Please Enter City',
                                                   style: TextStyle(
                                                       color: Colors.red),
                                                 ),

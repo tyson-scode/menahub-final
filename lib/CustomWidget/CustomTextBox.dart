@@ -51,18 +51,18 @@ Widget customTextBox({
                 validator: (value) {
                   if (emailField) {
                     if (value.isEmpty) {
-                      return 'Please enter Email';
+                      return 'Please Enter Email';
                     } else if (value.isNotEmpty) {
                       final validyEmail = emailvalidation(email: value);
                       // ignore: unrelated_type_equality_checks
                       if (validyEmail != true) {
-                        return 'Please enter valid Email';
+                        return 'Please Enter Valid Email';
                       }
                     }
                     return null;
                   } else {
                     if (value.isEmpty) {
-                      return 'Please enter $hintText';
+                      return 'Please Enter $hintText';
                     }
 
                     return null;

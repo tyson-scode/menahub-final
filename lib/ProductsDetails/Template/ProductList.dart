@@ -59,7 +59,7 @@ class _ProductListState extends State<ProductList> {
                 flex: 3,
                 child: Container(
                   margin: EdgeInsets.only(right: 10),
-                  height: 80,
+                  height: 100,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                     image: DecorationImage(
@@ -71,11 +71,14 @@ class _ProductListState extends State<ProductList> {
                 ),
               ),
               Expanded(
-                flex: 6,
+                flex: 7,
                 child: Column(
                   children: [
                     Text(
                       widget.productDetails["name"],
+                      softWrap: true,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,

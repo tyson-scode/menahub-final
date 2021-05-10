@@ -104,10 +104,13 @@ class _ProductGridState extends State<ProductGrid> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      height: 30,
+                      height: 50,
                       width: MediaQuery.of(context).size.width,
                       child: Text(
                         widget.productDetails["name"],
+                        softWrap: true,
+                        maxLines: 3,
+                        overflow: TextOverflow.clip,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,

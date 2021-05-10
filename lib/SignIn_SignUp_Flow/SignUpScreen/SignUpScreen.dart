@@ -167,7 +167,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         progress.dismiss();
         setState(() {
           Fluttertoast.showToast(
-            msg: "Please Enter Valid otp",
+            msg: "Please Enter Valid OTP",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
@@ -402,7 +402,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                 ),
                                                 validator: (value) {
                                                   if (value.isEmpty) {
-                                                    return 'Please enter Mobile Number';
+                                                    return 'Please Enter Mobile Number';
                                                   }
                                                   return null;
                                                 },
@@ -423,7 +423,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         } else {
                                           Fluttertoast.showToast(
                                             msg:
-                                                "Password and Confirm Password Do not match",
+                                                "Password and Confirm Password Do Not Match",
                                             // toastLength: Toast.LENGTH_LONG,
                                             // gravity: ToastGravity.CENTER,
                                             // timeInSecForIosWeb: 10,

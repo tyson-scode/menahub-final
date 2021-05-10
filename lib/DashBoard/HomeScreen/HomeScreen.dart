@@ -7,6 +7,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:menahub/ProductsDetails/ParticularProductsDetailsScreen.dart';
 import 'package:menahub/ProductsDetails/ProductsDetailsScreen.dart';
 import 'package:menahub/SearchScreen/SearchScreen.dart';
+import 'package:menahub/SignIn_SignUp_Flow/SignInScreen/SignInScreen.dart';
 import 'package:menahub/Template/HomeScreen/Block1.dart';
 import 'package:menahub/Template/HomeScreen/Block2.dart';
 import 'package:menahub/Template/HomeScreen/Block3.dart';
@@ -192,6 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (slider1.statusCode == 200) {
       List bannerImageList = sliderData1;
+      print('Slider = $bannerImageList');
       setState(() {
         List imageList =
             bannerImageList.map((e) => e["image"].toString()).toList();
@@ -436,16 +438,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Column(children: [
                                   CarouselSlider(
                                     items: sliderList1
-                                        .map((item) => Container(
-                                              height: 150,
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              child: ClipRRect(
-                                                child: Image.network(
-                                                    "$bannerSliderBaseUrl$item",
-                                                    fit: BoxFit.fill,
-                                                    width: 1000.0),
+                                        .map((item) => InkWell(
+                                              onTap: () {
+                                                // Navigator.pushReplacement(
+                                                //     context,
+                                                //     MaterialPageRoute(
+                                                //       builder: (context) =>
+                                                //            SignIn(),
+                                                //     ));
+                                              },
+                                              child: Container(
+                                                height: 150,
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                child: ClipRRect(
+                                                  child: Image.network(
+                                                      "$bannerSliderBaseUrl$item",
+                                                      fit: BoxFit.fill,
+                                                      width: 1000.0),
+                                                ),
                                               ),
                                             ))
                                         .toList(),
