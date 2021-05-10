@@ -7,6 +7,13 @@ bool emailvalidation({String email}) {
   return emailValid;
 }
 
+bool passwordvalidation({String password}) {
+  bool passwordvalid =
+      RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
+          .hasMatch(password);
+  return passwordvalid;
+}
+
 // remove html tags
 String removeHtmlFromString(String htmlString) {
   final document = parse(htmlString);
