@@ -319,6 +319,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     keyboardType: TextInputType.emailAddress,
                                     emailField: true,
                                   ),
+
                                   sizedBoxheight10,
                                   customTextBox(
                                     icons: "assets/icon/lockIcon.png",
@@ -419,11 +420,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       if (formKey.currentState.validate()) {
                                         if (passwordTextfield.text ==
                                             confirmPasswordTextfield.text) {
-                                          signUpOtp(context);
-                                        } else {
                                           Fluttertoast.showToast(
                                             msg:
-                                                "Password and Confirm Password Do Not Match",
+                                                "Your OTP has been sent to your mobile number",
+                                            // toastLength: Toast.LENGTH_LONG,
+                                            // gravity: ToastGravity.CENTER,
+                                            // timeInSecForIosWeb: 10,
+                                            // backgroundColor: Colors.red,
+                                            // textColor: Colors.white,
+                                            // fontSize: 16.0,
+                                          );
+                                        } else {
+                                          Fluttertoast.showToast(
+                                            msg: "Some Error Occurs..",
                                             // toastLength: Toast.LENGTH_LONG,
                                             // gravity: ToastGravity.CENTER,
                                             // timeInSecForIosWeb: 10,

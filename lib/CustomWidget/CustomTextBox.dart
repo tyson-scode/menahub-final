@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/StaticFunction.dart';
@@ -12,6 +13,7 @@ Widget customTextBox({
   bool passwordField = false,
   bool confirmpasswordfield = false,
   bool emailField = false,
+  bool passwordfield = false,
   TextInputType keyboardType = TextInputType.text,
 }) {
   return Card(
@@ -47,8 +49,23 @@ Widget customTextBox({
                     fontWeight: FontWeight.w500,
                     color: greyColor,
                   ),
+                  errorMaxLines: 4,
                 ),
                 validator: (value) {
+                  if (passwordField) {
+                    if (value.isEmpty) {
+                      return 'Please Enter Password';
+                    }
+                    if (value.length < 8) {
+                      return 'Password Should Contains Atleast 8 Characters';
+                    } else if (value.isNotEmpty) {
+                      final validatepassword =
+                          passwordvalidation(password: value);
+                      if (validatepassword != true) {
+                        return 'Password Should Contain Atleast 1 UpperCase,1 LowerCase,1 Special Charcter';
+                      }
+                    }
+                  }
                   if (emailField) {
                     if (value.isEmpty) {
                       return 'Please Enter Email';
