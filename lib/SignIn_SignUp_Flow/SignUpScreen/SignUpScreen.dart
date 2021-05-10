@@ -405,6 +405,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                   if (value.isEmpty) {
                                                     return 'Please Enter Mobile Number';
                                                   }
+                                                  if (value.length < 10) {
+                                                    return 'Please Enter Valid Mobile NUmber';
+                                                  }
+                                                  if (value.length > 10) {
+                                                    return 'Please Enter Valid Mobile NUmber';
+                                                  }
                                                   return null;
                                                 },
                                               ),

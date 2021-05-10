@@ -57,12 +57,12 @@ Widget customTextBox({
                       return 'Please Enter Password';
                     }
                     if (value.length < 8) {
-                      return 'Password Should Contains Atleast 8 Characters';
+                      return 'Password must be at least eight characters long';
                     } else if (value.isNotEmpty) {
                       final validatepassword =
                           passwordvalidation(password: value);
                       if (validatepassword != true) {
-                        return 'Password Should Contain Atleast 1 UpperCase,1 LowerCase,1 Special Charcter';
+                        return 'Password must have at least one uppercase, one lowercase, one digit(0-9), one special character';
                       }
                     }
                   }
