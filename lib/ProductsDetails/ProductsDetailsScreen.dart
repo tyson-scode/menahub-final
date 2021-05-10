@@ -559,7 +559,7 @@ class _ProductsDetailsScreenState extends State<ProductsDetailsScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Showing ${productList.length} out of $totalPageSize products",
+                                    "Showing ${productList.length} Out Of $totalPageSize Products",
                                     style:
                                         TextStyle(fontWeight: FontWeight.w500),
                                   ),
@@ -625,7 +625,7 @@ class _ProductsDetailsScreenState extends State<ProductsDetailsScreen> {
                                                 2,
                                         child: Center(
                                           child:
-                                              Text("category items list empty"),
+                                              Text("Category Items List Empty"),
                                         ),
                                       )
                                 : productList.isNotEmpty == true
@@ -670,7 +670,7 @@ class _ProductsDetailsScreenState extends State<ProductsDetailsScreen> {
                                                 2,
                                         child: Center(
                                           child:
-                                              Text("category items list empty"),
+                                              Text("Category Items List Empty"),
                                         ),
                                       ),
                             if (apiupdate)

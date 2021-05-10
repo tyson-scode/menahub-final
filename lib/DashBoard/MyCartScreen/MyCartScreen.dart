@@ -7,6 +7,7 @@ import 'package:menahub/Address/SelectAddressScreen.dart';
 import 'package:menahub/CustomWidget/CustomButton.dart';
 import 'package:menahub/DashBoard/DashBoard.dart';
 import 'package:menahub/ProductsDetails/ParticularProductsDetailsScreen.dart';
+import 'package:menahub/SignIn_SignUp_Flow/SignInScreen/SignInScreen.dart';
 import 'package:menahub/Template/CardItem.dart';
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:menahub/Util/Api/ApiResponseModel.dart';
@@ -365,13 +366,85 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     )
                   : _items.isEmpty == true
                       ? Center(
-                          child: Text(
-                          errorMessage,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                          child: Container(
+                            height: 150,
+                            width: MediaQuery.of(context).size.width -
+                                MediaQuery.of(context).size.width / 4,
+                            decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(15, 15, 20, 15),
+                                  child: Text(
+                                    "No items added. Cart is Empty",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      letterSpacing: 1,
+                                      color: whiteColor,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 17,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                  child: InkWell(
+                                    onTap: () {
+                                      navigationDashBoard();
+                                    },
+                                    child: Icon(
+                                      Icons.add_shopping_cart,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 20,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          navigationDashBoard();
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            color: whiteColor,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 15,
+                                              right: 15,
+                                              top: 5,
+                                              bottom: 5,
+                                            ),
+                                            child: Text(
+                                              "Continue Shopping to Add Items",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ))
+                        )
                       : SingleChildScrollView(
                           child: Column(
                             children: [

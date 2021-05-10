@@ -175,6 +175,17 @@ class _ParticularProductsDetailsScreenState
           }
         });
       } else {
+        Map errorMessage = responseData.responseValue;
+        print("Error Message =$errorMessage");
+        Fluttertoast.showToast(
+          msg: "Product that you are trying to add is not available.",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         progress.dismiss();
       }
     }
@@ -896,15 +907,15 @@ class _ParticularProductsDetailsScreenState
                                             ),
                                           ),
                                         sizedBoxwidth30,
-                                        Expanded(
-                                          child: InkWell(
-                                            onTap: () {},
-                                            child: customButton(
-                                              title: "Enquire Now",
-                                              backgroundColor: secondaryColor,
-                                            ),
-                                          ),
-                                        ),
+                                        // Expanded(
+                                        //   child: InkWell(
+                                        //     onTap: () {},
+                                        //     child: customButton(
+                                        //       title: "Enquire Now",
+                                        //       backgroundColor: secondaryColor,
+                                        //     ),
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                   ),

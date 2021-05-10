@@ -240,7 +240,7 @@ class _SignInState extends State<SignIn> {
                                           fontWeight: FontWeight.w500),
                                     ),
                                     Text(
-                                      "sign in to continue",
+                                      "Sign In To Continue",
                                       style: TextStyle(
                                           fontSize: 20,
                                           color: lightGreyColor,
@@ -313,7 +313,7 @@ class _SignInState extends State<SignIn> {
                                                                 email: value);
                                                         if (validyEmail !=
                                                             true) {
-                                                          return 'Please enter valid Email';
+                                                          return 'Please Enter Valid Email';
                                                         } else
                                                           return null;
                                                       } else
@@ -329,7 +329,7 @@ class _SignInState extends State<SignIn> {
                                       ),
                                     ),
                                     sizedBoxheight20,
-                                    customTextBox(
+                                    customTextBox1(
                                       icons: "assets/icon/lockIcon.png",
                                       hintText: "Password",
                                       controller: passwordTextfield,
@@ -353,7 +353,7 @@ class _SignInState extends State<SignIn> {
                                             );
                                           },
                                           child: Text(
-                                            "Forgot Password",
+                                            "Forgot Password?",
                                             style: TextStyle(
                                               color: HexColor("#6D6D6D"),
                                               fontSize: 16,
@@ -381,7 +381,7 @@ class _SignInState extends State<SignIn> {
                                             height: 25,
                                             width: 100,
                                             child: Text(
-                                              "Sign up",
+                                              "Sign Up",
                                               textAlign: TextAlign.right,
                                               style: TextStyle(
                                                 color: HexColor("#6D6D6D"),

@@ -14,6 +14,7 @@ Widget customTextBox({
   bool confirmpasswordfield = false,
   bool emailField = false,
   bool passwordfield = false,
+  bool signinpasswordField = false,
   TextInputType keyboardType = TextInputType.text,
 }) {
   return Card(
@@ -84,6 +85,74 @@ Widget customTextBox({
 
                     return null;
                   }
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget customTextBox1({
+  BuildContext context,
+  String hintText,
+  String icons,
+  String backgroundColor,
+  TextEditingController controller,
+  String errorMessage,
+  bool passwordField = false,
+  bool confirmpasswordfield = false,
+  bool emailField = false,
+  bool passwordfield = false,
+  bool signinpasswordField = false,
+  TextInputType keyboardType = TextInputType.text,
+}) {
+  return Card(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(50.0),
+    ),
+    elevation: 2,
+    child: Container(
+      height: 60,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20.0),
+        child: Row(
+          children: [
+            Image.asset(
+              icons,
+              height: 30,
+              width: 30,
+            ),
+            Expanded(
+              child: TextFormField(
+                controller: controller,
+                obscureText: passwordField,
+                keyboardType: keyboardType,
+                decoration: new InputDecoration(
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  contentPadding: EdgeInsets.only(left: 15, right: 15),
+                  hintText: hintText,
+                  hintStyle: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: greyColor,
+                  ),
+                  errorMaxLines: 4,
+                ),
+                validator: (value) {
+                  if (passwordField) {
+                    if (value.isEmpty) {
+                      return 'Please Enter Password';
+                    }
+
+                    return null;
+                  }
+                  return null;
                 },
               ),
             )

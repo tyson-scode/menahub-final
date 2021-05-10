@@ -36,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List sampleBlockList6 = [];
   List sampleBlockList7 = [];
   List<String> sliderList1 = [];
+  List<String> titleList = [];
+
   List<String> sliderList2 = [];
   //slider indicator
   int slider1position = 0;
@@ -193,11 +195,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (slider1.statusCode == 200) {
       List bannerImageList = sliderData1;
-      print('Slider = $bannerImageList');
       setState(() {
         List imageList =
             bannerImageList.map((e) => e["image"].toString()).toList();
         sliderList1 = imageList;
+        List titlelist =
+            bannerImageList.map((e) => e["title"].toString()).toList();
+        print(sliderData1);
+        titleList = titlelist;
+        print(titleList);
       });
     } else {}
   }
@@ -438,28 +444,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Column(children: [
                                   CarouselSlider(
                                     items: sliderList1
-                                        .map((item) => InkWell(
-                                              onTap: () {
-                                                // Navigator.pushReplacement(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //       builder: (context) =>
-                                                //            SignIn(),
-                                                //     ));
-                                              },
-                                              child: Container(
-                                                height: 150,
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                child: ClipRRect(
-                                                  child: Image.network(
-                                                      "$bannerSliderBaseUrl$item",
-                                                      fit: BoxFit.fill,
-                                                      width: 1000.0),
-                                                ),
+                                        .map(
+                                          (item) => Container(
+                                            height: 150,
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            child: GestureDetector(
+                                              onTap: () {},
+                                              child: ClipRRect(
+                                                child: Image.network(
+                                                    "$bannerSliderBaseUrl$item",
+                                                    fit: BoxFit.fill,
+                                                    width: 1000.0),
                                               ),
-                                            ))
+                                            ),
+                                          ),
+                                        )
                                         .toList(),
                                     options: CarouselOptions(
                                       // autoPlayAnimationDuration:
@@ -470,8 +471,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       // enlargeCenterPage: true,
                                       // aspectRatio: 2.0,
                                       viewportFraction: 1.0,
+
                                       onPageChanged: (index, reason) {
                                         setState(() {
+                                          print(titleList[index]);
                                           slider1position = index;
                                         });
                                       },

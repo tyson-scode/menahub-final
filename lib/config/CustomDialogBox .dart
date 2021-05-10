@@ -119,13 +119,13 @@ Widget guestUser({BuildContext context}) {
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 15, 20, 15),
             child: Text(
-              "Now you are a guest user please SignIn",
+              "Now You Are a Guest User Please SignIn To See Account Details",
               textAlign: TextAlign.center,
               style: TextStyle(
                 letterSpacing: 1,
                 color: whiteColor,
                 fontWeight: FontWeight.w600,
-                fontSize: 17,
+                fontSize: 16,
               ),
             ),
           ),

@@ -178,7 +178,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                       DropdownButton<String>(
                                         underline: Container(),
                                         value: countryCode,
-                                        items: <String>['+ 91', '+ 1', '+ 974']
+                                        items: <String>['+ 91', '+ 974']
                                             .map((String value) {
                                           return new DropdownMenuItem<String>(
                                             value: value,

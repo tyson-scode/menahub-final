@@ -58,7 +58,7 @@ class _DashBoardState extends State<DashBoard> {
         debugShowCheckedModeBanner: false,
         home: DefaultTabController(
           initialIndex: widget.initialIndex,
-          length: 4,
+          length: 5,
           child: Scaffold(
             key: _scaffoldKey,
             appBar: AppBar(
@@ -120,7 +120,7 @@ class _DashBoardState extends State<DashBoard> {
                     badgeColor: redColor,
                     position: BadgePosition(top: 7, end: 0),
                     badgeContent: Text(
-                      '2',
+                      '',
                       style: TextStyle(
                         fontSize: 10,
                         color: whiteColor,
@@ -184,14 +184,14 @@ class _DashBoardState extends State<DashBoard> {
                         width: 25,
                       ),
                     ),
-                    // Tab(
-                    //   text: "Enquire",
-                    //   icon: Image.asset(
-                    //     "assets/icon/enquireBlueIcon.png",
-                    //     height: 25,
-                    //     width: 25,
-                    //   ),
-                    // ),
+                    Tab(
+                      text: "Enquire",
+                      icon: Image.asset(
+                        "assets/icon/enquireBlueIcon.png",
+                        height: 25,
+                        width: 25,
+                      ),
+                    ),
                     Tab(
                       text: "Account",
                       icon: Image.asset(
@@ -215,7 +215,7 @@ class _DashBoardState extends State<DashBoard> {
               children: [
                 HomeScreen(),
                 CategoriesScreen(),
-                //EnquireNowScreen(),
+                EnquireNowScreen(),
                 MyAccountScreen(),
                 MyCartScreen(),
               ],

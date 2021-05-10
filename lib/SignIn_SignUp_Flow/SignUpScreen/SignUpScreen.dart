@@ -205,7 +205,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     sizedBoxwidth5,
                     Text(
-                      "Sign in",
+                      "Sign In",
                       style: TextStyle(fontSize: 16, color: Colors.blue),
                     ),
                   ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:menahub/Address/SelectAddressScreen.dart';
 import 'package:menahub/DashBoard/MyAccountScreen/UpdateProfile.dart';
 import 'package:menahub/MyOrdersScreen/MyOrdersScreen.dart';
@@ -43,11 +44,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userType = prefs.getString("userType");
     if (userType == "guest") {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (BuildContext context) => SignIn(),
-        ),
+      Fluttertoast.showToast(
+        msg:
+            "You have logged in as Guest User. Please Sign In to see the Account Details",
+        // toastLength: Toast.LENGTH_LONG,
+        // gravity: ToastGravity.CENTER,
+        // timeInSecForIosWeb: 10,
+        // backgroundColor: Colors.red,
+        // textColor: Colors.white,
+        // fontSize: 16.0,
       );
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //     builder: (BuildContext context) => SignIn(),
+      //   ),
+      // );
     } else {
       var token = prefs.get("token");
       Map<String, String> headers = {
