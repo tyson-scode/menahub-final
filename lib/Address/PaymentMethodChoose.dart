@@ -383,8 +383,8 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                                   maxLines: null,
                                   //enabled: false,
                                   decoration: new InputDecoration(
-                                    hintText:
-                                        'Lorem Ipsum is simply dummy text of printing and typesetting industry.Lorem Ipsum has been the industrys standard dummy text ever since the 1500s',
+                                    // hintText:
+                                    //     'Lorem Ipsum is simply dummy text of printing and typesetting industry.Lorem Ipsum has been the industrys standard dummy text ever since the 1500s',
                                     hintMaxLines: 5,
                                     hintStyle: TextStyle(fontSize: 14),
                                     focusedBorder: OutlineInputBorder(
