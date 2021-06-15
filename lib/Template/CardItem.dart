@@ -4,9 +4,12 @@ import 'package:menahub/Util/ConstantData.dart';
 
 import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/Models/ConfigCartModel.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 typedef CartToProductCallback = void Function(
-    dynamic onstate, String checkState, bool status);
+    dynamic onstate, String checkState, bool status, int qty);
 
 class CartItem extends StatefulWidget {
   const CartItem({this.onstate, this.productDetails, this.context});
@@ -20,6 +23,15 @@ class CartItem extends StatefulWidget {
 class _CartItemState extends State<CartItem> {
   bool wishlistStatus = false;
   int productCount = 1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    productCount = widget.productDetails["qty"];
+  }
+
   @override
   Widget build(BuildContext context) {
     Map extensionAttributes = widget.productDetails["extension_attributes"];
@@ -31,10 +43,13 @@ class _CartItemState extends State<CartItem> {
     if (mediaGalleryEntriesList.isNotEmpty) {
       productImage = mediaGalleryEntriesList[0]["file"];
     }
-    productCount = widget.productDetails["qty"];
     return InkWell(
       onTap: () {
-        widget.onstate(sku, "next", !wishlistStatus);
+        print(productCount);
+        print("wishlistStatus");
+
+        print(!wishlistStatus);
+        widget.onstate(sku, "next", !wishlistStatus, productCount);
       },
       child: Card(
         margin: EdgeInsets.only(top: 5),
@@ -55,7 +70,7 @@ class _CartItemState extends State<CartItem> {
                       ),
                       sizedBoxheight10,
                       Text(
-                        "QAR ${widget.productDetails["price"]}",
+                        "QAR ${(widget.productDetails["price"]).toStringAsFixed(2).toString()}",
                         style: TextStyle(
                             color: secondaryColor,
                             fontSize: 16,
@@ -76,14 +91,22 @@ class _CartItemState extends State<CartItem> {
                                   onTap: () {
                                     setState(() {
                                       if (productCount != 1) {
-                                        productCount -= 1;
+                                        // productCount -= 1;
+                                        // print(sku);
+                                        // widget.onstate(sku, "0", false, true,
+                                        //     productCount);
                                       }
                                     });
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.only(
                                         left: 10, right: 10, top: 5, bottom: 5),
-                                    child: Text("-"),
+                                    // child: Text("-"),
+                                    child: Text(
+                                      "QUANTITY :",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ),
                                   ),
                                 ),
                                 Padding(
@@ -91,22 +114,24 @@ class _CartItemState extends State<CartItem> {
                                       left: 10, right: 10, top: 5, bottom: 5),
                                   child: Text(productCount.toString()),
                                 ),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      productCount += 1;
-                                    });
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 10, top: 5, bottom: 5),
-                                    child: Text("+"),
-                                  ),
-                                )
+                                // InkWell(
+                                //   onTap: () {
+                                //     setState(() {
+                                //       // productCount += 1;
+                                //     });
+                                //   },
+                                //   child: Padding(
+                                //     padding: const EdgeInsets.only(
+                                //         left: 10, right: 10, top: 5, bottom: 5),
+                                //     child: Text(""),
+                                //
+                                //     // Text("+"),
+                                //   ),
+                                // )
                               ],
                             ),
                           ),
-                          sizedBoxwidth30,
+                          sizedBoxwidth20,
                           InkWell(
                             onTap: () {
                               setState(() {
@@ -117,7 +142,8 @@ class _CartItemState extends State<CartItem> {
                                         qty: productCount.toString(),
                                       ),
                                       "0",
-                                      !wishlistStatus);
+                                      !wishlistStatus,
+                                      0);
                                   wishlistStatus = !wishlistStatus;
                                 }
                               });
@@ -134,13 +160,14 @@ class _CartItemState extends State<CartItem> {
                                     width: 25,
                                   ),
                           ),
-                          sizedBoxwidth30,
+                          sizedBoxwidth20,
                           InkWell(
                             onTap: () {
                               widget.onstate(
                                   widget.productDetails['item_id'].toString(),
                                   "0",
-                                  false);
+                                  false,
+                                  0);
                             },
                             child: Image.asset(
                               "assets/icon/deleteIcon.png",
@@ -151,6 +178,14 @@ class _CartItemState extends State<CartItem> {
                           ),
                         ],
                       ),
+                      sizedBoxheight20,
+                      Text(
+                          LocaleKeys.Sub_Total.tr() +
+                              " : QAR ${widget.productDetails["row_total"].toStringAsFixed(2).toString()}",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          )),
                     ],
                   ),
                 ),

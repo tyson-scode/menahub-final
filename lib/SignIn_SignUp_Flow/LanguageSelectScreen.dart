@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:menahub/DashBoard/DashBoard.dart';
+import 'package:menahub/SplashScreen/SplashScreen.dart';
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:menahub/Util/Api/ApiResponseModel.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
@@ -10,6 +11,9 @@ import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/CustomBackground.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LanguageSelectScreen extends StatefulWidget {
   final String router;
@@ -46,6 +50,9 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: ProgressHUD(
@@ -73,7 +80,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                           // mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              'Welcome,',
+                              LocaleKeys.language_first.tr(),
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.normal,
@@ -81,7 +88,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                             ),
                             sizedBoxheight5,
                             Text(
-                              'Choose Language',
+                              LocaleKeys.language_second.tr(),
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[600],
@@ -99,7 +106,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                                 color: Colors.orange[50],
                                 child: Container(
                                   child: Center(
-                                    child: Text("Arabic",
+                                    child: Text(LocaleKeys.arabic.tr(),
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Colors.grey[600],
@@ -107,14 +114,21 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                                   ),
                                 ),
                                 onPressed: () async {
+                                  await context.setLocale(Locale('ar'));
+
                                   setState(() {
                                     lang = "ar";
                                   });
 
-                                  context.setLocale(Locale('ar'));
-
                                   if (widget.router == "account") {
-                                    Navigator.pop(context);
+                                    // Navigator.pop(context);
+                                    setState(() {
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                SplashScreen()),
+                                      );
+                                    });
                                   } else {
                                     SharedPreferences preferences =
                                         await SharedPreferences.getInstance();
@@ -159,7 +173,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                                 child: Container(
                                   child: Center(
                                     child: Text(
-                                      "English",
+                                      LocaleKeys.english.tr(),
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.grey[600],
@@ -168,12 +182,20 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                                   ),
                                 ),
                                 onPressed: () async {
+                                  await context.setLocale(Locale('en'));
                                   setState(() {
                                     lang = "default";
                                   });
-                                  context.setLocale(Locale('en'));
+
                                   if (widget.router == "account") {
-                                    Navigator.pop(context);
+                                    setState(() {
+                                      // Navigator.pop(context);
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                SplashScreen()),
+                                      );
+                                    });
                                   } else {
                                     SharedPreferences preferences =
                                         await SharedPreferences.getInstance();
@@ -182,12 +204,12 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                                         null) {
                                       guestId =
                                           preferences.getString("guestId");
+                                      print('guestID = $guestId');
                                     }
                                     preferences.clear();
                                     preferences.setString("userType", "guest");
                                     if (guestId != "") {
                                       preferences.setString("guestId", guestId);
-                                      print(preferences.getString("guestId"));
                                       Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
                                           builder: (BuildContext context) =>

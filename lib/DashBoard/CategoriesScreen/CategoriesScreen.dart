@@ -8,8 +8,13 @@ import 'package:menahub/Util/Api/ApiResponseModel.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/config/CustomLoader.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CategoriesScreen extends StatefulWidget {
+  CategoriesScreen({this.router});
+  String router;
   @override
   _CategoriesScreenState createState() => _CategoriesScreenState();
 }
@@ -21,7 +26,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   int rightMenuTappedIndex;
   int leftMenuTappedIndex;
   int subListTappedIndex;
-
+  int subListTappedIndex2;
   Color selectedbtncolor = whiteColor;
   Color selectedtextcolor = redColor;
   Color unselectedbtncolor = Colors.grey[200];
@@ -46,7 +51,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         context: context);
     if (responseData.statusCode == 200) {
       Map categoriesMap = responseData.responseValue[0][0];
+
       List categoriesList = categoriesMap["children"];
+      print('category MAp=$categoriesMap');
+      print('categoriesList MAp=$categoriesList');
+
       setState(() {
         categoriesLists = categoriesList;
         for (var i = 0; i < categoriesLists.length; i++)
@@ -62,13 +71,21 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     return InkWell(
       onTap: () {
         setState(() {
-          rightMenuTappedIndex = index;
+          rightMenuTappedIndex =
+              rightMenuTappedIndex == null || rightMenuTappedIndex != index
+                  ? index
+                  : null;
+
           leftMenuTappedIndex = null;
           subListTappedIndex = null;
+          subListTappedIndex2 = null;
         });
       },
       child: Container(
-        decoration: BoxDecoration(color: colorLists[index]),
+        // decoration: BoxDecoration( color: colorLists[index]),
+        decoration: BoxDecoration(
+            color: index % 2 == 0 ? Colors.black12 : Colors.white),
+
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -83,7 +100,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         values["name"],
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.bold,
                           color: rightMenuTappedIndex == index
                               ? appBarColor
                               : blackColor,
@@ -109,7 +126,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           margin: EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: colorLists[index],
+                            // color: colorLists[index],
+                            color:
+                                index % 2 == 0 ? Colors.white : Colors.black12,
                           ),
                         ),
                         Container(
@@ -179,7 +198,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   ),
                   filtertypeList(subList: values["children"]),
                 ],
-              )
+              ),
           ],
         ),
       ),
@@ -202,64 +221,148 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   filtertypeItem(values, index) {
     List subList = values["children"];
+    print(subList);
     print("sublist count ${subList.length}");
     print(subList.length);
-    return InkWell(
-      onTap: () {
-        setState(() {
-          leftMenuTappedIndex = index;
-          subListTappedIndex = index;
-          if (subList.isNotEmpty) {
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (contexts) => ProductsDetailsScreen(
-                  productId: values["id"],
-                  title: values["name"],
-                ),
-              ),
-            );
-          }
-        });
-      },
-      child: Container(
-        color: whiteColor,
-        child: Padding(
-          padding:
-              const EdgeInsets.only(left: 20, right: 30, bottom: 10, top: 10),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "${values["name"]} (${values["product_count"]})",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: leftMenuTappedIndex == index
-                          ? appBarColor
-                          : blackColor,
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            setState(() {
+              leftMenuTappedIndex =
+                  leftMenuTappedIndex == null || leftMenuTappedIndex != index
+                      ? index
+                      : null;
+              // subListTappedIndex = index;
+              // subListTappedIndex =
+              //     subListTappedIndex == null || subListTappedIndex != index
+              //         ? index
+              //         : null;
+
+              if (subList.isNotEmpty) {
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (contexts) => ProductsDetailsScreen(
+                      productId: values["id"],
+                      title: values["name"],
                     ),
                   ),
-                  if (subList.isNotEmpty)
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      color: leftMenuTappedIndex == index
-                          ? appBarColor
-                          : blackColor,
-                    ),
+                );
+              }
+            });
+          },
+          child: Container(
+            color: whiteColor,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 20, right: 30, bottom: 10, top: 10),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${values["name"]} (${values["product_count"]})",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: leftMenuTappedIndex == index
+                              ? appBarColor
+                              : blackColor,
+                        ),
+                      ),
+                      if (subList.isNotEmpty)
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          color: leftMenuTappedIndex == index
+                              ? appBarColor
+                              : blackColor,
+                        ),
+                    ],
+                  ),
+                  // if select any field show
+                  if (leftMenuTappedIndex == index)
+                    subListcatogry(subList: values["children"]),
                 ],
               ),
-              // if select any field show
-              if (subListTappedIndex == index)
-                subListcatogry(subList: values["children"]),
-            ],
+            ),
           ),
         ),
-      ),
+      ],
+    );
+  }
+
+  filtertypeItem2(values, index) {
+    List subList = values["children"];
+    print(subList);
+    print("sublist count ${subList.length}");
+    print(subList.length);
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            setState(() {
+              subListTappedIndex =
+                  subListTappedIndex == null || subListTappedIndex != index
+                      ? index
+                      : null;
+
+              if (subList.isNotEmpty) {
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (contexts) => ProductsDetailsScreen(
+                      productId: values["id"],
+                      title: values["name"],
+                    ),
+                  ),
+                );
+              }
+            });
+          },
+          child: Container(
+            color: whiteColor,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 20, right: 30, bottom: 10, top: 10),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${values["name"]} (${values["product_count"]})",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: leftMenuTappedIndex == index
+                              ? appBarColor
+                              : blackColor,
+                        ),
+                      ),
+                      if (subList.isNotEmpty)
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          color: leftMenuTappedIndex == index
+                              ? appBarColor
+                              : blackColor,
+                        ),
+                    ],
+                  ),
+                  // if select any field show
+                  if (subListTappedIndex == index)
+                    subListcatogry(subList: values["children"]),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -272,7 +375,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       scrollDirection: Axis.vertical,
       itemCount: subList.length,
       itemBuilder: (context, index) {
-        return filtertypeItem(subList[index], index);
+        return filtertypeItem2(subList[index], index);
       },
     );
   }
@@ -281,36 +384,40 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     List subList = values["children"];
     print("sublist count ${subList.length}");
     print(subList.length);
-    return InkWell(
-      onTap: () {
-        setState(() {
-          subListTappedIndex = index;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (contexts) => ProductsDetailsScreen(
-                productId: values["id"],
-                title: values["name"],
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            setState(() {
+              subListTappedIndex = index;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (contexts) => ProductsDetailsScreen(
+                    productId: values["id"],
+                    title: values["name"],
+                  ),
+                ),
+              );
+            });
+          },
+          child: Container(
+            color: whiteColor,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 20, right: 30, bottom: 10, top: 10),
+              child: Text(
+                "${values["name"]} (${values["product_count"]})",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: subListTappedIndex == index ? appBarColor : blackColor,
+                ),
               ),
-            ),
-          );
-        });
-      },
-      child: Container(
-        color: whiteColor,
-        child: Padding(
-          padding:
-              const EdgeInsets.only(left: 20, right: 30, bottom: 10, top: 10),
-          child: Text(
-            "${values["name"]} (${values["product_count"]})",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: subListTappedIndex == index ? appBarColor : blackColor,
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -326,10 +433,46 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: SafeArea(
-        top: false,
+        top: widget.router != "search" ? false : true,
         child: Scaffold(
+          appBar: widget.router != "search"
+              ? null
+              : AppBar(
+                  centerTitle: true,
+                  iconTheme: IconThemeData(color: Colors.black),
+                  title: Text(
+                    "Categories",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  leading: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: whiteColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }),
+                  backgroundColor: appBarColor,
+                  brightness: Brightness.dark,
+                  elevation: 0,
+                  flexibleSpace: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: <Color>[
+                          const Color(0xFF02161F),
+                          const Color(0xFF0B3B52),
+                          const Color(0xFF103D52),
+                          const Color(0xFF304C58),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
           body: Container(
             width: double.infinity,
             height: double.infinity,
@@ -374,8 +517,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 enabled: false,
                                 decoration: new InputDecoration(
                                   border: InputBorder.none,
-                                  hintText:
-                                      'Search by Products, Brands & More...',
+                                  hintText: LocaleKeys.search.tr(),
                                   hintStyle: TextStyle(color: Colors.white),
                                   prefixIcon: const Icon(
                                     Icons.search,

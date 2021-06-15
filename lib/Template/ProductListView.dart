@@ -37,8 +37,9 @@ class _ProductListState extends State<ProductList> {
 
   Future<Map> sendCountriesDataRequest(int page) async {
     print('page $page');
+
     String url =
-        'https://uat2.menahub.com/rest/default/V1/products?searchCriteria[filter_groups][0][filters][0][field]=category_id&searchCriteria[filter_groups][0][filters][0][condition_type]=eq&searchCriteria[pageSize]=20&searchCriteria[filter_groups][0][filters][0][value]=${widget.searchId}&searchCriteria[current_page]=$page';
+        '$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=category_id&searchCriteria[filter_groups][0][filters][0][condition_type]=eq&searchCriteria[pageSize]=20&searchCriteria[filter_groups][0][filters][0][value]=${widget.searchId}&searchCriteria[current_page]=$page';
     http.Response response = await http.get(
       Uri.parse(url),
     );
@@ -127,7 +128,7 @@ class _ProductListState extends State<ProductList> {
                     Row(
                       children: [
                         Text(
-                          "QAR ${value["price"]}",
+                          "QAR ${double.parse(value["price"]).toStringAsFixed(2)}",
                           style: TextStyle(
                               color: secondaryColor,
                               fontSize: 14,

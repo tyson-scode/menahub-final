@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:menahub/Address/SelectAddressScreen.dart';
+import 'package:menahub/Address/setbillingAddress.dart';
 import 'package:menahub/OrdersInfo/OrderSuccessScreen.dart';
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:menahub/Util/Api/ApiResponseModel.dart';
@@ -10,13 +11,28 @@ import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/AppLoader.dart';
 import 'package:menahub/config/CustomLoader.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PaymentMethodChoose extends StatefulWidget {
   final Map screenInfo;
   final Map billingAddress;
+  final Map shippingAddress;
+  final String router;
+  final Map paymentMethods;
+  final int paymentid;
+  final bool agree;
   final String cartId;
-  PaymentMethodChoose({this.screenInfo, this.billingAddress, this.cartId});
+  PaymentMethodChoose(
+      {this.screenInfo,
+      this.billingAddress,
+      this.cartId,
+      this.shippingAddress,
+      this.router,
+      this.paymentMethods,
+      this.paymentid,
+      this.agree});
   @override
   _PaymentMethodChooseState createState() => _PaymentMethodChooseState();
 }
@@ -24,18 +40,30 @@ class PaymentMethodChoose extends StatefulWidget {
 class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
   int selectedRadio = 0;
   bool agree = false;
+  bool addressagree = true;
   bool otherinfovisible = false;
+  bool payment = false;
+  bool checkbox = false;
   List paymentList;
   Map paymentInformation;
-  int paymentTypeId = 0;
+  int paymentTypeId;
   String orderId;
+  String paymentType;
+
   void initState() {
     super.initState();
     selectedRadio = 0;
     paymentList = widget.screenInfo["payment_methods"];
     print("payment info $paymentList");
     print('address = ${widget.billingAddress}');
+    print('address = ${widget.shippingAddress}');
+
     paymentInformation = widget.screenInfo["totals"];
+    widget.router == "billing"
+        ? paymentTypeId = widget.paymentid
+        : paymentTypeId;
+    widget.router == "billing" ? checkbox = widget.agree : checkbox;
+    widget.router == "billing" ? addressagree = false : false;
   }
 
   setPaymentInformation() async {
@@ -49,7 +77,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
     };
     var body = jsonEncode({
       "cartId": widget.cartId,
-      "paymentMethod": {"method": "cashondelivery"},
+      "paymentMethod": {"method": paymentType},
       "billingAddress": {
         "customerAddressId": widget.billingAddress["save_in_address_book"],
         "countryId": widget.billingAddress["country_id"],
@@ -146,11 +174,12 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
         "saveInAddressBook": null
       },
       "paymentMethod": {
-        "method": "cashondelivery",
+        "method": paymentType,
         "po_number": null,
         "additional_data": null
       }
     });
+//    print(body['paymentMethod']);
     ApiResponseModel responseData = await postApiCall(
       postUrl: "$placeOrderApi",
       headers: headers,
@@ -163,7 +192,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
 
     if (responseData.statusCode == 200) {
       overlay.hide();
-
+      print(orderId);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -186,6 +215,9 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.grey.shade200,
@@ -243,7 +275,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                                     padding:
                                         const EdgeInsets.fromLTRB(15, 5, 0, 5),
                                     child: Text(
-                                      'Delivery Details',
+                                      LocaleKeys.Delivery_Details.tr(),
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -257,7 +289,10 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(20, 8, 0, 0),
                                 child: Row(
-                                  children: [Text('Address Type: Home')],
+                                  children: [
+                                    Text(LocaleKeys.Address_Type.tr() +
+                                        ': ${widget.billingAddress["company"] == null ? LocaleKeys.home.tr() : LocaleKeys.Work.tr()}')
+                                  ],
                                 ),
                               ),
                               Row(
@@ -291,8 +326,8 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                                       padding:
                                           const EdgeInsets.fromLTRB(0, 0, 5, 0),
                                       child: Icon(
-                                        Icons.keyboard_arrow_right,
-                                        size: 30,
+                                        Icons.arrow_forward_ios_rounded,
+                                        size: 20,
                                       ),
                                     ),
                                   ),
@@ -315,7 +350,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(20, 10, 0, 8),
                         child: Text(
-                          'Additional Information',
+                          LocaleKeys.Additional_Information.tr(),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -342,7 +377,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                                   padding:
                                       const EdgeInsets.fromLTRB(20, 8, 0, 10),
                                   child: Text(
-                                    'Other Details',
+                                    LocaleKeys.Other_Details.tr(),
                                     style: TextStyle(
                                         fontWeight: otherinfovisible == true
                                             ? FontWeight.bold
@@ -354,8 +389,8 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                               flex: 1,
                               fit: FlexFit.tight,
                               child: Icon(
-                                Icons.keyboard_arrow_right,
-                                size: 30,
+                                Icons.arrow_forward_ios_rounded,
+                                size: 20,
                               ),
                             )
                           ],
@@ -376,28 +411,28 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                                child: TextField(
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  //enabled: false,
-                                  decoration: new InputDecoration(
-                                    // hintText:
-                                    //     'Lorem Ipsum is simply dummy text of printing and typesetting industry.Lorem Ipsum has been the industrys standard dummy text ever since the 1500s',
-                                    hintMaxLines: 5,
-                                    hintStyle: TextStyle(fontSize: 14),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    border: OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: Colors.black)),
-                                  ),
-                                ),
-                              ),
+                              // Padding(
+                              //   padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                              //   child: TextField(
+                              //     keyboardType: TextInputType.multiline,
+                              //     maxLines: null,
+                              //     //enabled: false,
+                              //     decoration: new InputDecoration(
+                              //       // hintText:
+                              //       //     'Lorem Ipsum is simply dummy text of printing and typesetting industry.Lorem Ipsum has been the industrys standard dummy text ever since the 1500s',
+                              //       hintMaxLines: 5,
+                              //       hintStyle: TextStyle(fontSize: 14),
+                              //       focusedBorder: OutlineInputBorder(
+                              //         borderSide: BorderSide(
+                              //           color: Colors.black,
+                              //         ),
+                              //       ),
+                              //       border: OutlineInputBorder(
+                              //           borderSide:
+                              //           BorderSide(color: Colors.black)),
+                              //     ),
+                              //   ),
+                              // ),
                               CheckboxListTile(
                                 activeColor: Theme.of(context).accentColor,
                                 controlAffinity:
@@ -406,7 +441,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                                   transform:
                                       Matrix4.translationValues(-18, 0.0, 0.0),
                                   child: Text(
-                                    'I agree to the terms and conditions and the privacy policy*',
+                                    LocaleKeys.agree.tr(),
                                     style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold),
@@ -416,6 +451,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                                 onChanged: (bool value) {
                                   setState(() {
                                     agree = value;
+                                    checkbox = true;
                                   });
                                 },
                               ),
@@ -425,7 +461,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                                     padding:
                                         const EdgeInsets.fromLTRB(50, 0, 0, 10),
                                     child: Text(
-                                      "[ Required *]",
+                                      LocaleKeys.required.tr(),
                                       style: TextStyle(color: Colors.red),
                                     ),
                                   )),
@@ -482,13 +518,14 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                 Container(
                   color: Colors.white,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Row(
                         children: [
                           Padding(
                             padding: const EdgeInsets.fromLTRB(15, 10, 0, 10),
                             child: Text(
-                              'Choose Payment',
+                              LocaleKeys.Choose_Payment.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -510,6 +547,11 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                               onTap: () {
                                 setState(() {
                                   paymentTypeId = index;
+                                  print('payment =$paymentTypeId');
+                                  checkbox = true;
+                                  payment = false;
+                                  paymentType = paymentList[index]["code"];
+                                  print(paymentType);
                                 });
                               },
                               child: Column(
@@ -549,6 +591,327 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                           },
                         ),
                       ),
+                      Visibility(
+                          visible: payment == true ? true : false,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 10, 0, 10),
+                            child: Text(
+                              LocaleKeys.valid_payment.tr(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.red),
+                            ),
+                          )),
+                      Container(
+                        child: Column(
+                          children: [
+                            widget.router == "billing"
+                                ? Container()
+                                : Visibility(
+                                    visible: checkbox == true ? true : false,
+                                    child: CheckboxListTile(
+                                      activeColor:
+                                          Theme.of(context).accentColor,
+                                      controlAffinity:
+                                          ListTileControlAffinity.leading,
+                                      title: Transform(
+                                        transform: Matrix4.translationValues(
+                                            -18, 0.0, 0.0),
+                                        child: Text(
+                                          LocaleKeys.shipping_billing.tr(),
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      value: addressagree,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          addressagree = value;
+                                          print("address =$addressagree");
+                                        });
+                                      },
+                                    ),
+                                  ),
+                            Visibility(
+                              visible: checkbox == true ? true : false,
+                              child: Container(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Container(
+                                        margin: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 2, color: orangeColor)),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Text(
+                                                  LocaleKeys.SHIPPING_ADDRESS
+                                                      .tr(),
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    '${widget.shippingAddress["firstname"]}' +
+                                                        ' ' +
+                                                        '${widget.shippingAddress["lastname"]}',
+                                                    softWrap: true,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Text(
+                                                '${widget.shippingAddress["street"][0]},',
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Text(
+                                                '${widget.shippingAddress["city"]},',
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Text(
+                                                '${widget.shippingAddress["postcode"]},',
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 8),
+                                              child: Text(
+                                                '${widget.shippingAddress["telephone"]},',
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    sizedBoxheight5,
+                                    Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Container(
+                                        margin: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 2, color: orangeColor)),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Text(
+                                                  LocaleKeys.BILLING_ADDRESS
+                                                      .tr(),
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    '${widget.billingAddress["firstname"]}' +
+                                                        ' ' +
+                                                        '${widget.billingAddress["lastname"]}',
+                                                    softWrap: true,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              SelectbillingAddressScreen(
+                                                            agree: checkbox,
+                                                            paymentid:
+                                                                paymentTypeId,
+                                                            screenInfo: widget
+                                                                .screenInfo,
+                                                            cartId:
+                                                                widget.cartId,
+                                                            shippingAddress: widget
+                                                                .shippingAddress,
+                                                            paymentMethods: widget
+                                                                .paymentMethods,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          20, 0, 10, 0),
+                                                      child: Row(
+                                                        children: [
+                                                          Visibility(
+                                                            visible:
+                                                                addressagree ==
+                                                                        true
+                                                                    ? false
+                                                                    : true,
+                                                            child: Icon(
+                                                              Icons.mode_edit,
+                                                              size: 20,
+                                                            ),
+                                                          ),
+                                                          sizedBoxwidth5,
+                                                          Visibility(
+                                                            visible:
+                                                                addressagree ==
+                                                                        true
+                                                                    ? false
+                                                                    : true,
+                                                            child: Text(
+                                                              LocaleKeys.Edit
+                                                                  .tr(),
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Text(
+                                                '${widget.billingAddress["street"][0]},',
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Text(
+                                                '${widget.billingAddress["city"]},',
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 0),
+                                              child: Text(
+                                                '${widget.billingAddress["postcode"]},',
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 8, 0, 8),
+                                              child: Text(
+                                                '${widget.billingAddress["telephone"]},',
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       SizedBox(
                         height: 120,
                       ),
@@ -557,7 +920,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                         child: Row(
                           children: [
                             Text(
-                              'PRICE DETAILS',
+                              LocaleKeys.PRICE_DETAILS.tr(),
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -572,10 +935,11 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
+                            Text(LocaleKeys.Sub_Total.tr() +
+                                ' (${paymentInformation["items_qty"]})' +
+                                LocaleKeys.items.tr()),
                             Text(
-                                'Sub Total (${paymentInformation["items_qty"]} items)'),
-                            Text(
-                              'QAR ${paymentInformation["subtotal"]}',
+                              'QAR ${(paymentInformation["subtotal"]).toStringAsFixed(2).toString()}',
                               style: TextStyle(color: Colors.blue),
                             ),
                           ],
@@ -586,9 +950,9 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text('Shipping'),
+                            Text(LocaleKeys.Shipping.tr()),
                             Text(
-                              'QAR ${paymentInformation["shipping_amount"]}',
+                              'QAR ${(paymentInformation["shipping_amount"]).toStringAsFixed(2).toString()}',
                               style: TextStyle(color: Colors.blue),
                             ),
                           ],
@@ -611,11 +975,11 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
-                              'Grand Total',
+                              LocaleKeys.Grand_Total.tr(),
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              'QAR ${paymentInformation["grand_total"]}',
+                              'QAR ${(paymentInformation["grand_total"].toStringAsFixed(2).toString())}',
                               style: TextStyle(
                                   color: Colors.blue,
                                   fontWeight: FontWeight.bold),
@@ -669,14 +1033,18 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
                               const Color(0xFFF5BB2A),
                             ])),
                         child: Text(
-                          'Place Order Request',
+                          LocaleKeys.Place_Order.tr(),
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
                       ),
                       onPressed: () {
-                        if (agree == false) {
+                        if (paymentTypeId == null) {
+                          setState(() {
+                            payment = true;
+                          });
+                        } else if (agree == false) {
                           setState(() {
                             otherinfovisible = true;
                           });

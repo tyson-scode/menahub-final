@@ -3,6 +3,9 @@ import 'package:menahub/SignIn_SignUp_Flow/SignInScreen/SignInScreen.dart';
 import 'dart:ui';
 
 import 'package:menahub/Util/ConstantData.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class EnquireNowScreen extends StatefulWidget {
   @override
@@ -18,6 +21,9 @@ class _EnquireNowScreenState extends State<EnquireNowScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
@@ -39,7 +45,7 @@ class _EnquireNowScreenState extends State<EnquireNowScreen> {
                     padding: const EdgeInsets.fromLTRB(15, 15, 20, 15),
                     child: Center(
                       child: Text(
-                        "Work In Progress",
+                        LocaleKeys.enquirescreen.tr(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           letterSpacing: 1,

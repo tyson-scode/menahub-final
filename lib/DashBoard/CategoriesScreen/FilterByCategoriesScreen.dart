@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:menahub/ProductsDetails/ProductsDetailsScreen.dart';
 import 'package:menahub/Util/ConstantData.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class FilterByCategoriesScreen extends StatefulWidget {
   final List categoriesList;
@@ -86,6 +87,9 @@ class _FilterByCategoriesScreenState extends State<FilterByCategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         top: false,

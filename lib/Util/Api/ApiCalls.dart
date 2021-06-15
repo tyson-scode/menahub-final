@@ -38,8 +38,8 @@ Future<ApiResponseModel> postApiCall({
   BuildContext context,
 }) async {
   print("PostApiCall: " + postUrl);
-  // print("Headers: " + headers.toString());
-  //print("body: " + body);
+  print('body');
+  print(body);
   http.Response response = await http.post(
     Uri.parse(postUrl),
     body: body,
@@ -66,9 +66,9 @@ Future<ApiResponseModel> putApiCall({
   Map<String, String> headers,
   BuildContext context,
 }) async {
-  // print("PutApiCall: " + postUrl);
+  print("PutApiCall: " + postUrl);
   // print("Headers: " + headers.toString());
-  // print("body: " + body);
+  print("body: " + body);
   http.Response response = await http.put(
     Uri.parse(postUrl),
     body: body,

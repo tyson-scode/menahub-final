@@ -6,6 +6,7 @@ import 'package:menahub/SignIn_SignUp_Flow/LanguageSelectScreen.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/config/CustomBackground.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -20,6 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
       () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String token = prefs.getString('token');
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        print(preferences.getString("firebasetoken"));
         if (token != null) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -38,6 +41,9 @@ class _SplashScreenState extends State<SplashScreen> {
       },
     );
     return MaterialApp(
+      // localizationsDelegates: context.localizationDelegates,
+      // supportedLocales: context.supportedLocales,
+      // locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Stack(children: [

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:menahub/Util/Api/ApiResponseModel.dart';
+import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
 import 'ReviewCard.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ReviewScreen extends StatefulWidget {
   final productId;
@@ -27,14 +30,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
     };
 
     ApiResponseModel response = await getApiCall(
-      getUrl:
-          "https://magento2blog.thestagings.com/rest/default/V1/mstore/review/reviews/5058",
+      getUrl: "${getReview}${widget.productId}",
       headers: headers,
       context: context,
     );
     List responseData = response.responseValue;
     if (response.statusCode == 200) {
       List reviewsList = responseData[0]["reviews"];
+      print(responseData);
       print(reviewsList.length);
       setState(() {
         _items = reviewsList;
@@ -48,7 +51,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
       appBar: AppBar(
         elevation: 0.0,
         title: Text(
-          "Reviews",
+          LocaleKeys.Reviews.tr(),
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
@@ -71,7 +74,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 20, left: 20, bottom: 0),
               child: Text(
-                "${_items.length} Review",
+                "${_items.length} " + LocaleKeys.Reviews.tr(),
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.grey,

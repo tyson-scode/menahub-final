@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:menahub/CustomWidget/CustomButton.dart';
 import 'package:menahub/CustomWidget/CustomTextBox.dart';
 import 'package:menahub/SignIn_SignUp_Flow/SignInScreen/SignInScreen.dart';
@@ -11,6 +12,10 @@ import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/CustomBackground.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ResetPassword extends StatefulWidget {
   final String code;
@@ -65,17 +70,26 @@ class _ResetPasswordState extends State<ResetPassword> {
       progress.dismiss();
       Map response = responseData.responseValue;
       String errorMessage = response["message"];
+      Fluttertoast.showToast(
+        msg: errorMessage,
+        // toastLength: Toast.LENGTH_LONG,
+        // gravity: ToastGravity.CENTER,
+        // timeInSecForIosWeb: 10,
+        // backgroundColor: Colors.red,
+        // textColor: Colors.white,
+        // fontSize: 16.0,
+      );
       // errorAlert(context: context, errorMessage: errorMessage);
       print(errorMessage);
-      AlertDialog alert = AlertDialog(
-        content: Text(errorMessage),
-      );
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        },
-      );
+      // AlertDialog alert = AlertDialog(
+      //   content: Text(errorMessage),
+      // );
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return alert;
+      //   },
+      // );
     }
   }
 
@@ -102,6 +116,15 @@ class _ResetPasswordState extends State<ResetPassword> {
     if (responseData.statusCode == 200) {
       setState(() {
         progress.dismiss();
+        Fluttertoast.showToast(
+          msg: LocaleKeys.reset_success.tr(),
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 10,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         Navigator.pop(context);
       });
     } else {
@@ -110,14 +133,8 @@ class _ResetPasswordState extends State<ResetPassword> {
       String errorMessage = response["message"];
       // errorAlert(context: context, errorMessage: errorMessage);
       print(errorMessage);
-      AlertDialog alert = AlertDialog(
-        content: Text(errorMessage),
-      );
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        },
+      Fluttertoast.showToast(
+        msg: errorMessage,
       );
     }
   }
@@ -129,7 +146,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         Container(
           padding: EdgeInsets.only(top: 30, left: 30),
           child: Text(
-            'New Password ',
+            LocaleKeys.New_Password.tr(),
             style: TextStyle(
               color: Colors.grey[500],
             ),
@@ -143,7 +160,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         Container(
           padding: EdgeInsets.only(top: 15, left: 30),
           child: Text(
-            'Confirm Password',
+            LocaleKeys.Confirm_Password.tr(),
             style: TextStyle(
               color: Colors.grey[500],
             ),
@@ -153,6 +170,9 @@ class _ResetPasswordState extends State<ResetPassword> {
     );
 
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: ProgressHUD(
@@ -203,7 +223,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                                                 padding: const EdgeInsets.only(
                                                     bottom: 20, top: 70),
                                                 child: Text(
-                                                  'Reset Password',
+                                                  LocaleKeys.Reset_Password
+                                                      .tr(),
                                                   style: TextStyle(
                                                     fontSize: 27,
                                                     fontWeight:
@@ -217,7 +238,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                                                 padding: const EdgeInsets.only(
                                                     bottom: 10),
                                                 child: Text(
-                                                  'Please set your new password',
+                                                  LocaleKeys.Set_New_Password
+                                                      .tr(),
                                                   style: TextStyle(
                                                     fontSize: 13,
                                                     color: Colors.grey[500],
@@ -237,7 +259,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                                       top: 5, left: 20, right: 20),
                                   child: customTextBox(
                                     icons: "assets/icon/lockIcon.png",
-                                    hintText: "New Password",
+                                    hintText: LocaleKeys.New_Password.tr(),
                                     controller: newPasswordTextField,
                                     passwordField: true,
                                     keyboardType: TextInputType.visiblePassword,
@@ -250,7 +272,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                                       top: 5, left: 20, right: 20),
                                   child: customTextBox(
                                     icons: "assets/icon/lockIcon.png",
-                                    hintText: "Confirm Password",
+                                    hintText: LocaleKeys.Confirm_Password.tr(),
                                     controller: confirmPasswordTextField,
                                     passwordField: true,
                                     keyboardType: TextInputType.visiblePassword,
@@ -269,16 +291,25 @@ class _ResetPasswordState extends State<ResetPassword> {
                                           passwordReset(contexts: context);
                                         }
                                       } else {
-                                        AlertDialog alert = AlertDialog(
-                                          content: Text(
-                                              "Your password and confirmation password do not match."),
+                                        Fluttertoast.showToast(
+                                          msg: LocaleKeys.match_password.tr(),
+                                          toastLength: Toast.LENGTH_LONG,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 10,
+                                          backgroundColor: Colors.red,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0,
                                         );
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return alert;
-                                          },
-                                        );
+                                        // AlertDialog alert = AlertDialog(
+                                        //   content: Text(
+                                        //       "Your password and confirmation password do not match."),
+                                        // );
+                                        // showDialog(
+                                        //   context: context,
+                                        //   builder: (BuildContext context) {
+                                        //     return alert;
+                                        //   },
+                                        // );
                                       }
                                     } else {
                                       setState(() {
@@ -289,7 +320,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                                   child: Container(
                                     width: 220,
                                     child: customGradientButton(
-                                        title: "Continue",
+                                        title: LocaleKeys.Continue.tr(),
                                         backgroundColor: primaryColor),
                                   ),
                                 )
@@ -312,7 +343,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 child: Row(
                   children: <Widget>[
                     Text(
-                      'Already have an account?',
+                      LocaleKeys.already_account.tr(),
                       style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                     ),
                     GestureDetector(
@@ -324,7 +355,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                               ));
                         },
                         child: new Text(
-                          '  sign in',
+                          LocaleKeys.sign_in.tr(),
                           style: new TextStyle(
                               fontSize: 13,
                               color: Colors.blue,

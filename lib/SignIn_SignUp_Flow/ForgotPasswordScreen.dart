@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:menahub/Util/StaticFunction.dart';
 import 'package:flutter/material.dart';
 import 'package:menahub/CustomWidget/CustomButton.dart';
@@ -9,8 +11,11 @@ import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/CustomBackground.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'SignInScreen/SignInScreen.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -24,6 +29,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _autoValidate = false;
 
   passwordForgot() async {
+    // final progress = ProgressHUD.of(context);
+    // progress.show();
     var body = jsonEncode({
       "telephone": emailTextField.text,
       "code": countryCode.replaceAll("+", ""),
@@ -40,17 +47,74 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         context: context);
     print(responseData.responseValue);
     if (responseData.statusCode == 200) {
-      setState(() {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) => OtpVerify(
-              mobilenumber: emailTextField.text,
-              code: countryCode.replaceAll("+", ""),
-            ),
-          ),
+      // progress.dismiss();
+      print(responseData.responseValue);
+      Map response = responseData.responseValue[0];
+      bool status = response["status"];
+      print(response);
+      print(status);
+      if (status == true) {
+        Fluttertoast.showToast(
+          msg: LocaleKeys.OTP_Sent.tr(),
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 10,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
-      });
+        setState(() {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) => OtpVerify(
+                mobilenumber: emailTextField.text,
+                code: countryCode.replaceAll("+", ""),
+              ),
+            ),
+          );
+        });
+      } else {
+        Fluttertoast.showToast(
+          msg: LocaleKeys.error.tr(),
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 10,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+      // status == true
+      //     ? Fluttertoast.showToast(
+      //         msg: 'OTP Has Been Sent To Your Mobile',
+      //         // toastLength: Toast.LENGTH_LONG,
+      //         // gravity: ToastGravity.CENTER,
+      //         // timeInSecForIosWeb: 10,
+      //         // backgroundColor: Colors.red,
+      //         // textColor: Colors.white,
+      //         // fontSize: 16.0,
+      //       )
+      //     : Fluttertoast.showToast(
+      //         msg: 'SomeError Occurs',
+      //         // toastLength: Toast.LENGTH_LONG,
+      //         // gravity: ToastGravity.CENTER,
+      //         // timeInSecForIosWeb: 10,
+      //         // backgroundColor: Colors.red,
+      //         // textColor: Colors.white,
+      //         // fontSize: 16.0,
+      //       );
+      // setState(() {
+      //   Navigator.of(context).push(
+      //     MaterialPageRoute(
+      //       builder: (BuildContext context) => OtpVerify(
+      //         mobilenumber: emailTextField.text,
+      //         code: countryCode.replaceAll("+", ""),
+      //       ),
+      //     ),
+      //   );
+      // });
     } else {
+      //progress.dismiss();
       print(responseData);
     }
   }
@@ -58,6 +122,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Stack(
@@ -103,7 +170,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           padding: const EdgeInsets.only(
                                               bottom: 15, top: 0),
                                           child: Text(
-                                            'Forgot Password',
+                                            LocaleKeys.Forgot.tr(),
                                             style: TextStyle(
                                               fontSize: 27,
                                               fontWeight: FontWeight.normal,
@@ -116,7 +183,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           padding:
                                               const EdgeInsets.only(bottom: 3),
                                           child: Text(
-                                            'Enter your email address to reset',
+                                            LocaleKeys.Enter_Mobile_Reset.tr(),
                                             style: TextStyle(
                                               fontSize: 13,
                                               color: Colors.grey[600],
@@ -129,7 +196,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                           padding:
                                               const EdgeInsets.only(bottom: 0),
                                           child: Text(
-                                            'your password',
+                                            LocaleKeys.Your_Password.tr(),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 13,
@@ -153,7 +220,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   left: 40,
                                 ),
                                 child: Text(
-                                  'Email / Mobile Number',
+                                  LocaleKeys.Mobile.tr(),
                                   style: TextStyle(
                                     color: Colors.grey[600],
                                   ),
@@ -178,7 +245,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                       DropdownButton<String>(
                                         underline: Container(),
                                         value: countryCode,
-                                        items: <String>['+ 91', '+ 974']
+                                        items: <String>['+91', '+974']
                                             .map((String value) {
                                           return new DropdownMenuItem<String>(
                                             value: value,
@@ -206,36 +273,37 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                             disabledBorder: InputBorder.none,
                                             contentPadding: EdgeInsets.only(
                                                 left: 15, right: 15),
-                                            hintText: "Email / Mobile Number",
+                                            hintText: LocaleKeys.Mobile.tr(),
                                             hintStyle: TextStyle(
                                               fontWeight: FontWeight.w500,
                                               color: greyColor,
                                             ),
                                           ),
                                           validator: (value) {
-                                            bool isemail = false;
                                             if (value.isEmpty) {
-                                              return "Email / Mobile Number";
-                                            } else if (value.isNotEmpty) {
-                                              try {
-                                                print(int.parse(value[0]));
-                                                isemail = false;
-                                              } on Exception catch (_) {
-                                                isemail = true;
-                                                print('never reached');
-                                              }
-                                              if (isemail) {
-                                                final validyEmail =
-                                                    emailvalidation(
-                                                        email: value);
-                                                if (validyEmail != true) {
-                                                  return 'Please enter valid Email';
-                                                } else
-                                                  return null;
-                                              } else
-                                                return null;
-                                            } else
-                                              return null;
+                                              return 'Please Enter Mobile Number';
+                                            }
+                                            if (countryCode == '+91' &&
+                                                value.length < 10) {
+                                              return LocaleKeys.valid_mobile1
+                                                  .tr();
+                                            }
+                                            if (countryCode == '+91' &&
+                                                value.length > 10) {
+                                              return LocaleKeys.valid_mobile
+                                                  .tr();
+                                            }
+                                            if (countryCode == '+974' &&
+                                                value.length < 8) {
+                                              return LocaleKeys.valid_mobile
+                                                  .tr();
+                                            }
+                                            if (countryCode == '+974' &&
+                                                value.length > 8) {
+                                              return LocaleKeys.valid_mobile
+                                                  .tr();
+                                            }
+                                            return null;
                                           },
                                         ),
                                       )
@@ -259,7 +327,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             child: Container(
                               width: 220,
                               child: customGradientButton(
-                                  title: "Continue",
+                                  title: LocaleKeys.Continue.tr(),
                                   backgroundColor: primaryColor),
                             ),
                           )
@@ -279,7 +347,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Row(
             children: <Widget>[
               Text(
-                'Already have an account?',
+                LocaleKeys.already_account.tr(),
                 style: TextStyle(fontSize: 13, color: Colors.grey[600]),
               ),
               GestureDetector(
@@ -291,7 +359,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ));
                   },
                   child: new Text(
-                    '  Sign in',
+                    LocaleKeys.sign_in.tr(),
                     style: new TextStyle(
                         fontSize: 13,
                         color: Colors.blue,

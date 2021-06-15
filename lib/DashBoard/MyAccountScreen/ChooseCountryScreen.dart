@@ -5,6 +5,8 @@ import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/CustomLoader.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
 
 class ChooseCountryScreen extends StatefulWidget {
   @override
@@ -53,6 +55,9 @@ class _ChooseCountryScreenState extends State<ChooseCountryScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
@@ -63,7 +68,7 @@ class _ChooseCountryScreenState extends State<ChooseCountryScreen> {
               Navigator.pop(context);
             },
           ),
-          title: Text("Country"),
+          title: Text(LocaleKeys.Country.tr()),
         ),
         body: Container(
           height: double.infinity,

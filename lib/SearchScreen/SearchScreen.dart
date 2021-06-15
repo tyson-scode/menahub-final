@@ -1,13 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
-import 'package:menahub/ProductsDetails/Template/ProductList.dart';
+import 'package:menahub/ProductsDetails/ProductsDetailsScreen.dart';
+import 'package:menahub/ProductsDetails/Template/SearchProductList.dart';
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:menahub/Util/Api/ApiResponseModel.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
+import 'package:menahub/config/AppLoader.dart';
 import 'package:menahub/config/CustomLoader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -58,11 +63,12 @@ class _SearchScreenState extends State<SearchScreen> {
     };
     ApiResponseModel response = await getApiCall(
       getUrl:
-          "https://uat2.menahub.com/rest/default/V1/products?searchCriteria[filter_groups][1][filters][0][field]=name&searchCriteria[filter_groups][1][filters][0][condition_type]=like&searchCriteria[filter_groups][1][filters][0][value]=%25${searchTextField.text}%25&searchCriteria[filter_groups][1][filters][1][field]=sku&searchCriteria[currentPage]=1&searchCriteria[pageSize]=10",
+          "$baseUrl$lang/V1/products?searchCriteria[filter_groups][1][filters][0][field]=name&searchCriteria[filter_groups][1][filters][0][condition_type]=like&searchCriteria[filter_groups][1][filters][0][value]=%25${searchTextField.text}%25&searchCriteria[filter_groups][1][filters][1][field]=sku&searchCriteria[currentPage]=1&searchCriteria[pageSize]=10&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1",
       headers: headers,
       context: context,
     );
     if (response.statusCode == 200) {
+      // overlay.hide();
       Map responseMap = response.responseValue;
       List listItem = responseMap["items"];
       print(listItem.length);
@@ -113,7 +119,7 @@ class _SearchScreenState extends State<SearchScreen> {
       };
       ApiResponseModel response = await getApiCall(
         getUrl:
-            "https://uat2.menahub.com/rest/default/V1/products?searchCriteria[filter_groups][1][filters][0][field]=name&searchCriteria[filter_groups][1][filters][0][condition_type]=like&searchCriteria[filter_groups][1][filters][0][value]=%25${searchTextField.text}%25&searchCriteria[filter_groups][1][filters][1][field]=sku&searchCriteria[currentPage]=1&searchCriteria[pageSize]=$page",
+            "$baseUrl$lang/V1/products?searchCriteria[filter_groups][1][filters][0][field]=name&searchCriteria[filter_groups][1][filters][0][condition_type]=like&searchCriteria[filter_groups][1][filters][0][value]=%25${searchTextField.text}%25&searchCriteria[filter_groups][1][filters][1][field]=sku&searchCriteria[currentPage]=1&searchCriteria[pageSize]=$page&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1",
         headers: headers,
         context: context,
       );
@@ -129,9 +135,25 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  viewMoreNavigation({String productId, String title}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (contexts) => ProductsDetailsScreen(
+          router: "homesearch",
+          productId: productId,
+          title: title,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
@@ -152,7 +174,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           title: Text(
-            "Search",
+            LocaleKeys.search_.tr(),
             style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
           ),
           leading: IconButton(
@@ -191,29 +213,41 @@ class _SearchScreenState extends State<SearchScreen> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: TextField(
-                            controller: searchTextField,
-                            style: TextStyle(color: whiteColor),
-                            cursorColor: whiteColor,
-                            autofocus: true,
-                            decoration: new InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Search by Products, Brands & More...',
-                              hintStyle: TextStyle(color: Colors.white),
-                              prefixIcon: const Icon(
-                                Icons.search,
-                                color: Colors.white,
+                              textInputAction: TextInputAction.search,
+                              controller: searchTextField,
+                              style: TextStyle(color: whiteColor),
+                              cursorColor: whiteColor,
+                              autofocus: true,
+                              decoration: new InputDecoration(
+                                border: InputBorder.none,
+                                hintText: LocaleKeys.search.tr(),
+                                hintStyle: TextStyle(color: Colors.white),
+                                prefixIcon: const Icon(
+                                  Icons.search,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            onChanged: (value) {
-                              if (value.length > 3) {
-                                getProductList();
-                              } else {
-                                setState(() {
-                                  productList = [];
-                                });
-                              }
-                            },
-                          ),
+                              onChanged: (value) {
+                                if (value.length >= 3) {
+                                  getProductList();
+                                } else {
+                                  setState(() {
+                                    productList = [];
+                                  });
+                                }
+                              },
+                              onSubmitted: (value) {
+                                if (value.length > 3) {
+                                  print("search clicked");
+                                  viewMoreNavigation(
+                                      productId: searchTextField.text,
+                                      title: searchTextField.text);
+                                } else {
+                                  setState(() {
+                                    productList = [];
+                                  });
+                                }
+                              }),
                         ),
                       ),
                     ),
@@ -234,68 +268,86 @@ class _SearchScreenState extends State<SearchScreen> {
                             }
                           }
                         },
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Column(
-                            children: [
-                              productList.isNotEmpty == true
-                                  ? Container(
-                                      child: ListView.builder(
-                                        padding: EdgeInsets.zero,
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        scrollDirection: Axis.vertical,
-                                        itemCount: productList.length,
-                                        itemBuilder: (context, index) {
-                                          return ProductList(
-                                            productDetails: productList[index],
-                                            context: context,
-                                            userType: userType,
-                                            onstate: (value, status) {
-                                              if (status) {
-                                                addWishlist(
-                                                    productId: value,
-                                                    context: context);
-                                              } else {
-                                                // Navigator.push(
-                                                //   context,
-                                                //   MaterialPageRoute(
-                                                //     builder: (context) =>
-                                                //         ParticularProductsDetailsScreen(
-                                                //       productSkuId: value,
-                                                //     ),
-                                                //   ),
-                                                // );
-                                              }
-                                            },
-                                          );
-                                        },
-                                      ),
-                                    )
-                                  : Container(
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              2,
-                                      child: Center(
-                                        child: Text("Search items list empty"),
-                                      ),
-                                    ),
-                              if (apiupdate)
-                                Center(
-                                  child: Container(
-                                    padding: EdgeInsets.all(20),
-                                    child: CustomerLoader(
-                                      dotType: DotType.circle,
-                                      dotOneColor: secondaryColor,
-                                      dotTwoColor: primaryColor,
-                                      dotThreeColor: Colors.red,
-                                      duration: Duration(milliseconds: 1000),
-                                    ),
+                        child: initialAppLoader == true
+                            ? Center(
+                                child: Container(
+                                  padding: EdgeInsets.all(20),
+                                  child: CustomerLoader(
+                                    dotType: DotType.circle,
+                                    dotOneColor: secondaryColor,
+                                    dotTwoColor: primaryColor,
+                                    dotThreeColor: Colors.red,
+                                    duration: Duration(milliseconds: 1000),
                                   ),
-                                )
-                            ],
-                          ),
-                        ),
+                                ),
+                              )
+                            : SingleChildScrollView(
+                                controller: _scrollController,
+                                child: Column(
+                                  children: [
+                                    productList.isNotEmpty == true
+                                        ? Container(
+                                            child: ListView.builder(
+                                              padding: EdgeInsets.zero,
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              scrollDirection: Axis.vertical,
+                                              itemCount: productList.length,
+                                              itemBuilder: (context, index) {
+                                                return SearchProductList(
+                                                  productDetails:
+                                                      productList[index],
+                                                  context: context,
+                                                  userType: userType,
+                                                  onstate: (value, status) {
+                                                    if (status) {
+                                                      addWishlist(
+                                                          productId: value,
+                                                          context: context);
+                                                    } else {
+                                                      // Navigator.push(
+                                                      //   context,
+                                                      //   MaterialPageRoute(
+                                                      //     builder: (context) =>
+                                                      //         ParticularProductsDetailsScreen(
+                                                      //       productSkuId: value,
+                                                      //     ),
+                                                      //   ),
+                                                      // );
+                                                    }
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                          )
+                                        : Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                2,
+                                            child: Center(
+                                              child: Text(
+                                                  "Search items list empty"),
+                                            ),
+                                          ),
+                                    if (apiupdate)
+                                      Center(
+                                        child: Container(
+                                          padding: EdgeInsets.all(20),
+                                          child: CustomerLoader(
+                                            dotType: DotType.circle,
+                                            dotOneColor: secondaryColor,
+                                            dotTwoColor: primaryColor,
+                                            dotThreeColor: Colors.red,
+                                            duration:
+                                                Duration(milliseconds: 1000),
+                                          ),
+                                        ),
+                                      )
+                                  ],
+                                ),
+                              ),
                       ),
                     ),
                   ],

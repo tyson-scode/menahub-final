@@ -4,9 +4,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:menahub/CustomAlertBox/CustomAlertBox.dart';
 import 'package:menahub/CustomWidget/CustomButton.dart';
+import 'package:menahub/CustomWidget/CustomTextBox.dart';
 import 'package:menahub/DashBoard/MyCartScreen/MyCartScreen.dart';
+import 'package:menahub/ProductsDetails/ProductsDetailsScreen.dart';
+import 'package:menahub/ReviewScreen/ReviewScreen.dart';
 import 'package:menahub/SearchScreen/SearchScreen.dart';
 import 'package:menahub/SignIn_SignUp_Flow/SignInScreen/SignInScreen.dart';
 import 'package:menahub/Util/Api/ApiCalls.dart';
@@ -14,17 +19,25 @@ import 'package:menahub/Util/Api/ApiResponseModel.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:menahub/config/AppLoader.dart';
 import 'package:menahub/config/CustomLoader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'SellerListScreen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ParticularProductsDetailsScreen extends StatefulWidget {
-  ParticularProductsDetailsScreen({this.productSkuId, this.apiType});
+  ParticularProductsDetailsScreen(
+      {this.productSkuId, this.apiType, this.router, this.qty});
 
   final String apiType;
   final productSkuId;
+  String qty;
+  String router;
 
   @override
   _ParticularProductsDetailsScreenState createState() =>
@@ -33,24 +46,56 @@ class ParticularProductsDetailsScreen extends StatefulWidget {
 
 class _ParticularProductsDetailsScreenState
     extends State<ParticularProductsDetailsScreen> {
+  final formKey = new GlobalKey<FormState>();
+  bool _autoValidate = false;
+
+  TextEditingController reviewTitleTextfield = TextEditingController();
+  TextEditingController reviewDescriptionTextfield = TextEditingController();
+  TextEditingController nameTextfield = TextEditingController();
+
+  // TextEditingController emailTextfield = TextEditingController();
   String details;
   String errorMessage;
   List<String> imgList = [];
+  String relatedimgList;
+  int finalratingquality;
+  int finalratingvalue;
+
+  int finalratingprice;
+
+  int finalrating;
+
   int productCount = 1;
   String productDescription;
+  String deliveryDetails;
+  String warrantyDetails;
+  String productBrand;
+  String configure;
+  bool reviewVisible = false;
+  List relatedProduct;
   List productDetailsList = ["", "", "", ""];
   Map productDetials;
+  String productID;
+  Map relatedproductDetials;
+  String configue;
   List sellerDataList = [];
+  List configoptions;
+  List configdetails;
+  List otherSellersData = [];
+  Map sellers;
+  Map othersellers;
   bool userType;
   var cartCount = 0;
   int _current = 0;
-  var specialPrice;
+  var price;
 
+  var specialPrice;
   @override
   void initState() {
     getLocalInformation();
     getProductDetails();
     super.initState();
+    widget.router == "mycart" ? productCount = int.parse(widget.qty) : 1;
   }
 
   getLocalInformation() async {
@@ -78,12 +123,15 @@ class _ParticularProductsDetailsScreenState
     if (widget.apiType == "id") {
       response = await getApiCall(
         getUrl: "$productViewByIdApi${widget.productSkuId}",
+        // getUrl: "${productViewByIdApi}MHSKURXI5K",
         headers: headers,
         context: context,
       );
     } else {
       response = await getApiCall(
         getUrl: "$productsDetailsUrl${widget.productSkuId}",
+        // getUrl: "${productsDetailsUrl}MHSKURXI5K",
+
         headers: headers,
         context: context,
       );
@@ -94,26 +142,85 @@ class _ParticularProductsDetailsScreenState
       List bannerImageList = productDetails["media_gallery_entries"];
       setState(() {
         this.productDetials = productDetails;
+        // print("product=$productDetails");
+        productID = productDetials["id"].toString();
+        print("productID=${productID}");
+
         List imageList =
             bannerImageList.map((e) => e["file"].toString()).toList();
         imgList = imageList;
         List customAttributes = productDetails["custom_attributes"];
+        relatedProduct = productDetails["product_links"];
+        int pricedetailsindex =
+            customAttributes.indexWhere((f) => f['attribute_code'] == "cost");
+
+        Map pricedetailsindexMap = pricedetailsindex.isNegative
+            ? {"attribute_code": "null", "value": "Not Available"}
+            : customAttributes[pricedetailsindex.abs()];
+        price = pricedetailsindexMap["value"];
+        print("price=$price");
         int descriptionIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "description");
+        int shortdescriptionIndex = customAttributes
+            .indexWhere((f) => f['attribute_code'] == "short_description");
         int productDetailsIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "product_details");
-        Map productDescriptionMap = customAttributes[descriptionIndex.abs()];
+        int productBrandIndex = customAttributes
+            .indexWhere((f) => f['attribute_code'] == "facebook_brand");
+        Map productBrandIndexMap = productBrandIndex.isNegative
+            ? {"attribute_code": "null", "value": "Not Available"}
+            : customAttributes[productBrandIndex.abs()];
+        int deliverydetailsindex = customAttributes
+            .indexWhere((f) => f['attribute_code'] == "delivery");
+        int warrantydetailsindex = customAttributes
+            .indexWhere((f) => f['attribute_code'] == "warranty");
+        Map warrantydetailsindexMap = warrantydetailsindex.isNegative
+            ? {"attribute_code": "null", "value": "Not Available"}
+            : customAttributes[warrantydetailsindex.abs()];
+        Map deliverydetailsindexMap = deliverydetailsindex.isNegative
+            ? {"attribute_code": "null", "value": "Not Available"}
+            : customAttributes[deliverydetailsindex.abs()];
+        productBrand = productBrandIndexMap["value"];
+
+        deliveryDetails = deliverydetailsindexMap["value"];
+        warrantyDetails = warrantydetailsindexMap["value"];
+        Map productDescriptionMap = descriptionIndex.isNegative
+            ? customAttributes[shortdescriptionIndex.abs()]
+            : customAttributes[descriptionIndex.abs()];
         productDescription = productDescriptionMap["value"];
-        Map productDetailsMap = customAttributes[productDetailsIndex.abs()];
+        Map productDetailsMap = productDetailsIndex.isNegative
+            ? {"attribute_code": "null", "value": "Not Available"}
+            : customAttributes[productDetailsIndex.abs()];
         details = productDetailsMap["value"];
         Map extensionAttributes = productDetails["extension_attributes"];
+        // print("product description = $productDescription");
+        configdetails = extensionAttributes["configurable_product_options"];
+        // configdetails = extensionAttributes["config_options"];
+
+        print('configdetails=$configdetails');
+        // configoptions = configdetails == null ? null : configdetails[0];
+        configoptions =
+            configdetails == null ? null : configdetails[0]["values"];
+        print('configoptions=$configoptions');
+
+        // configoptions = configoptionslist[0];
+
         for (var item in customAttributes) {
           if (item["attribute_code"] == "special_price") {
             specialPrice = item["value"];
           }
         }
         if (widget.apiType != "id") {
-          sellerDataList = extensionAttributes["assigned_seller_data"];
+          sellerDataList = extensionAttributes["seller_data"];
+          otherSellersData = extensionAttributes["assigned_seller_data"];
+
+          for (Map item in sellerDataList) {
+            sellers = item;
+          }
+          for (Map item in otherSellersData) {
+            othersellers = item;
+            print('othersellers=$othersellers');
+          }
         }
       });
     } else {
@@ -124,118 +231,100 @@ class _ParticularProductsDetailsScreenState
     }
   }
 
-  addToCart({String sku, String qty, BuildContext contexts}) async {
+  addToCart(
+      {String sku, String qty, String configure, BuildContext contexts}) async {
     final progress = ProgressHUD.of(contexts);
     progress.show();
+    // final overlay = LoadingOverlay.of(context);
+    // overlay.show();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.get("token");
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': "Bearer $token"
     };
+
     ApiResponseModel quoteResponseData = await postApiCall(
       postUrl: getQuoteIdUrl,
       headers: headers,
       context: contexts,
     );
     if (quoteResponseData.statusCode == 200) {
+      print('response=${quoteResponseData.responseValue}');
+
+      progress.dismiss();
+      // overlay.hide();
+
       var body = jsonEncode({
         "cartItem": {
           "sku": sku,
           "qty": qty,
-          "quote_id": quoteResponseData.responseValue
+          "quote_id": quoteResponseData.responseValue,
+          "product_option": {
+            "extension_attributes": {
+              "configurable_item_options": [
+                {"option_id": "177", "option_value": configue}
+              ]
+            }
+          }
         }
       });
+
       ApiResponseModel responseData = await postApiCall(
         postUrl: addCartUrl,
         headers: headers,
         context: contexts,
         body: body,
       );
-      print(responseData.responseValue);
+
+      progress.dismiss();
+      // overlay.hide();
 
       if (responseData.statusCode == 200) {
         setState(() {
           progress.dismiss();
+          // overlay.hide();
           Fluttertoast.showToast(
-            msg: "Product successfully added to cart",
+            msg: LocaleKeys.Product_added.tr(),
             toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
+            gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.black,
             textColor: Colors.white,
             fontSize: 16.0,
           );
           if (userType == true) {
+            progress.dismiss();
+            // overlay.hide();
+
             getGuestCartCount();
           } else {
-            progress.dismiss();
-
             getCartCount();
+            progress.dismiss();
+            // overlay.hide();
+
           }
         });
       } else {
+        progress.dismiss();
+        // overlay.hide();
+
         Map errorMessage = responseData.responseValue;
         print("Error Message =$errorMessage");
         Fluttertoast.showToast(
-          msg: "Product that you are trying to add is not available.",
+          msg: LocaleKeys.Choose_Size.tr(),
           toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
+          gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.black,
           textColor: Colors.white,
           fontSize: 16.0,
         );
         progress.dismiss();
+        // overlay.hide();
       }
     }
   }
-  // addToCart({String sku, String qty, BuildContext contexts}) async {
-  //   //EasyLoading.show(status: 'loading...');
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   var token = prefs.get("token");
-  //   Map<String, String> headers = {
-  //     'Content-Type': 'application/json',
-  //     'Authorization': "Bearer $token"
-  //   };
-  //
-  //   http.Response response = await http.post(
-  //     Uri.parse("https://uat2.menahub.com/rest/default/V1/carts/mine/"),
-  //     headers: headers,
-  //   );
-  //   print(response.statusCode);
-  //   if (response.statusCode == 200) {
-  //     var body = jsonEncode({
-  //       "cartItem": {
-  //         "sku": sku,
-  //         "qty": qty,
-  //         "quote_id": response.body.toString()
-  //       }
-  //     });
-  //     http.Response responsecart = await http.post(
-  //         Uri.parse(
-  //             "https://uat2.menahub.com/rest/default/V1/carts/mine/items"),
-  //         headers: headers,
-  //         body: body);
-  //     print(responsecart.statusCode);
-  //     if (responsecart.statusCode == 200) {
-  //       //EasyLoading.dismiss();
-  //       print("Product successfully added to cart");
-  //       Fluttertoast.showToast(
-  //         msg: "Product successfully added to cart",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         gravity: ToastGravity.CENTER,
-  //         timeInSecForIosWeb: 1,
-  //         backgroundColor: Colors.black,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0,
-  //       );
-  //     } else {
-  //       // EasyLoading.dismiss();
-  //       // EasyLoading.showError(responesData["message"].toString());
-  //     }
-  //   }
-  // }
 
   reduceToCart(
       {String sku, String qty, BuildContext contexts, String cartId}) async {
@@ -253,11 +342,12 @@ class _ParticularProductsDetailsScreenState
       context: contexts,
     );
     if (quoteResponseData.statusCode == 200) {
+      progress.dismiss();
       var body = jsonEncode({
         "cartItem": {
           "sku": sku,
           "qty": qty,
-          "quote_id": quoteResponseData.responseValue
+          "quote_id": quoteResponseData.responseValue,
         }
       });
       ApiResponseModel responseData = await postApiCall(
@@ -271,9 +361,9 @@ class _ParticularProductsDetailsScreenState
         setState(() {
           progress.dismiss();
           Fluttertoast.showToast(
-            msg: "Product successfully added to cart",
+            msg: LocaleKeys.Product_added.tr(),
             toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
+            gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.black,
             textColor: Colors.white,
@@ -295,8 +385,20 @@ class _ParticularProductsDetailsScreenState
       'Content-Type': 'application/json',
       'Authorization': "Bearer $token"
     };
+
     var body = jsonEncode({
-      "cartItem": {"sku": sku, "qty": qty, "quote_id": token}
+      "cartItem": {
+        "sku": sku,
+        "qty": qty,
+        "quote_id": token,
+        "product_option": {
+          "extension_attributes": {
+            "configurable_item_options": [
+              {"option_id": "177", "option_value": configue}
+            ]
+          }
+        }
+      }
     });
     ApiResponseModel responseData = await postApiCall(
       postUrl: "$createEmptyCart/$token/items",
@@ -309,9 +411,9 @@ class _ParticularProductsDetailsScreenState
       setState(() {
         progress.dismiss();
         Fluttertoast.showToast(
-          msg: "Product successfully added to cart",
+          msg: LocaleKeys.Product_added.tr(),
           toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
+          gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.black,
           textColor: Colors.white,
@@ -319,6 +421,7 @@ class _ParticularProductsDetailsScreenState
         );
         if (userType == true) {
           getGuestCartCount();
+          progress.dismiss();
         } else {
           progress.dismiss();
 
@@ -327,7 +430,18 @@ class _ParticularProductsDetailsScreenState
       });
     } else {
       progress.dismiss();
+      print("error");
+      Fluttertoast.showToast(
+        msg: LocaleKeys.Choose_Size.tr(),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
+    progress.dismiss();
   }
 
   getCartCount() async {
@@ -346,6 +460,8 @@ class _ParticularProductsDetailsScreenState
     Map responseData = response.responseValue;
     if (response.statusCode == 200) {
       List cartList = responseData["items"];
+      print("cartList.length");
+
       print(cartList.length);
       setState(() {
         cartCount = cartList.length;
@@ -361,14 +477,15 @@ class _ParticularProductsDetailsScreenState
       'Content-Type': 'application/json',
     };
     ApiResponseModel response = await getApiCall(
-      getUrl:
-          "https://uat2.menahub.com/rest/default/V1/guest-carts/$token/totals",
+      getUrl: "${baseUrl}default/V1/guest-carts/$token/totals",
       headers: headers,
       context: context,
     );
     Map responseData = response.responseValue;
     if (response.statusCode == 200) {
       List cartList = responseData["items"];
+      print("cartList.length");
+
       print(cartList.length);
       setState(() {
         cartCount = cartList.length;
@@ -376,9 +493,92 @@ class _ParticularProductsDetailsScreenState
     } else {}
   }
 
+  postReview() async {
+    // final progress = ProgressHUD.of(contexts);
+    // progress.show();
+    // final overlay = LoadingOverlay.of(context);
+    // overlay.show();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.get("token");
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': "Bearer $token"
+    };
+    var body = jsonEncode({
+      "title": reviewTitleTextfield.text,
+      "detail": reviewDescriptionTextfield.text,
+      "nickname": nameTextfield.text,
+      "rating_data": [
+        {"rating_id": 4, "rating_value": finalrating},
+        {"rating_id": 3, "rating_value": finalratingprice},
+        {"rating_id": 2, "rating_value": finalratingvalue},
+        {"rating_id": 1, "rating_value": finalratingquality}
+      ],
+      "review_entity": "product",
+      "review_status": 2,
+      "product_id": productID
+    });
+
+    ApiResponseModel responseData = await postApiCall(
+      postUrl: reviewpost,
+      headers: headers,
+      context: context,
+      body: body,
+    );
+
+    // progress.dismiss();
+    // overlay.hide();
+
+    if (responseData.statusCode == 200) {
+      print(responseData.responseValue);
+      setState(() {
+        // progress.dismiss();
+        // overlay.hide();
+        Fluttertoast.showToast(
+          msg: LocaleKeys.review_commit.tr(),
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        if (userType == true) {
+          // progress.dismiss();
+          // overlay.hide();
+
+        } else {
+          // progress.dismiss();
+          // overlay.hide();
+
+        }
+      });
+    } else {
+      // progress.dismiss();
+      // overlay.hide();
+
+      Map errorMessage = responseData.responseValue;
+      print("Error Message =$errorMessage");
+      Fluttertoast.showToast(
+        msg: LocaleKeys.review_error.tr(),
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      // progress.dismiss();
+      // overlay.hide();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: Locale(context.locale.languageCode),
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
@@ -403,23 +603,31 @@ class _ParticularProductsDetailsScreenState
               sizedBoxwidth5,
               InkWell(
                 onTap: () {
-                  if (userType == true) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SignIn(),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MyCartScreen(
+                        router: "nav",
                       ),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MyCartScreen(
-                          router: "nav",
-                        ),
-                      ),
-                    );
-                  }
+                    ),
+                  );
+                  // if (userType == true) {
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => SignIn(),
+                  //     ),
+                  //   );
+                  // } else {
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => MyCartScreen(
+                  //         router: "nav",
+                  //       ),
+                  //     ),
+                  //   );
+                  // }
                 },
                 child: Badge(
                     padding: EdgeInsets.all(4.5),
@@ -470,125 +678,198 @@ class _ParticularProductsDetailsScreenState
                                 duration: Duration(milliseconds: 1000),
                               ),
                             )
-                          : Column(
-                              children: [
-                                Expanded(
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        //slider
-                                        Container(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                              3,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: CarouselSlider(
-                                              items: imgList
-                                                  .map(
-                                                    (item) => Container(
-                                                      width:
-                                                          MediaQuery.of(context)
-                                                              .size
-                                                              .width,
-                                                      child: ClipRRect(
-                                                        child: Image.network(
-                                                            "$imageBaseUrl$item",
-                                                            fit: BoxFit.contain,
-                                                            width: 1000.0),
+                          : Form(
+                              key: formKey,
+                              // ignore: deprecated_member_use
+                              autovalidate: _autoValidate,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          //slider
+                                          Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                3,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(20.0),
+                                              child: CarouselSlider(
+                                                items: imgList
+                                                    .map(
+                                                      (item) => Container(
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        child: ClipRRect(
+                                                          child: Image.network(
+                                                              "$imageBaseUrl$item",
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                              width: 1000.0),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  )
-                                                  .toList(),
-                                              options: CarouselOptions(
-                                                pageSnapping: true,
-                                                autoPlay: true,
-                                                // enlargeCenterPage: true,
-                                                // aspectRatio: 2.0,
-                                                viewportFraction: 1.0,
-                                                onPageChanged: (index, reason) {
-                                                  setState(() {
-                                                    _current = index;
-                                                  });
-                                                },
+                                                    )
+                                                    .toList(),
+                                                options: CarouselOptions(
+                                                  pageSnapping: true,
+                                                  autoPlay: true,
+                                                  // enlargeCenterPage: true,
+                                                  // aspectRatio: 2.0,
+                                                  viewportFraction: 1.0,
+                                                  onPageChanged:
+                                                      (index, reason) {
+                                                    setState(() {
+                                                      _current = index;
+                                                    });
+                                                  },
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Divider(
-                                          thickness: 1,
-                                        ),
-                                        //indicator
-                                        Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          alignment: Alignment.bottomCenter,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: imgList.map((url) {
-                                              int index = imgList.indexOf(url);
-                                              return Container(
-                                                width: 8.0,
-                                                height: 8.0,
-                                                margin: EdgeInsets.symmetric(
-                                                    vertical: 0,
-                                                    horizontal: 2.0),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(50),
-                                                  color: _current == index
-                                                      ? secondaryColor
-                                                      : lightGreyColor,
-                                                ),
-                                              );
-                                            }).toList(),
+                                          Divider(
+                                            thickness: 1,
                                           ),
-                                        ),
-                                        sizedBoxheight10,
-                                        productDetials != null
-                                            ? Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 20.0),
-                                                child: Text(
-                                                  productDetials["name"],
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 14,
+                                          //indicator
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            alignment: Alignment.bottomCenter,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: imgList.map((url) {
+                                                int index =
+                                                    imgList.indexOf(url);
+                                                return Container(
+                                                  width: 8.0,
+                                                  height: 8.0,
+                                                  margin: EdgeInsets.symmetric(
+                                                      vertical: 0,
+                                                      horizontal: 2.0),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    color: _current == index
+                                                        ? secondaryColor
+                                                        : lightGreyColor,
                                                   ),
-                                                ),
-                                              )
-                                            : Container(),
-                                        sizedBoxheight10,
-                                        // Padding(
-                                        //   padding: const EdgeInsets.only(left: 20.0),
-                                        //   child: Text(
-                                        //     "Available For Quote",
-                                        //     style: TextStyle(
-                                        //       color: secondaryColor,
-                                        //       fontWeight: FontWeight.w600,
-                                        //       decoration: TextDecoration.underline,
-                                        //     ),
-                                        //   ),
-                                        // ),
-                                        if (productDetials != null)
-                                          if (productDetials["price"] != 0)
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ),
+                                          sizedBoxheight10,
+                                          productDetials != null
+                                              ? Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 20.0,
+                                                          right: 0.0),
+                                                  child: Container(
+                                                    height: 40,
+                                                    child: Center(
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                            flex: 2,
+                                                            child: Text(
+                                                              'SKU: ${productDetials["sku"]}'
+                                                                  .toUpperCase(),
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontSize: 14,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .fromLTRB(
+                                                                    5, 0, 5, 0),
+                                                            child:
+                                                                VerticalDivider(
+                                                              thickness: 1,
+                                                              width: 2,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 4,
+                                                            child: Text(
+                                                              productDetials[
+                                                                  "name"],
+                                                              softWrap: true,
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .clip,
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontSize: 14,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              : Container(),
+                                          sizedBoxheight10,
+                                          // Padding(
+                                          //   padding: const EdgeInsets.only(left: 20.0),
+                                          //   child: Text(
+                                          //     "Available For Quote",
+                                          //     style: TextStyle(
+                                          //       color: secondaryColor,
+                                          //       fontWeight: FontWeight.w600,
+                                          //       decoration: TextDecoration.underline,
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          if (productDetials != null)
+                                            // if (productDetials["price"] != 0)
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   left: 20.0),
                                               child: Row(
                                                 children: [
-                                                  Text(
-                                                    "QAR ${productDetials["price"]}",
-                                                    style: TextStyle(
-                                                      color: secondaryColor,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
+                                                  productDetials["extension_attributes"]
+                                                              [
+                                                              "custom_final_price"] ==
+                                                          null
+                                                      ? Text(
+                                                          "QAR ${productDetials["price"].toStringAsFixed(2).toString()}",
+                                                          style: TextStyle(
+                                                            color:
+                                                                secondaryColor,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        )
+                                                      : Text(
+                                                          "QAR ${double.parse((productDetials["extension_attributes"]["custom_final_price"])).toStringAsFixed(2).toString()}",
+                                                          style: TextStyle(
+                                                            color:
+                                                                secondaryColor,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+
                                                   sizedBoxwidth10,
                                                   if (specialPrice != null)
                                                     Text(
@@ -621,7 +902,8 @@ class _ParticularProductsDetailsScreenState
                                               child: Row(
                                                 children: [
                                                   Text(
-                                                    "Available For Quote",
+                                                    LocaleKeys.Available_Quote
+                                                        .tr(),
                                                     style: TextStyle(
                                                       color: secondaryColor,
                                                       fontWeight:
@@ -632,40 +914,113 @@ class _ParticularProductsDetailsScreenState
                                                   ),
                                                 ],
                                               ),
-                                            )
-                                        else
-                                          Container(),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 20.0, top: 10),
-                                          child: Row(
-                                            children: [
-                                              Text("QTY"),
-                                              sizedBoxwidth10,
-                                              Row(
+                                            ),
+                                          // else
+                                          //   Container(),
+                                          sizedBoxheight10,
+                                          if (productBrand != null)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20,
+                                                  right: 20,
+                                                  bottom: 0),
+                                              child: Row(
                                                 children: [
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                            color:
-                                                                lightGreyColor,
-                                                            width: 2),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5)),
-                                                    child: Row(
-                                                      children: [
-                                                        InkWell(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              if (productCount !=
-                                                                  1) {
-                                                                productCount -=
-                                                                    1;
-                                                              }
-                                                            });
-                                                          },
-                                                          child: Padding(
+                                                  Text(
+                                                    LocaleKeys.Brand.tr() +
+                                                        " : ",
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  productBrand ==
+                                                          'Not Available'
+                                                      ? Expanded(
+                                                          flex: 1,
+                                                          child: Text(
+                                                            productDetials[
+                                                                    "name"]
+                                                                .split("|")[0],
+                                                            softWrap: true,
+                                                            maxLines: 2,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .clip,
+                                                            style: TextStyle(
+                                                                color:
+                                                                    orangeColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        )
+                                                      : Expanded(
+                                                          flex: 1,
+                                                          child: Text(
+                                                            "$productBrand",
+                                                            softWrap: true,
+                                                            maxLines: 2,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .clip,
+                                                            style: TextStyle(
+                                                              color:
+                                                                  orangeColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                ],
+                                              ),
+                                            ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 20.0, top: 10),
+                                            child: Row(
+                                              children: [
+                                                Text("QTY"),
+                                                sizedBoxwidth10,
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                              color:
+                                                                  lightGreyColor,
+                                                              width: 2),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5)),
+                                                      child: Row(
+                                                        children: [
+                                                          InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                if (productCount !=
+                                                                    1) {
+                                                                  productCount -=
+                                                                      1;
+                                                                }
+                                                              });
+                                                            },
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 10,
+                                                                      right: 10,
+                                                                      top: 5,
+                                                                      bottom:
+                                                                          5),
+                                                              child: Text("-"),
+                                                            ),
+                                                          ),
+                                                          Padding(
                                                             padding:
                                                                 const EdgeInsets
                                                                         .only(
@@ -673,212 +1028,1200 @@ class _ParticularProductsDetailsScreenState
                                                                     right: 10,
                                                                     top: 5,
                                                                     bottom: 5),
-                                                            child: Text("-"),
+                                                            child: Text(
+                                                                productCount
+                                                                    .toString()),
+                                                          ),
+                                                          InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                productCount +=
+                                                                    1;
+                                                              });
+                                                            },
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 10,
+                                                                      right: 10,
+                                                                      top: 5,
+                                                                      bottom:
+                                                                          5),
+                                                              child: Text("+"),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    sizedBoxwidth30,
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (deliveryDetails != null)
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 10, 0, 0),
+                                              child: Row(
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Image(
+                                                        image: AssetImage(
+                                                            "assets/Socialmedia/delivery.png"),
+                                                        height: 50,
+                                                        width: 50,
+                                                      ),
+                                                      Text(
+                                                        "$deliveryDetails",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  sizedBoxwidth10,
+                                                  if (warrantyDetails != null)
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Column(
+                                                        children: [
+                                                          Image(
+                                                            image: AssetImage(
+                                                                "assets/Socialmedia/warranty.png"),
+                                                            height: 50,
+                                                            width: 50,
+                                                          ),
+                                                          Text(
+                                                            "$warrantyDetails",
+                                                            softWrap: true,
+                                                            maxLines: 2,
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  sizedBoxwidth10,
+                                                  // configoptions != null
+                                                  //     ? Expanded(
+                                                  //         flex: 1,
+                                                  //         child: DropdownButtonHideUnderline(
+                                                  //             child: ButtonTheme(
+                                                  //                 alignedDropdown: true,
+                                                  //                 child: Padding(
+                                                  //                   padding:
+                                                  //                       const EdgeInsets
+                                                  //                               .fromLTRB(
+                                                  //                           5,
+                                                  //                           5,
+                                                  //                           5,
+                                                  //                           0),
+                                                  //                   child: DropdownButtonFormField(
+                                                  //                       hint: Text('Size'),
+                                                  //                       decoration: InputDecoration(
+                                                  //                         focmusedBorder:
+                                                  //                             UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF0D3451))),
+                                                  //                       ),
+                                                  //                       // focusNode: myFocusNode,
+                                                  //                       icon: Icon(Icons.keyboard_arrow_down_outlined),
+                                                  //                       value: configue,
+                                                  //                       //   onTap: () => node.requestFocus(),
+                                                  //
+                                                  //                       onChanged: (newValue) {
+                                                  //                         setState(
+                                                  //                             () async {
+                                                  //                           configue =
+                                                  //                               newValue;
+                                                  //                           print(
+                                                  //                               configue);
+                                                  //                         });
+                                                  //                       }, //
+                                                  //                       validator: (value) => value == null ? 'field required' : null,
+                                                  //                       items: configoptions == null
+                                                  //                           ? []
+                                                  //                           : configoptions.map((item) {
+                                                  //                               return DropdownMenuItem(
+                                                  //                                   // value: item['code'].toString(),
+                                                  //                                   value: item['value_index'].toString(),
+                                                  //                                   child: Row(
+                                                  //                                     mainAxisAlignment: MainAxisAlignment.start,
+                                                  //                                     children: <Widget>[
+                                                  //                                       Container(
+                                                  //                                         margin: EdgeInsets.only(left: 0),
+                                                  //                                         child: Text(item['value_index'].toString()),
+                                                  //
+                                                  //                                         // child: Text(item['label'].toString()),
+                                                  //                                       ),
+                                                  //                                     ],
+                                                  //                                   ));
+                                                  //                             }).toList()),
+                                                  //                 ))),
+                                                  //       )
+                                                  //     : Container()
+                                                ],
+                                              ),
+                                            ),
+
+                                          Divider(
+                                            thickness: 1,
+                                          ),
+                                          if (sellers != null)
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 10, 20, 10),
+                                              child: Row(
+                                                children: [
+                                                  Text(LocaleKeys.Sold_By.tr() +
+                                                      ' : '),
+                                                  Text(
+                                                    sellers["shop_title"] ==
+                                                            null
+                                                        ? LocaleKeys
+                                                            .Not_Available.tr()
+                                                        : '${sellers["shop_title"]}',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: orangeColor),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                          if (otherSellersData.isNotEmpty ==
+                                              true)
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 10, 20, 10),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "${otherSellersData.length} " +
+                                                        LocaleKeys.More_Sellers
+                                                            .tr(),
+                                                    style: TextStyle(
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              SellerListScreen(
+                                                            sellerDataList:
+                                                                otherSellersData,
+                                                            productDetails:
+                                                                productDetials,
                                                           ),
                                                         ),
+                                                      );
+                                                    },
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          color:
+                                                              Colors.blueAccent,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(50),
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                15, 5, 15, 5),
+                                                        child: Text(
+                                                          LocaleKeys
+                                                                  .View_Sellers
+                                                              .tr(),
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .blueAccent),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          Divider(
+                                            thickness: 1,
+                                          ),
+
+                                          // Container(
+                                          //   child: ListView.builder(
+                                          //     shrinkWrap: true,
+                                          //     physics:
+                                          //         NeverScrollableScrollPhysics(),
+                                          //     scrollDirection: Axis.vertical,
+                                          //     itemCount:
+                                          //         productDetailsList.length,
+                                          //     itemBuilder: (context, index) {
+                                          //       return Container(
+                                          //         child: Padding(
+                                          //           padding:
+                                          //               const EdgeInsets.only(
+                                          //                   left: 20.0,
+                                          //                   bottom: 5,
+                                          //                   right: 20),
+                                          //           child: Row(
+                                          //             children: [
+                                          //               Text("Brands :"),
+                                          //               sizedBoxwidth10,
+                                          //               Expanded(
+                                          //                 child: Text(
+                                          //                     "MediaTek Helio P22T (8C, 8xA53 @2.3GHZ)"),
+                                          //               ),
+                                          //             ],
+                                          //           ),
+                                          //         ),
+                                          //       );
+                                          //     },
+                                          //   ),
+                                          // ),
+
+                                          Visibility(
+                                            visible: details == "Not Available"
+                                                ? false
+                                                : true,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20,
+                                                  right: 20,
+                                                  bottom: 20),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    LocaleKeys.Specification
+                                                            .tr() +
+                                                        " : ",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Html(
+                                                    data: details,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          sizedBoxheight5,
+                                          Divider(
+                                            thickness: 1,
+                                          ),
+
+                                          // if (relatedProduct.isNotEmpty)
+                                          //   Padding(
+                                          //     padding: const EdgeInsets.fromLTRB(
+                                          //         20, 10, 20, 10),
+                                          //     child: Row(
+                                          //       mainAxisAlignment:
+                                          //           MainAxisAlignment
+                                          //               .spaceBetween,
+                                          //       children: [
+                                          //         Text(
+                                          //           "${relatedProduct.length} related Products",
+                                          //           style: TextStyle(
+                                          //             decoration: TextDecoration
+                                          //                 .underline,
+                                          //             fontWeight: FontWeight.w600,
+                                          //           ),
+                                          //         ),
+                                          //         InkWell(
+                                          //           onTap: () {
+                                          //             Navigator.push(
+                                          //               context,
+                                          //               MaterialPageRoute(
+                                          //                 builder: (contexts) =>
+                                          //                     ProductsDetailsScreen(
+                                          //                   productId:
+                                          //                       '${relatedProduct[0]["linked_product_sku"]}',
+                                          //                   title:
+                                          //                       "relatedProduct",
+                                          //                 ),
+                                          //               ),
+                                          //             );
+                                          //           },
+                                          //           child: Container(
+                                          //             decoration: BoxDecoration(
+                                          //               border: Border.all(
+                                          //                 color:
+                                          //                     Colors.blueAccent,
+                                          //               ),
+                                          //               borderRadius:
+                                          //                   BorderRadius.circular(
+                                          //                       50),
+                                          //             ),
+                                          //             child: Padding(
+                                          //               padding: const EdgeInsets
+                                          //                       .fromLTRB(
+                                          //                   15, 5, 15, 5),
+                                          //               child: Text(
+                                          //                 "View All Products",
+                                          //                 style: TextStyle(
+                                          //                     color: Colors
+                                          //                         .blueAccent),
+                                          //               ),
+                                          //             ),
+                                          //           ),
+                                          //         )
+                                          //       ],
+                                          //     ),
+                                          //   ),
+
+                                          if (sellerDataList.isNotEmpty == true)
+                                            Divider(),
+                                          productDescription != null
+                                              ? Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 20,
+                                                          right: 20,
+                                                          bottom: 0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        LocaleKeys.Description
+                                                                .tr() +
+                                                            " :",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      Html(
+                                                        data:
+                                                            productDescription,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : Container(),
+                                          relatedProduct.isNotEmpty == true
+                                              ? Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 20,
+                                                          right: 20,
+                                                          bottom: 0),
+                                                  child: Text(
+                                                    LocaleKeys.RELATED_PRODUCTS
+                                                            .tr() +
+                                                        " :",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                )
+                                              : Container(),
+                                          relatedProduct.isNotEmpty
+                                              ? ListView.builder(
+                                                  padding:
+                                                      EdgeInsets.only(top: 0),
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      NeverScrollableScrollPhysics(),
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  itemCount:
+                                                      relatedProduct.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    return Container(
+                                                      height: 30,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                left: 20,
+                                                                right: 20,
+                                                                bottom: 10),
+                                                        child: InkWell(
+                                                          onTap: () {
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    //     ProductsDetailsScreen(
+                                                                    //   productId:
+                                                                    //       '144',
+                                                                    //   title:
+                                                                    //       "relatedProduct",
+                                                                    // ),
+                                                                    ParticularProductsDetailsScreen(
+                                                                  productSkuId:
+                                                                      "${relatedProduct[index]["linked_product_sku"]}",
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              // Expanded(
+                                                              //   flex: 2,
+                                                              //   child:
+                                                              //       Container(
+                                                              //     child: Image.network(
+                                                              //         "$imageBaseUrl$relatedimgList",
+                                                              //         fit: BoxFit
+                                                              //             .contain,
+                                                              //         height:
+                                                              //             500,
+                                                              //         width:
+                                                              //             500),
+                                                              //   ),
+                                                              // ),
+                                                              Expanded(
+                                                                flex: 2,
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          2.0),
+                                                                  child: Text(
+                                                                    '${relatedProduct[index]["linked_product_sku"]}',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color:
+                                                                          orangeColor,
+                                                                      decoration:
+                                                                          TextDecoration
+                                                                              .underline,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                )
+                                              : Container(),
+
+                                          userType != true
+                                              ? Divider(
+                                                  thickness: 2,
+                                                )
+                                              : Container(),
+                                          userType != true
+                                              ? GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      reviewVisible =
+                                                          reviewVisible == false
+                                                              ? true
+                                                              : false;
+                                                    });
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Row(
+                                                      children: [
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .only(
-                                                                  left: 10,
-                                                                  right: 10,
-                                                                  top: 5,
-                                                                  bottom: 5),
-                                                          child: Text(
-                                                              productCount
-                                                                  .toString()),
+                                                                      .fromLTRB(
+                                                                  20, 0, 20, 0),
+                                                          child: Icon(Icons
+                                                              .rate_review),
                                                         ),
-                                                        InkWell(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              productCount += 1;
-                                                            });
-                                                          },
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    left: 10,
-                                                                    right: 10,
-                                                                    top: 5,
-                                                                    bottom: 5),
-                                                            child: Text("+"),
-                                                          ),
-                                                        )
+                                                        Text(
+                                                          LocaleKeys
+                                                              .WRITE_A_REVIEW
+                                                              .tr(),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
-                                                  sizedBoxwidth30,
+                                                )
+                                              : Container(),
+                                          Visibility(
+                                            visible: reviewVisible == true
+                                                ? true
+                                                : false,
+                                            child: Container(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                        20, 10, 20, 0),
+                                                    child: Text(LocaleKeys
+                                                        .required_field
+                                                        .tr()),
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                20, 20, 20, 0),
+                                                        child: Text(
+                                                          LocaleKeys.Quality
+                                                              .tr(),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 14),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                20, 10, 20, 0),
+                                                        child:
+                                                            RatingBar.builder(
+                                                          initialRating: 0,
+                                                          minRating: 1,
+                                                          itemSize: 25,
+                                                          direction:
+                                                              Axis.horizontal,
+                                                          // allowHalfRating: true,
+                                                          itemCount: 5,
+                                                          itemPadding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      4.0),
+                                                          itemBuilder:
+                                                              (context, _) =>
+                                                                  Icon(
+                                                            Icons.star,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onRatingUpdate:
+                                                              (rating) {
+                                                            finalratingquality =
+                                                                rating.toInt();
+                                                            print(rating);
+                                                            print(
+                                                                finalratingquality);
+                                                          },
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                20, 20, 20, 0),
+                                                        child: Text(
+                                                          LocaleKeys.Value.tr(),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 14),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                20, 10, 20, 0),
+                                                        child:
+                                                            RatingBar.builder(
+                                                          initialRating: 0,
+                                                          minRating: 1,
+                                                          itemSize: 25,
+                                                          direction:
+                                                              Axis.horizontal,
+                                                          // allowHalfRating: true,
+                                                          itemCount: 5,
+                                                          itemPadding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      4.0),
+                                                          itemBuilder:
+                                                              (context, _) =>
+                                                                  Icon(
+                                                            Icons.star,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onRatingUpdate:
+                                                              (rating) {
+                                                            finalratingvalue =
+                                                                rating.toInt();
+                                                            print(rating);
+                                                            print(
+                                                                finalratingvalue);
+                                                          },
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                20, 20, 20, 0),
+                                                        child: Text(
+                                                          LocaleKeys.Price.tr(),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 14),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                20, 10, 20, 0),
+                                                        child:
+                                                            RatingBar.builder(
+                                                          initialRating: 0,
+                                                          minRating: 1,
+                                                          itemSize: 25,
+                                                          direction:
+                                                              Axis.horizontal,
+                                                          // allowHalfRating: true,
+                                                          itemCount: 5,
+                                                          itemPadding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      4.0),
+                                                          itemBuilder:
+                                                              (context, _) =>
+                                                                  Icon(
+                                                            Icons.star,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onRatingUpdate:
+                                                              (rating) {
+                                                            finalratingprice =
+                                                                rating.toInt();
+                                                            print(rating);
+                                                            print(
+                                                                finalratingprice);
+                                                          },
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                20, 20, 20, 0),
+                                                        child: Text(
+                                                          LocaleKeys.Rating
+                                                              .tr(),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 14),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                20, 10, 20, 0),
+                                                        child:
+                                                            RatingBar.builder(
+                                                          initialRating: 0,
+                                                          minRating: 1,
+                                                          itemSize: 25,
+                                                          direction:
+                                                              Axis.horizontal,
+                                                          // allowHalfRating: true,
+                                                          itemCount: 5,
+                                                          itemPadding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      4.0),
+                                                          itemBuilder:
+                                                              (context, _) =>
+                                                                  Icon(
+                                                            Icons.star,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onRatingUpdate:
+                                                              (rating) {
+                                                            finalrating =
+                                                                rating.toInt();
+                                                            print(rating);
+                                                            print(finalrating);
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                        20, 20, 20, 0),
+                                                    child: Text(
+                                                      LocaleKeys.Title.tr(),
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 14),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: TextFormField(
+                                                        validator: (text) {
+                                                          if (text == null ||
+                                                              text.isEmpty) {
+                                                            return LocaleKeys
+                                                                .req
+                                                                .tr();
+                                                          }
+                                                          return null;
+                                                        },
+                                                        controller:
+                                                            reviewTitleTextfield,
+                                                        decoration:
+                                                            new InputDecoration(
+                                                          focusedBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          enabledBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          border:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          errorBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    width: 2.0),
+                                                          ),
+                                                          disabledBorder:
+                                                              InputBorder.none,
+                                                          contentPadding:
+                                                              EdgeInsets.only(
+                                                                  left: 15,
+                                                                  right: 15),
+                                                          hintStyle: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: greyColor,
+                                                          ),
+                                                          errorMaxLines: 4,
+                                                        ),
+                                                      )),
+
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                        20, 20, 20, 0),
+                                                    child: Text(
+                                                      LocaleKeys.Review.tr(),
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 14),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: TextFormField(
+                                                        validator: (text) {
+                                                          if (text == null ||
+                                                              text.isEmpty) {
+                                                            return LocaleKeys
+                                                                .req
+                                                                .tr();
+                                                          }
+                                                          return null;
+                                                        },
+                                                        controller:
+                                                            reviewDescriptionTextfield,
+                                                        decoration:
+                                                            new InputDecoration(
+                                                          focusedBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          enabledBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          border:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          errorBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    width: 2.0),
+                                                          ),
+                                                          disabledBorder:
+                                                              InputBorder.none,
+                                                          contentPadding:
+                                                              EdgeInsets.only(
+                                                                  left: 15,
+                                                                  right: 15),
+                                                          hintStyle: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: greyColor,
+                                                          ),
+                                                          errorMaxLines: 4,
+                                                        ),
+                                                      )),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .fromLTRB(
+                                                        20, 20, 20, 0),
+                                                    child: Text(
+                                                      LocaleKeys.name.tr(),
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 14),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: TextFormField(
+                                                        validator: (text) {
+                                                          if (text == null ||
+                                                              text.isEmpty) {
+                                                            return LocaleKeys
+                                                                .req
+                                                                .tr();
+                                                          }
+                                                          return null;
+                                                        },
+                                                        controller:
+                                                            nameTextfield,
+                                                        decoration:
+                                                            new InputDecoration(
+                                                          focusedBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          enabledBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          border:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    width: 2.0),
+                                                          ),
+                                                          errorBorder:
+                                                              OutlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    width: 2.0),
+                                                          ),
+                                                          disabledBorder:
+                                                              InputBorder.none,
+                                                          contentPadding:
+                                                              EdgeInsets.only(
+                                                                  left: 15,
+                                                                  right: 15),
+                                                          hintStyle: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: greyColor,
+                                                          ),
+                                                          errorMaxLines: 4,
+                                                        ),
+                                                      )),
+                                                  // Padding(
+                                                  //   padding:
+                                                  //   const EdgeInsets.fromLTRB(
+                                                  //       20, 20, 20, 0),
+                                                  //   child: Text(
+                                                  //     '* Email',
+                                                  //     style: TextStyle(
+                                                  //         fontWeight:
+                                                  //         FontWeight.w600,
+                                                  //         fontSize: 14),
+                                                  //   ),
+                                                  // ),
+                                                  // Padding(
+                                                  //   padding:
+                                                  //   const EdgeInsets.all(8.0),
+                                                  //   child: Container(
+                                                  //       decoration: BoxDecoration(
+                                                  //         border: Border.all(
+                                                  //           color: Colors.black,
+                                                  //         ),
+                                                  //       ),
+                                                  //       height: 60,
+                                                  //       child: Padding(
+                                                  //           padding:
+                                                  //           const EdgeInsets
+                                                  //               .only(
+                                                  //               left: 20.0),
+                                                  //           child: Row(children: [
+                                                  //             Expanded(
+                                                  //                 child:
+                                                  //                 TextFormField(
+                                                  //                   controller:
+                                                  //                   emailTextfield,
+                                                  //                   decoration:
+                                                  //                   new InputDecoration(
+                                                  //                     border:
+                                                  //                     InputBorder
+                                                  //                         .none,
+                                                  //                     focusedBorder:
+                                                  //                     InputBorder
+                                                  //                         .none,
+                                                  //                     enabledBorder:
+                                                  //                     InputBorder
+                                                  //                         .none,
+                                                  //                     errorBorder:
+                                                  //                     InputBorder
+                                                  //                         .none,
+                                                  //                     disabledBorder:
+                                                  //                     InputBorder
+                                                  //                         .none,
+                                                  //                     contentPadding:
+                                                  //                     EdgeInsets.only(
+                                                  //                         left:
+                                                  //                         15,
+                                                  //                         right:
+                                                  //                         15),
+                                                  //                     hintStyle:
+                                                  //                     TextStyle(
+                                                  //                       fontWeight:
+                                                  //                       FontWeight
+                                                  //                           .w500,
+                                                  //                       color:
+                                                  //                       greyColor,
+                                                  //                     ),
+                                                  //                     errorMaxLines:
+                                                  //                     4,
+                                                  //                   ),
+                                                  //                 ))
+                                                  //           ]))),
+                                                  // ),
+
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: ElevatedButton(
+                                                            style: ElevatedButton
+                                                                .styleFrom(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .symmetric(
+                                                                      horizontal:
+                                                                          50,
+                                                                    ),
+                                                                    primary:
+                                                                        primaryColor,
+                                                                    textStyle:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                    )),
+                                                            onPressed: () {
+                                                              if (formKey
+                                                                      .currentState
+                                                                      .validate() &&
+                                                                  finalrating !=
+                                                                      null &&
+                                                                  finalratingprice !=
+                                                                      null &&
+                                                                  finalratingquality !=
+                                                                      null &&
+                                                                  finalratingvalue !=
+                                                                      null) {
+                                                                postReview();
+                                                              } else {
+                                                                setState(() {
+                                                                  print(
+                                                                      finalrating);
+                                                                  print(
+                                                                      finalratingquality);
+                                                                  print(
+                                                                      finalratingprice);
+                                                                  print(
+                                                                      finalratingvalue);
+
+                                                                  _autoValidate =
+                                                                      true;
+                                                                });
+                                                              }
+                                                            },
+                                                            child: Text(
+                                                                LocaleKeys.POST
+                                                                    .tr())),
+                                                      ),
+                                                    ],
+                                                  )
                                                 ],
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        ),
-                                        Divider(
-                                          thickness: 1,
-                                        ),
-                                        // Container(
-                                        //   child: ListView.builder(
-                                        //     shrinkWrap: true,
-                                        //     physics: NeverScrollableScrollPhysics(),
-                                        //     scrollDirection: Axis.vertical,
-                                        //     itemCount: productDetailsList.length,
-                                        //     itemBuilder: (context, index) {
-                                        //       return Container(
-                                        //         child: Padding(
-                                        //           padding: const EdgeInsets.only(
-                                        //               left: 20.0, bottom: 5, right: 20),
-                                        //           child: Row(
-                                        //             children: [
-                                        //               Text("Brands :"),
-                                        //               sizedBoxwidth10,
-                                        //               Expanded(
-                                        //                 child: Text(
-                                        //                     "MediaTek Helio P22T (8C, 8xA53 @2.3GHZ)"),
-                                        //               ),
-                                        //             ],
-                                        //           ),
-                                        //         ),
-                                        //       );
-                                        //     },
-                                        //   ),
-                                        // ),
-                                        // Padding(
-                                        //   padding:
-                                        //       const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                                        //   child: Html(
-                                        //     data: details,
-                                        //   ),
-                                        // ),
-                                        // sizedBoxheight5,
-                                        // Divider(
-                                        //   thickness: 1,
-                                        // ),
-                                        if (sellerDataList.isNotEmpty == true)
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                20, 10, 20, 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "${sellerDataList.length} More Sellors",
-                                                  style: TextStyle(
-                                                    decoration: TextDecoration
-                                                        .underline,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                                InkWell(
+                                          userType != true
+                                              ? InkWell(
                                                   onTap: () {
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) =>
-                                                            SellerListScreen(
-                                                          sellerDataList:
-                                                              sellerDataList,
-                                                          productDetails:
-                                                              productDetials,
+                                                            ReviewScreen(
+                                                          productId:
+                                                              productDetials[
+                                                                  "id"],
                                                         ),
                                                       ),
                                                     );
                                                   },
                                                   child: Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                        color:
-                                                            Colors.blueAccent,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                    ),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                              .fromLTRB(
-                                                          15, 5, 15, 5),
-                                                      child: Text(
-                                                        "View All Sellers",
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .blueAccent),
-                                                      ),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Divider(
+                                                            color: Colors.blue),
+                                                        Text(
+                                                          LocaleKeys.View_all
+                                                              .tr(),
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .blueAccent),
+                                                        ),
+                                                        Divider(
+                                                            color: Colors.blue)
+                                                      ],
                                                     ),
                                                   ),
                                                 )
-                                              ],
-                                            ),
-                                          ),
-                                        if (sellerDataList.isNotEmpty == true)
-                                          Divider(),
-                                        productDescription != null
-                                            ? Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 20,
-                                                    right: 20,
-                                                    bottom: 0),
-                                                child: Html(
-                                                  data: productDescription,
-                                                ),
-                                              )
-                                            : Container(),
-                                        // InkWell(
-                                        //   onTap: () {
-                                        //     Navigator.push(
-                                        //       context,
-                                        //       MaterialPageRoute(
-                                        //         builder: (context) =>
-                                        //             ReviewScreen(
-                                        //           productId:
-                                        //               productDetials["id"],
-                                        //         ),
-                                        //       ),
-                                        //     );
-                                        //   },
-                                        //   child: Container(
-                                        //     child: Column(
-                                        //       crossAxisAlignment:
-                                        //           CrossAxisAlignment.center,
-                                        //       mainAxisAlignment:
-                                        //           MainAxisAlignment.center,
-                                        //       children: [
-                                        //         Divider(color: Colors.blue),
-                                        //         Text(
-                                        //           "View All Reviews",
-                                        //           style: TextStyle(
-                                        //               color: Colors.blueAccent),
-                                        //         ),
-                                        //         Divider(color: Colors.blue)
-                                        //       ],
-                                        //     ),
-                                        //   ),
-                                        // )
-                                      ],
+                                              : Container()
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: whiteColor,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 5,
-                                        blurRadius: 7,
-                                        offset: Offset(
-                                            0, 3), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  height: 50,
-                                  child: Padding(
-                                    padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                                    child: Row(
-                                      children: [
-                                        if (productDetials["price"] != 0)
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: whiteColor,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 5,
+                                          blurRadius: 7,
+                                          offset: Offset(0,
+                                              3), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    height: 50,
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(20, 5, 20, 5),
+                                      child: Row(
+                                        children: [
+                                          // if (productDetials["price"] != 0)
                                           Expanded(
                                             child: InkWell(
                                               onTap: () {
@@ -889,6 +2232,7 @@ class _ParticularProductsDetailsScreenState
                                                       sku:
                                                           productDetials["sku"],
                                                       contexts: context);
+
                                                   getCartCount();
                                                 } else {
                                                   guestAddToCart(
@@ -901,26 +2245,29 @@ class _ParticularProductsDetailsScreenState
                                                 }
                                               },
                                               child: customButton(
-                                                title: "ADD TO CART",
+                                                title:
+                                                    LocaleKeys.ADD_TO_CART.tr(),
                                                 backgroundColor: primaryColor,
                                               ),
                                             ),
                                           ),
-                                        sizedBoxwidth30,
-                                        // Expanded(
-                                        //   child: InkWell(
-                                        //     onTap: () {},
-                                        //     child: customButton(
-                                        //       title: "Enquire Now",
-                                        //       backgroundColor: secondaryColor,
-                                        //     ),
-                                        //   ),
-                                        // ),
-                                      ],
+                                          sizedBoxwidth30,
+                                          // Expanded(
+                                          //   child: InkWell(
+                                          //     onTap: () {},
+                                          //     child: customButton(
+                                          //       title: "Enquire Now",
+                                          //       backgroundColor: secondaryColor,
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                )
-                              ],
+                                  //view product
+                                ],
+                              ),
                             ),
                 ),
               ),

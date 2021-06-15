@@ -13,12 +13,13 @@ class Block1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        print(productSkuId);
         onstate(productSkuId, false);
       },
       child: Container(
         height: 120,
         width: (MediaQuery.of(context).size.width / 3) - 10,
-        padding: EdgeInsets.only(left: 6, top: 6, bottom: 6),
+        padding: EdgeInsets.only(left: 6, top: 6, bottom: 6, right: 6),
         color: whiteColor,
         child: Container(
           decoration: BoxDecoration(

@@ -5,12 +5,14 @@ import 'package:menahub/Notification/NotificationScreen.dart';
 import 'package:menahub/SignIn_SignUp_Flow/SignInScreen/SignInScreen.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'CategoriesScreen/CategoriesScreen.dart';
 import 'EnquireNowScreen/EnquireNowScreen.dart';
 import 'HomeScreen/HomeScreen.dart';
 import 'MyAccountScreen/MyAccountScreen.dart';
 import 'MyCartScreen/MyCartScreen.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class DashBoard extends StatefulWidget {
   final initialIndex;
@@ -23,38 +25,22 @@ class _DashBoardState extends State<DashBoard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   bool userType;
   int pageIndex = 0;
-  @override
-  void initState() {
-    super.initState();
-    getLocalInformation();
-  }
-
-  getLocalInformation() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String type = prefs.getString("userType");
-    if (type == "guest") {
-      setState(() {
-        userType = true;
-      });
-    } else {
-      setState(() {
-        userType = false;
-      });
-    }
-    print(userType);
-  }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      // ignore: missing_return
-      onWillPop: () async {
-        if (Navigator.of(context).userGestureInProgress)
+      onWillPop:
+          // async => false,
+          () async {
+        if (Navigator.of(context).canPop()) {
           return false;
-        else
+        } else
           return true;
       },
       child: MaterialApp(
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: Locale(context.locale.languageCode),
         debugShowCheckedModeBanner: false,
         home: DefaultTabController(
           initialIndex: widget.initialIndex,
@@ -134,6 +120,52 @@ class _DashBoardState extends State<DashBoard> {
                     ),
                   ),
                 ),
+                sizedBoxwidth10,
+                // InkWell(
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => MyCartScreen(
+                //           router: "nav",
+                //         ),
+                //       ),
+                //     );
+                //     // if (userType == true) {
+                //     //   Navigator.push(
+                //     //     context,
+                //     //     MaterialPageRoute(
+                //     //       builder: (context) => SignIn(),
+                //     //     ),
+                //     //   );
+                //     // } else {
+                //     //   Navigator.push(
+                //     //     context,
+                //     //     MaterialPageRoute(
+                //     //       builder: (context) => MyCartScreen(
+                //     //         router: "nav",
+                //     //       ),
+                //     //     ),
+                //     //   );
+                //     // }
+                //   },
+                //   child: Badge(
+                //       padding: EdgeInsets.all(4.5),
+                //       badgeColor: redColor,
+                //       position: BadgePosition(top: 7, end: 0),
+                //       badgeContent: Text(
+                //         cartCount.toString(),
+                //         style: TextStyle(
+                //           fontSize: 10,
+                //           color: whiteColor,
+                //           fontWeight: FontWeight.w600,
+                //         ),
+                //       ),
+                //       child: Icon(
+                //         Icons.shopping_cart,
+                //         size: 25,
+                //       )),
+                // ),
                 sizedBoxwidth10
               ],
             ),
@@ -169,7 +201,7 @@ class _DashBoardState extends State<DashBoard> {
                   },
                   tabs: [
                     Tab(
-                      text: "Home",
+                      text: LocaleKeys.home.tr(),
                       icon: Image.asset(
                         "assets/icon/homeIcon.png",
                         height: 25,
@@ -177,7 +209,7 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                     ),
                     Tab(
-                      text: "Categories",
+                      text: LocaleKeys.categories.tr(),
                       icon: Image.asset(
                         "assets/icon/categoriesBlueIcon.png",
                         height: 25,
@@ -185,7 +217,7 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                     ),
                     Tab(
-                      text: "Enquire",
+                      text: LocaleKeys.enquire.tr(),
                       icon: Image.asset(
                         "assets/icon/enquireBlueIcon.png",
                         height: 25,
@@ -193,7 +225,7 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                     ),
                     Tab(
-                      text: "Account",
+                      text: LocaleKeys.Account.tr(),
                       icon: Image.asset(
                         "assets/icon/myaccountBlueIcon.png",
                         height: 25,
@@ -201,13 +233,12 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                     ),
                     Tab(
-                      text: "Cart",
-                      icon: Image.asset(
-                        "assets/icon/cartBlueIcon.png",
-                        height: 25,
-                        width: 25,
-                      ),
-                    ),
+                        text: LocaleKeys.Cart.tr(),
+                        icon: Image.asset(
+                          "assets/icon/cartBlueIcon.png",
+                          height: 25,
+                          width: 25,
+                        )),
                   ],
                 )),
             body: TabBarView(

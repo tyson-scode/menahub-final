@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,6 +19,11 @@ import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/CustomBackground.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -31,7 +37,7 @@ class _SignInState extends State<SignIn> {
   bool _autoValidate = false;
   bool emptyEmailValidation = false;
   bool emailValidation = false;
-
+  String customer_ID;
   @override
   void dispose() {
     super.dispose();
@@ -41,6 +47,7 @@ class _SignInState extends State<SignIn> {
   }
 
   createCart(BuildContext _context) async {
+    print("createCart api called");
     final progress = ProgressHUD.of(_context);
     progress.show();
     Map<String, String> headers = {
@@ -51,6 +58,7 @@ class _SignInState extends State<SignIn> {
     if (responseModel.statusCode == 200) {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       preferences.setString("guestId", responseModel.responseValue.toString());
+
       progress.dismiss();
       Navigator.of(_context).pushReplacement(
         MaterialPageRoute(
@@ -100,6 +108,7 @@ class _SignInState extends State<SignIn> {
   // }
   signInApiCall(BuildContext _context) async {
     print("sign api called");
+
     FocusManager.instance.primaryFocus.unfocus();
     final progress = ProgressHUD.of(_context);
     progress.show();
@@ -110,12 +119,9 @@ class _SignInState extends State<SignIn> {
     Map<String, String> headers = {
       'Content-Type': 'application/json',
     };
+
     final response = await http.post(
-        Uri.parse(
-            "https://uat2.menahub.com/rest/default/V1/integration/customer/token"),
-        // final response = await http.post(
-        //     Uri.parse(
-        //         "https://magento2blog.thestagings.com/rest/default/V1/integration/customer/token"),
+        Uri.parse("${baseUrl}default/V1/integration/customer/token"),
         headers: headers,
         body: body);
     print(body);
@@ -126,24 +132,26 @@ class _SignInState extends State<SignIn> {
       await prefs.setString('token', responseData.toString());
       print(prefs.getString('token'));
       progress.dismiss();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (BuildContext context) => DashBoard(
-            initialIndex: 0,
-          ),
-        ),
-      );
+      getValues();
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(
+      //     builder: (BuildContext context) => DashBoard(
+      //       initialIndex: 0,
+      //     ),
+      //   ),
+      // );
     } else {
       progress.dismiss();
       Map response = responseData;
       String errorMessage = response["message"];
+      print(errorMessage);
       Fluttertoast.showToast(
         msg: errorMessage,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
+        gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black,
-        textColor: Colors.white,
+        backgroundColor: Colors.white,
+        textColor: Colors.black,
         fontSize: 16.0,
       );
       // AlertDialog alert = AlertDialog(
@@ -159,9 +167,87 @@ class _SignInState extends State<SignIn> {
     }
   }
 
+  getValues() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.get("token");
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': "Bearer $token"
+    };
+    ApiResponseModel responseData = await getApiCall(
+      getUrl: myAccountUrl,
+      headers: headers,
+      context: context,
+    );
+    if (responseData.statusCode == 200) {
+      Map data = responseData.responseValue;
+      pushNotification(context);
+      setState(() {
+        customer_ID = data["id"].toString();
+        print(customer_ID);
+      });
+    } else {
+      print(responseData);
+    }
+  }
+
+  pushNotification(BuildContext _context) async {
+    print("pushNotification called");
+    SharedPreferences preference = await SharedPreferences.getInstance();
+    String deviceID = preference.getString("firebasetoken");
+    print("preference.getString(firebasetoken)");
+    print(preference.getString("firebasetoken"));
+    var body = jsonEncode({
+      "device_type": Platform.isAndroid
+          ? "Android"
+          : Platform.isIOS
+              ? "IOS"
+              : "Null",
+      "device_id": deviceID,
+      "customer_id": customer_ID
+    });
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    ApiResponseModel responseData = await postApiCall(
+        postUrl: pushNotificationUrl,
+        headers: headers,
+        context: context,
+        body: body);
+
+    if (responseData.statusCode == 200) {
+      print(responseData.responseValue);
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (BuildContext context) => DashBoard(
+            initialIndex: 0,
+          ),
+        ),
+      );
+    } else {
+      Map response = responseData.responseValue;
+      String errorMessage = response["message"];
+      print(errorMessage);
+      // Fluttertoast.showToast(
+      //   msg: errorMessage,
+      //   toastLength: Toast.LENGTH_SHORT,
+      //   gravity: ToastGravity.BOTTOM,
+      //   timeInSecForIosWeb: 1,
+      //   backgroundColor: Colors.white,
+      //   textColor: Colors.black,
+      //   fontSize: 16.0,
+      // );
+
+      print(errorMessage);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: Locale(context.locale.languageCode),
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           body: SafeArea(
@@ -188,16 +274,41 @@ class _SignInState extends State<SignIn> {
                                 onTap: () async {
                                   SharedPreferences preferences =
                                       await SharedPreferences.getInstance();
+                                  String guestId = "";
+                                  if (preferences.getString("guestId") !=
+                                      null) {
+                                    guestId = preferences.getString("guestId");
+                                    print('guestID = $guestId');
+                                  }
                                   preferences.clear();
                                   preferences.setString("userType", "guest");
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          DashBoard(
-                                        initialIndex: 0,
+                                  if (guestId != "") {
+                                    preferences.setString("guestId", guestId);
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            DashBoard(
+                                          initialIndex: 0,
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  } else {
+                                    createCart(context);
+                                  }
+
+                                  // preferences.clear();
+                                  // preferences.setString("userType", "guest");
+                                  // String guesttoken =
+                                  //     preferences.getString("guestId");
+                                  // print("token = $guesttoken");
+                                  // Navigator.of(context).pushReplacement(
+                                  //   MaterialPageRoute(
+                                  //     builder: (BuildContext context) =>
+                                  //         DashBoard(
+                                  //       initialIndex: 0,
+                                  //     ),
+                                  //   ),
+                                  // );
                                 },
                                 child: Padding(
                                   padding:
@@ -206,7 +317,7 @@ class _SignInState extends State<SignIn> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Text(
-                                        "Skip",
+                                        LocaleKeys.skip.tr(),
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500),
@@ -233,14 +344,14 @@ class _SignInState extends State<SignIn> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "Welcome,",
+                                      LocaleKeys.language_first.tr(),
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                           fontSize: 25,
                                           fontWeight: FontWeight.w500),
                                     ),
                                     Text(
-                                      "Sign In To Continue",
+                                      LocaleKeys.signIntoContinue.tr(),
                                       style: TextStyle(
                                           fontSize: 20,
                                           color: lightGreyColor,
@@ -285,8 +396,8 @@ class _SignInState extends State<SignIn> {
                                                         EdgeInsets.only(
                                                             left: 15,
                                                             right: 15),
-                                                    hintText:
-                                                        "Email / Mobile Number",
+                                                    hintText: LocaleKeys
+                                                        .Email_Mobile.tr(),
                                                     hintStyle: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -296,7 +407,8 @@ class _SignInState extends State<SignIn> {
                                                   validator: (value) {
                                                     bool isemail = false;
                                                     if (value.isEmpty) {
-                                                      return "Email / Mobile Number";
+                                                      return LocaleKeys
+                                                          .Email_Mobile.tr();
                                                     } else if (value
                                                         .isNotEmpty) {
                                                       try {
@@ -313,7 +425,9 @@ class _SignInState extends State<SignIn> {
                                                                 email: value);
                                                         if (validyEmail !=
                                                             true) {
-                                                          return 'Please Enter Valid Email';
+                                                          return LocaleKeys
+                                                              .valid_email
+                                                              .tr();
                                                         } else
                                                           return null;
                                                       } else
@@ -331,7 +445,7 @@ class _SignInState extends State<SignIn> {
                                     sizedBoxheight20,
                                     customTextBox1(
                                       icons: "assets/icon/lockIcon.png",
-                                      hintText: "Password",
+                                      hintText: LocaleKeys.Password.tr(),
                                       controller: passwordTextfield,
                                       passwordField: true,
                                       keyboardType:
@@ -353,7 +467,7 @@ class _SignInState extends State<SignIn> {
                                             );
                                           },
                                           child: Text(
-                                            "Forgot Password?",
+                                            LocaleKeys.Forgot_Password.tr(),
                                             style: TextStyle(
                                               color: HexColor("#6D6D6D"),
                                               fontSize: 16,
@@ -381,7 +495,7 @@ class _SignInState extends State<SignIn> {
                                             height: 25,
                                             width: 100,
                                             child: Text(
-                                              "Sign Up",
+                                              LocaleKeys.SignUp.tr(),
                                               textAlign: TextAlign.right,
                                               style: TextStyle(
                                                 color: HexColor("#6D6D6D"),
@@ -411,11 +525,12 @@ class _SignInState extends State<SignIn> {
                                               }
                                             },
                                             child: customGradientButton(
-                                              title: "SUBMIT",
+                                              title: LocaleKeys.SUBMIT.tr(),
                                               backgroundColor: primaryColor,
                                             ),
                                           ),
                                           sizedBoxheight20,
+/*
                                           Row(
                                             children: [
                                               Expanded(
@@ -440,7 +555,9 @@ class _SignInState extends State<SignIn> {
                                               ),
                                             ],
                                           ),
+*/
                                           sizedBoxheight20,
+/*
                                           Padding(
                                             padding: const EdgeInsets.only(
                                                 left: 10, right: 10),
@@ -463,6 +580,7 @@ class _SignInState extends State<SignIn> {
                                               ],
                                             ),
                                           )
+*/
                                         ],
                                       ),
                                     )

@@ -16,15 +16,17 @@ import 'package:menahub/translation/codegen_loader.g.dart';
 import 'package:menahub/translation/locale_keys.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-class AddNewAddressScreen extends StatefulWidget {
-  AddNewAddressScreen({this.router});
+class EditAddressScreen extends StatefulWidget {
+  EditAddressScreen({this.router, this.addressdetails, this.addressID});
   final String router;
+  final List addressdetails;
+  int addressID;
 
   @override
-  _AddNewAddressScreenState createState() => _AddNewAddressScreenState();
+  _EditAddressScreenState createState() => _EditAddressScreenState();
 }
 
-class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
+class _EditAddressScreenState extends State<EditAddressScreen> {
   TextEditingController form1addressTitleTextField1 = TextEditingController();
   TextEditingController form1nameTextField1 = TextEditingController();
   TextEditingController form1companyNameTextField1 = TextEditingController();
@@ -48,13 +50,15 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
   bool _form1company = false;
   bool _form1email = false;
   bool _form1mobile = false;
+  bool _form1countrycode = false;
+
   bool _form1buildingno = false;
   bool _form1street = false;
   bool _form1zoneno = false;
   bool _form1city = false;
   bool _form1country = false;
   bool _form1region = false;
-  bool _form1countrycode = false;
+
   bool _form2address = false;
   bool _form2name = false;
   bool _form2company = false;
@@ -65,6 +69,27 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
   bool _form2zoneno = false;
   bool _form2city = false;
   bool _form2country = false;
+  String addressID;
+  String customerID;
+  List storecofigdetails;
+  Map countrydetails;
+  Map regiondetails;
+  List region_QA;
+  List region_IN;
+  List region_AE;
+  List<Map> _QA = [
+    {'id': 'QA', "image": "assets/image/flag-of-Qatar.png", 'name': 'QATAR'},
+  ];
+  List<Map> _IN = [
+    {'id': "IN", "image": "assets/image/india.png", 'name': 'INDIA'},
+  ];
+  List<Map> _AE = [
+    {
+      'id': "AE",
+      "image": "assets/image/flag-of-United-Arab-Emirates.png",
+      'name': 'UAE'
+    },
+  ];
   // ignore: non_constant_identifier_names
   final FocusNode Form1mobile = FocusNode();
   // ignore: non_constant_identifier_names
@@ -79,54 +104,51 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
 
   //user profile details from api
   Map accountDetails;
-  String countryCode = '+91';
   String userType;
-  int countryid;
-  List storecofigdetails;
-  Map countrydetails;
-  List countries;
-  Map regiondetails;
-  List region;
-  List region_QA;
-  List region_IN;
-  List region_AE;
-  Map selectedregion;
-  String regionCode;
-  String regionname;
+
   @override
   void initState() {
     super.initState();
     getProfileDetails();
     getStoreConfigDetails();
-  }
+    setState(() {
+      addressID = widget.addressdetails[widget.addressID]["id"].toString();
+      customerID =
+          widget.addressdetails[widget.addressID]["customer_id"].toString();
+      List customAttributes =
+          widget.addressdetails[widget.addressID]["custom_attributes"];
+      int addresstitleIndex = customAttributes
+          .indexWhere((f) => f['attribute_code'] == "addresscategory");
 
-  getProfileDetails() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.get("token");
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': "Bearer $token"
-    };
-    ApiResponseModel responseData = await getApiCall(
-      getUrl: myAccountUrl,
-      headers: headers,
-      context: context,
-    );
-    if (responseData.statusCode == 200) {
-      Map data = responseData.responseValue;
-      List customAttributes = data["custom_attributes"];
-      // print(data);
-      setState(() {
-        accountDetails = data;
-        Map mobileNumberMap = customAttributes[2];
-        Map countryCodeMap = customAttributes[3];
-        countryCode = countryCodeMap["value"];
-        form1emailTextField1.text = data["email"];
-        form1nameTextField1.text = data["firstname"];
-      });
-    } else {
-      print(responseData);
-    }
+      Map addresstitleIndexMap = customAttributes[addresstitleIndex];
+      String addresstitle = addresstitleIndexMap["value"];
+
+      form1addressTitleTextField1.text = addresstitle.toString();
+      _form1regionselection =
+          widget.addressdetails[widget.addressID]["region_id"].toString();
+      _form1countryselection =
+          widget.addressdetails[widget.addressID]["country_id"].toString();
+
+      String mob =
+          widget.addressdetails[widget.addressID]["telephone"].toString();
+      form1mobileNumberTextField1.text = '${mob.split(" ")[1]}'.toString();
+
+      form1cityTextField1.text =
+          widget.addressdetails[widget.addressID]["city"].toString();
+      form1nameTextField1.text =
+          widget.addressdetails[widget.addressID]["firstname"].toString();
+      form1streetNumberTextField1.text =
+          widget.addressdetails[widget.addressID]["street"][1].toString();
+      form1buildingNumberTextField1.text =
+          widget.addressdetails[widget.addressID]["street"][0].toString();
+      form1zoneNumberTextField1.text =
+          widget.addressdetails[widget.addressID]["postcode"].toString();
+      String company =
+          widget.addressdetails[widget.addressID]["company"].toString();
+      String empty = " ";
+      form1companyNameTextField1.text =
+          company == null ? empty.toString() : company.toString();
+    });
   }
 
   getStoreConfigDetails() async {
@@ -147,21 +169,69 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
         countrydetails = storecofigdetails[0]["store"][0]["countries"];
         regiondetails = storecofigdetails[0]["store"][0]["region"];
         region_IN = regiondetails["IN"];
+        // print('Indian =$region_IN');
         Map ind = region_IN.removeAt(0);
 
+        // print("ind=$ind");
+        // print("removed=$region_IN");
         region_QA = regiondetails["QA"];
         Map qa = region_QA.removeAt(0);
         region_AE = regiondetails["AE"];
-        print('QA=$region_QA');
-
-        // region = region_IN + region_QA + region_AE;
+        print(region_QA);
+        print(region_IN);
+        region = region_IN + region_QA + region_AE;
       });
     } else {
       print(responseData);
     }
   }
 
-  saveAddress() async {
+  getProfileDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.get("token");
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': "Bearer $token"
+    };
+    ApiResponseModel responseData = await getApiCall(
+      getUrl: myAccountUrl,
+      headers: headers,
+      context: context,
+    );
+    if (responseData.statusCode == 200) {
+      Map data = responseData.responseValue;
+      List customAttributes = data["custom_attributes"];
+      int mobilenumberIndex = customAttributes
+          .indexWhere((f) => f['attribute_code'] == "mobilenumber");
+      int mobilenumberCodeIndex = customAttributes
+          .indexWhere((f) => f['attribute_code'] == "mobilenumber_code");
+      Map mobilenumberIndexMap = customAttributes[mobilenumberIndex];
+      Map mobilenumberCodeIndexMap = customAttributes[mobilenumberCodeIndex];
+      String mobileNumber = mobilenumberIndexMap["value"];
+      String mobileNumbercode = mobilenumberCodeIndexMap["value"];
+
+      // print(data);
+      setState(() {
+        accountDetails = data;
+        // print('account = $accountDetails');
+        Map mobileNumberMap = customAttributes[2];
+        Map countryCodeMap = customAttributes[3];
+        countryCode = countryCodeMap["value"];
+        // print("mobileNumber  = $mobileNumber");
+        // print("mobileNumber code = $mobileNumbercode");
+        String mob =
+            widget.addressdetails[widget.addressID]["telephone"].toString();
+        countryCode = '${mob.split(" ")[0]}';
+        form1emailTextField1.text = data["email"];
+
+        // form1nameTextField1.text = data["firstname"];
+      });
+    } else {
+      print(responseData);
+    }
+  }
+
+  updateAddress(String customerID, String addressID) async {
     final overlay = LoadingOverlay.of(context);
     overlay.show();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -172,6 +242,8 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
     };
     var body = jsonEncode({
       "address": {
+        "id": addressID,
+        "customer_id": customerID,
         "region": {
           "region_code": "Doha",
           "region": "Doha",
@@ -213,76 +285,28 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
     print(responseData.responseValue);
     if (responseData.statusCode == 200) {
       overlay.hide();
-      Navigator.pop(context, "getAddressRefersh");
+      Navigator.of(context).maybePop();
     } else {
       overlay.hide();
-      Navigator.of(context).pop();
+      Navigator.of(context).maybePop();
     }
   }
 
-  savebillAddress() async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.get("token");
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': "Bearer $token"
-    };
-    var body = jsonEncode({
-      "address": {
-        "region": "Puducherry",
-        "region_id": 559,
-        "region_code": "PY",
-        "country_id": "IN",
-        "street": [
-          form2streetNumberTextField2.text,
-          form2buildingNumberTextField2.text
-        ],
-        "telephone": form2mobileNumberTextField2.text,
-        "postcode": form2zoneNumberTextField2.text,
-        "city": form2cityTextField2.text,
-        "firstname": form2nameTextField2.text,
-        "lastname": accountDetails["lastname"],
-        "customer_id": accountDetails["customer_id"],
-        "email": "punithavelkt@gmail.com",
-        "same_as_billing": 0,
-        "save_in_address_book": 0
-      }
-    });
-    ApiResponseModel responseData = await postApiCall(
-      postUrl: "$billaddressSaveApi",
-      headers: headers,
-      context: context,
-      body: body,
-    );
-    print(responseData.responseValue);
-    if (responseData.statusCode == 200) {
-      print(responseData.responseValue);
-
-      overlay.hide();
-      Navigator.pop(context, "getAddressRefersh");
-    } else {
-      overlay.hide();
-      Navigator.of(context).pop();
-    }
-  }
-
-  List<Map> _QA = [
+  List<Map> _myJson = [
     {'id': 'QA', "image": "assets/image/flag-of-Qatar.png", 'name': 'QATAR'},
-  ];
-  List<Map> _IN = [
-    {'id': "IN", "image": "assets/image/india.png", 'name': 'INDIA'},
-  ];
-  List<Map> _AE = [
     {
       'id': "AE",
       "image": "assets/image/flag-of-United-Arab-Emirates.png",
       'name': 'UAE'
     },
+    {'id': "IN", "image": "assets/image/india.png", 'name': 'INDIA'},
   ];
+
   String _form1countryselection;
   String _form1regionselection;
+  String countryCode;
+
+  List region;
 
   String _form2countryselection;
 
@@ -350,7 +374,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
               Navigator.pop(context);
             },
           ),
-          title: Text(LocaleKeys.Add_New_Address.tr()),
+          title: Text(LocaleKeys.Edit_Address.tr()),
           flexibleSpace: Container(
             decoration: BoxDecoration(
                 gradient: LinearGradient(colors: <Color>[
@@ -654,7 +678,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                             focusedBorder: UnderlineInputBorder(
                                                 borderSide: BorderSide(
                                                     color: Color(0xFF0D3451))),
-                                            hintText: LocaleKeys.Name.tr(),
+                                            hintText: LocaleKeys.name.tr(),
                                           ),
                                         ),
                                       ),
@@ -811,8 +835,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                             Flexible(
                                               flex: 1,
                                               child: ButtonTheme(
-                                                child: DropdownButtonFormField<
-                                                    String>(
+                                                child: DropdownButtonFormField(
                                                   decoration: InputDecoration(
                                                     focusedBorder:
                                                         UnderlineInputBorder(
@@ -825,15 +848,9 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                       .subtitle1,
                                                   icon: Icon(Icons
                                                       .keyboard_arrow_down_outlined),
-                                                  value: countryCode,
-                                                  validator: (var value) {
-                                                    if (value == null) {
-                                                      _form1countrycode = true;
-                                                    }
-                                                    return null;
-                                                  },
                                                   hint: Text(
                                                       LocaleKeys.Code.tr()),
+                                                  value: countryCode,
                                                   onChanged: (String newValue) {
                                                     FocusScope.of(context)
                                                         .requestFocus(
@@ -858,11 +875,11 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                     });
                                                   },
                                                   items: [
-                                                    DropdownMenuItem<String>(
+                                                    DropdownMenuItem(
                                                       child: Text('+91'),
                                                       value: '+91',
                                                     ),
-                                                    DropdownMenuItem<String>(
+                                                    DropdownMenuItem(
                                                       child: Text('+974'),
                                                       value: '+974',
                                                     ),
@@ -882,6 +899,10 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                             Flexible(
                                               flex: 3,
                                               child: TextFormField(
+                                                inputFormatters: [
+                                                  LengthLimitingTextInputFormatter(
+                                                      10)
+                                                ],
                                                 controller:
                                                     form1mobileNumberTextField1,
                                                 focusNode: Form1mobile,
@@ -899,6 +920,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
 
                                                   if (value.isEmpty) {
                                                     _form1mobile = true;
+                                                    return;
                                                   } else if (!regex
                                                       .hasMatch(value)) {}
                                                   return null;
@@ -929,7 +951,6 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                           ],
                                         ),
                                       ),
-
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -1206,12 +1227,12 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                   .keyboard_arrow_down_outlined),
                                               value: _form1regionselection,
                                               //   onTap: () => node.requestFocus(),
-
                                               onChanged: (newValue) {
+                                                FocusScope.of(context)
+                                                    .requestFocus(Form1country);
                                                 setState(() {
                                                   _form1region = false;
                                                   _form1country = false;
-
                                                   _form1regionselection =
                                                       newValue;
                                                   // _form1countryselection = int
@@ -1301,9 +1322,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                                 setState(() {
                                                   _form1countryselection =
                                                       newValue;
-                                                  print(
-                                                      'country = $_form1countryselection');
-                                                  // _form1country = false;
+                                                  _form1country = false;
                                                 });
                                               },
                                               validator: (String value) {
@@ -1381,7 +1400,6 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                                               )),
                                         ],
                                       ),
-
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(
                                             25, 5, 25, 0),
@@ -1464,128 +1482,228 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                       //     key: _formkey2,
                       //     child: Column(
                       //       children: <Widget>[
+                      //         // Column(
+                      //         //   children: [
+                      //         //     GestureDetector(
+                      //         //       onTap: () {
+                      //         //         setState(() {
+                      //         //           billaddressdif = false;
+                      //         //         });
+                      //         //       },
+                      //         //       child: SizedBox(
+                      //         //         //  height: 50,
+                      //         //         width: width,
+                      //         //         //color: Colors.orange,
+                      //         //         child: Padding(
+                      //         //           padding:
+                      //         //               const EdgeInsets.fromLTRB(20, 20, 0, 10),
+                      //         //           child: Text(
+                      //         //             'Shipping Address',
+                      //         //           ),
+                      //         //         ),
+                      //         //       ),
+                      //         //     ),
+                      //         //     Divider(
+                      //         //       thickness: 2,
+                      //         //       height: 1,
+                      //         //     ),
+                      //         //     Row(
+                      //         //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //         //       children: [
+                      //         //         Padding(
+                      //         //           padding:
+                      //         //               const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                      //         //           child: Text(
+                      //         //             'Address Title',
+                      //         //           ),
+                      //         //         ),
+                      //         //         Padding(
+                      //         //           padding: const EdgeInsets.only(right: 8),
+                      //         //           child: ButtonTheme(
+                      //         //             height: 20,
+                      //         //             minWidth: 1,
+                      //         //             // ignore: deprecated_member_use
+                      //         //             child: RaisedButton(
+                      //         //               // borderSide: BorderSide(color: Colors.black),
+                      //         //
+                      //         //               color: setdefault == true
+                      //         //                   ? Color(0xFFF78500)
+                      //         //                   : Color(0xFFFFFFFF),
+                      //         //               shape: RoundedRectangleBorder(
+                      //         //                 borderRadius:
+                      //         //                     BorderRadius.circular(40.0),
+                      //         //                 side: BorderSide(
+                      //         //                   color: setdefault == true
+                      //         //                       ? Color(0xFFF78500)
+                      //         //                       : Color(0xFF666666),
+                      //         //                 ),
+                      //         //               ),
+                      //         //               child: Text(
+                      //         //                 'Edit',
+                      //         //               ),
+                      //         //               onPressed: () {
+                      //         //                 setState(() {
+                      //         //                   setdefault = setdefault == false
+                      //         //                       ? true
+                      //         //                       : false;
+                      //         //                 });
+                      //         //               },
+                      //         //             ),
+                      //         //           ),
+                      //         //         ),
+                      //         //       ],
+                      //         //     ),
+                      //         //     Row(
+                      //         //       children: [
+                      //         //         IconButton(
+                      //         //           icon: (billaddressdif == true
+                      //         //               ? Icon(Icons.check_circle_outline)
+                      //         //               : Icon(Icons.radio_button_off)),
+                      //         //           color: Colors.orange,
+                      //         //           onPressed: _toggleFavorite2,
+                      //         //         ),
+                      //         //         GestureDetector(
+                      //         //             onTap: () {
+                      //         //               setState(() {
+                      //         //                 _isFavorited2 = _isFavorited2 == true
+                      //         //                     ? false
+                      //         //                     : true;
+                      //         //                 billaddressdif = billaddressdif == true
+                      //         //                     ? false
+                      //         //                     : true;
+                      //         //               });
+                      //         //             },
+                      //         //             child: Text(
+                      //         //               'Billing Address is Different',
+                      //         //               style: TextStyle(
+                      //         //                   fontWeight: FontWeight.bold),
+                      //         //             )),
+                      //         //       ],
+                      //         //     ),
+                      //         //   ],
+                      //         // ),
                       //         Container(
                       //           child: Form(
                       //             autovalidateMode:
                       //                 AutovalidateMode.onUserInteraction,
                       //             child: Column(
                       //               children: <Widget>[
-                      //                 // Padding(
-                      //                 //   padding: const EdgeInsets.fromLTRB(
-                      //                 //       25, 5, 25, 0),
-                      //                 //   child: TextFormField(
-                      //                 //     controller:
-                      //                 //         form2addressTitleTextField2,
-                      //                 //     validator: (String value) {
-                      //                 //       if (value.isEmpty) {
-                      //                 //         _form2address = true;
-                      //                 //       }
-                      //                 //       return null;
-                      //                 //     },
-                      //                 //     onChanged: (value) {
-                      //                 //       setState(() {
-                      //                 //         _form2address = false;
-                      //                 //       });
-                      //                 //     },
-                      //                 //     decoration: InputDecoration(
-                      //                 //       focusedBorder: UnderlineInputBorder(
-                      //                 //           borderSide: BorderSide(
-                      //                 //               color: Color(0xFF0D3451))),
-                      //                 //       hintText: 'Address Title',
-                      //                 //     ),
-                      //                 //   ),
-                      //                 // ),
-                      //                 // Row(
-                      //                 //   mainAxisAlignment:
-                      //                 //       MainAxisAlignment.end,
-                      //                 //   children: [
-                      //                 //     Visibility(
-                      //                 //         visible: _form2address == true
-                      //                 //             ? true
-                      //                 //             : false,
-                      //                 //         child: Padding(
-                      //                 //           padding:
-                      //                 //               const EdgeInsets.fromLTRB(
-                      //                 //                   0, 10, 40, 0),
-                      //                 //           child: Text(
-                      //                 //             'Please enter Address Title',
-                      //                 //             style: TextStyle(
-                      //                 //                 color: Colors.red),
-                      //                 //           ),
-                      //                 //         )),
-                      //                 //   ],
-                      //                 // ),
-                      //                 // InkWell(
-                      //                 //   radius: 25.0,
-                      //                 //   onTap: () {
-                      //                 //     setState(() {
-                      //                 //       form2addressType = false;
-                      //                 //     });
-                      //                 //   },
-                      //                 //   child: Container(
-                      //                 //     child: Padding(
-                      //                 //       padding: const EdgeInsets.fromLTRB(
-                      //                 //           25, 15, 25, 0),
-                      //                 //       child: Row(
-                      //                 //         children: [
-                      //                 //           Text('Address Type'),
-                      //                 //           Flexible(
-                      //                 //             flex: 1,
-                      //                 //             child: IconButton(
-                      //                 //               icon: (form2addressType
-                      //                 //                   ? Icon(Icons
-                      //                 //                       .check_circle_outline)
-                      //                 //                   : Icon(Icons
-                      //                 //                       .radio_button_off)),
-                      //                 //               color: Colors.orange,
-                      //                 //               onPressed:
-                      //                 //                   _form2toggleFavorite,
-                      //                 //             ),
-                      //                 //           ),
-                      //                 //           Flexible(
-                      //                 //             flex: 1,
-                      //                 //             child: Transform(
-                      //                 //               transform: Matrix4
-                      //                 //                   .translationValues(
-                      //                 //                       -8, 0.0, 0.0),
-                      //                 //               child: GestureDetector(
-                      //                 //                 onTap: () {
-                      //                 //                   setState(() {
-                      //                 //                     form2addressType =
-                      //                 //                         true;
-                      //                 //                   });
-                      //                 //                 },
-                      //                 //                 child: Text(
-                      //                 //                   'Home',
-                      //                 //                 ),
-                      //                 //               ),
-                      //                 //             ),
-                      //                 //           ),
-                      //                 //           Flexible(
-                      //                 //             flex: 1,
-                      //                 //             child: IconButton(
-                      //                 //               icon: (form2addressType
-                      //                 //                   ? Icon(Icons
-                      //                 //                       .radio_button_off)
-                      //                 //                   : Icon(Icons
-                      //                 //                       .check_circle_outline)),
-                      //                 //               color: Colors.orange,
-                      //                 //               onPressed:
-                      //                 //                   _form2toggleFavorite1,
-                      //                 //             ),
-                      //                 //           ),
-                      //                 //           Flexible(
-                      //                 //               flex: 1,
-                      //                 //               child: Transform(
-                      //                 //                   transform: Matrix4
-                      //                 //                       .translationValues(
-                      //                 //                           -8, 0.0, 0.0),
-                      //                 //                   child: Text('Work'))),
-                      //                 //         ],
-                      //                 //       ),
-                      //                 //     ),
-                      //                 //   ),
-                      //                 // ),
+                      //                 Padding(
+                      //                   padding: const EdgeInsets.fromLTRB(
+                      //                       25, 5, 25, 0),
+                      //                   child: TextFormField(
+                      //                     controller:
+                      //                         form2addressTitleTextField2,
+                      //                     validator: (String value) {
+                      //                       if (value.isEmpty) {
+                      //                         _form2address = true;
+                      //                       }
+                      //                       return null;
+                      //                     },
+                      //                     onChanged: (value) {
+                      //                       setState(() {
+                      //                         _form2address = false;
+                      //                       });
+                      //                     },
+                      //                     decoration: InputDecoration(
+                      //                       focusedBorder: UnderlineInputBorder(
+                      //                           borderSide: BorderSide(
+                      //                               color: Color(0xFF0D3451))),
+                      //                       hintText: 'Address Title',
+                      //                     ),
+                      //                   ),
+                      //                 ),
+                      //                 Row(
+                      //                   mainAxisAlignment:
+                      //                       MainAxisAlignment.end,
+                      //                   children: [
+                      //                     Visibility(
+                      //                         visible: _form2address == true
+                      //                             ? true
+                      //                             : false,
+                      //                         child: Padding(
+                      //                           padding:
+                      //                               const EdgeInsets.fromLTRB(
+                      //                                   0, 10, 40, 0),
+                      //                           child: Text(
+                      //                             'Please enter Address Title',
+                      //                             style: TextStyle(
+                      //                                 color: Colors.red),
+                      //                           ),
+                      //                         )),
+                      //                   ],
+                      //                 ),
+                      //                 InkWell(
+                      //                   radius: 25.0,
+                      //                   onTap: () {
+                      //                     setState(() {
+                      //                       form2addressType = false;
+                      //                     });
+                      //                   },
+                      //                   child: Container(
+                      //                     child: Padding(
+                      //                       padding: const EdgeInsets.fromLTRB(
+                      //                           25, 15, 25, 0),
+                      //                       child: Row(
+                      //                         children: [
+                      //                           Text('Address Type'),
+                      //                           Flexible(
+                      //                             flex: 1,
+                      //                             child: IconButton(
+                      //                               icon: (form2addressType
+                      //                                   ? Icon(Icons
+                      //                                       .check_circle_outline)
+                      //                                   : Icon(Icons
+                      //                                       .radio_button_off)),
+                      //                               color: Colors.orange,
+                      //                               onPressed:
+                      //                                   _form2toggleFavorite,
+                      //                             ),
+                      //                           ),
+                      //                           Flexible(
+                      //                             flex: 1,
+                      //                             child: Transform(
+                      //                               transform: Matrix4
+                      //                                   .translationValues(
+                      //                                       -8, 0.0, 0.0),
+                      //                               child: GestureDetector(
+                      //                                 onTap: () {
+                      //                                   setState(() {
+                      //                                     form2addressType =
+                      //                                         true;
+                      //                                   });
+                      //                                 },
+                      //                                 child: Text(
+                      //                                   'Home',
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                           ),
+                      //                           Flexible(
+                      //                             flex: 1,
+                      //                             child: IconButton(
+                      //                               icon: (form2addressType
+                      //                                   ? Icon(Icons
+                      //                                       .radio_button_off)
+                      //                                   : Icon(Icons
+                      //                                       .check_circle_outline)),
+                      //                               color: Colors.orange,
+                      //                               onPressed:
+                      //                                   _form2toggleFavorite1,
+                      //                             ),
+                      //                           ),
+                      //                           Flexible(
+                      //                               flex: 1,
+                      //                               child: Transform(
+                      //                                   transform: Matrix4
+                      //                                       .translationValues(
+                      //                                           -8, 0.0, 0.0),
+                      //                                   child: Text('Work'))),
+                      //                         ],
+                      //                       ),
+                      //                     ),
+                      //                   ),
+                      //                 ),
                       //                 Padding(
                       //                   padding: const EdgeInsets.fromLTRB(
                       //                       25, 5, 25, 0),
@@ -2266,8 +2384,8 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                   child: InkWell(
                     child: customButton(
                       title: widget.router == "account"
-                          ? LocaleKeys.SAVE.tr()
-                          : LocaleKeys.SAVE_DELIVER.tr(),
+                          ? LocaleKeys.UPDATE.tr()
+                          : LocaleKeys.UPDATE.tr(),
                       backgroundColor: secondaryColor,
                     ),
                     onTap: () {
@@ -2292,22 +2410,7 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                         form1mobileNumberTextField1.text.isEmpty
                             ? _form1mobile = true
                             : _form1mobile = false;
-                        if (countryCode == '+91' &&
-                            form1mobileNumberTextField1.text.length < 10) {
-                          _form1mobile = true;
-                        }
-                        if (countryCode == '+91' &&
-                            form1mobileNumberTextField1.text.length > 10) {
-                          _form1mobile = true;
-                        }
-                        if (countryCode == '+974' &&
-                            form1mobileNumberTextField1.text.length < 8) {
-                          _form1mobile = true;
-                        }
-                        if (countryCode == '+974' &&
-                            form1mobileNumberTextField1.text.length > 8) {
-                          _form1mobile = true;
-                        }
+
                         form1buildingNumberTextField1.text.isEmpty
                             ? _form1buildingno = true
                             : _form1buildingno = false;
@@ -2355,9 +2458,8 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                           print(form1streetNumberTextField1.text);
                           print(form1zoneNumberTextField1.text);
                           print(form1cityTextField1.text);
-                          saveAddress();
+                          updateAddress(customerID, addressID);
                         }
-
                         if (form1addressType == false) {
                           if (_form1address ||
                               _form1email ||
@@ -2380,11 +2482,15 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                             print(form1streetNumberTextField1.text);
                             print(form1zoneNumberTextField1.text);
                             print(form1cityTextField1.text);
-                            saveAddress();
+                            updateAddress(customerID, addressID);
                           }
                         }
 
                         if (billaddressdif == true) {
+                          form2addressTitleTextField2.text.isEmpty
+                              ? _form2address = true
+                              : _form2address = false;
+
                           form2nameTextField2.text.isEmpty
                               ? _form2name = true
                               : _form2name = false;
@@ -2420,7 +2526,6 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                           _form2countryselection == null
                               ? _form2country = true
                               : _form2country = false;
-
                           if (_form2address ||
                               _form2email ||
                               _form2mobile ||
@@ -2440,34 +2545,31 @@ class _AddNewAddressScreenState extends State<AddNewAddressScreen> {
                             print(form2streetNumberTextField2.text);
                             print(form2zoneNumberTextField2.text);
                             print(form2cityTextField2.text);
-                            savebillAddress();
                           }
-                          // if (form2addressType == false) {
-                          //   if (_form2address ||
-                          //       _form2email ||
-                          //       _form2mobile ||
-                          //       _form2name ||
-                          //       _form2company ||
-                          //       _form2country ||
-                          //       _form2buildingno ||
-                          //       _form2zoneno ||
-                          //       _form2city ||
-                          //       _form2street) {
-                          //     print("Form 2 Conatins Error");
-                          //   } else {
-                          //     print(form2addressTitleTextField2.text);
-                          //     print(form2nameTextField2.text);
-                          //     print(form2companyNameTextField2.text);
-                          //     print(form2emailTextField2.text);
-                          //     print(form2mobileNumberTextField2.text);
-                          //     print(form2buildingNumberTextField2.text);
-                          //     print(form2streetNumberTextField2.text);
-                          //     print(form2zoneNumberTextField2.text);
-                          //     print(form2cityTextField2.text);
-                          //     saveAddress();
-                          //   }
-                          // }
-                          //}
+                          if (form2addressType == false) {
+                            if (_form2address ||
+                                _form2email ||
+                                _form2mobile ||
+                                _form2name ||
+                                _form2company ||
+                                _form2country ||
+                                _form2buildingno ||
+                                _form2zoneno ||
+                                _form2city ||
+                                _form2street) {
+                              print("Form 2 Conatins Error");
+                            } else {
+                              print(form2addressTitleTextField2.text);
+                              print(form2nameTextField2.text);
+                              print(form2companyNameTextField2.text);
+                              print(form2emailTextField2.text);
+                              print(form2mobileNumberTextField2.text);
+                              print(form2buildingNumberTextField2.text);
+                              print(form2streetNumberTextField2.text);
+                              print(form2zoneNumberTextField2.text);
+                              print(form2cityTextField2.text);
+                            }
+                          }
                         }
                       });
                     },

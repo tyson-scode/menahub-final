@@ -21,7 +21,8 @@ class _PersonalCareSupliesState extends State<PersonalCareSuplies> {
   bool wishlistStatus = false;
   @override
   Widget build(BuildContext context) {
-    double productPrice = double.parse(widget.productDetails['price']);
+    String productPrice =
+        double.parse(widget.productDetails['price']).toStringAsFixed(2);
     return InkWell(
       onTap: () {
         widget.onstate(widget.productDetails['sku'].toString(), false);

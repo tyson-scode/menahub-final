@@ -7,7 +7,9 @@ import 'package:menahub/Util/Api/ApiResponseModel.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/config/CustomLoader.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   final searchIndex;
@@ -20,11 +22,11 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
   int searchIndex = 0;
 
   List orderTypeList = [
-    'All',
-    'Quote Request',
-    'Orders',
-    'UnPaid',
-    'Returns',
+    LocaleKeys.All.tr(),
+    LocaleKeys.Quote_Request.tr(),
+    LocaleKeys.Order.tr(),
+    LocaleKeys.Unpaid.tr(),
+    LocaleKeys.Returns.tr()
   ];
 
   List apiList = [
@@ -79,6 +81,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
@@ -86,7 +91,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
           backgroundColor: appBarColor,
           brightness: lightBrightness,
           title: Text(
-            "My Orders",
+            LocaleKeys.My_Orders.tr(),
             style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
           ),
           leading: IconButton(
@@ -172,6 +177,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                           itemCount: orderList.length,
                           itemBuilder: (context, index) {
                             return orderItem(
+                                searchIndex1: searchIndex,
                                 orderDetails: orderList[index],
                                 context: context);
                           },

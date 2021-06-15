@@ -4,7 +4,8 @@ import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 
 Widget whatsNewCard({Map productDetails, int index}) {
-  double productPrice = double.parse(productDetails['price']);
+  String productPrice =
+      double.parse(productDetails['price']).toStringAsFixed(2);
   return Column(
     children: [
       Container(
@@ -20,7 +21,7 @@ Widget whatsNewCard({Map productDetails, int index}) {
       ),
       sizedBoxheight10,
       Container(
-        height: 30,
+        //height: 30,
         child: Text(
           productDetails["name"],
           textAlign: TextAlign.center,
@@ -30,7 +31,7 @@ Widget whatsNewCard({Map productDetails, int index}) {
       sizedBoxheight5,
       Text(
         "QAR $productPrice",
-        style: TextStyle(color: appBarColor, fontWeight: FontWeight.w600),
+        style: TextStyle(color: secondaryColor, fontWeight: FontWeight.w600),
       )
     ],
   );
