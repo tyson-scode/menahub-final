@@ -38,6 +38,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   String mobileNumber;
   String countryCode;
   String userType;
+  String notificationToken;
+  var deviceID;
 
   @override
   void initState() {
@@ -148,34 +150,37 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     }
   }
 
-  removePushNotification(BuildContext _context) async {
-    print("remove pushNotification called");
-    SharedPreferences preference = await SharedPreferences.getInstance();
-    String deviceID = preference.getString("firebasetoken");
-    print("preference.getString(firebasetoken)");
-    print(preference.getString("firebasetoken"));
-    var body = jsonEncode({
-      "device_type": Platform.isAndroid
-          ? "Android"
-          : Platform.isIOS
-              ? "IOS"
-              : "Null",
-      "device_id": deviceID,
-      "customer_id": accountDetails["id"],
-    });
-
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-    };
-    ApiResponseModel responseData = await postApiCall(
-      postUrl: removepushNotificationUrl,
-      headers: headers,
-      body: body,
-      context: context,
-    );
-
-    if (responseData.statusCode == 200) {
-      print(responseData.responseValue);
+  removePushNotification() async {
+   // print("remove pushNotification called");
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    deviceID = preferences.getString("firebasetoken");
+    print('deviceID : $deviceID');
+    // String notificationToken = deviceID;
+    // //print("preference.getString(firebasetoken)");
+    // //print(preference.getString("firebasetoken"));
+    // var body = jsonEncode({
+    //   "device_type":
+    //   Platform.isAndroid
+    //       ? "Android"
+    //       : Platform.isIOS
+    //           ? "IOS"
+    //           : "Null",
+    //   "device_id": deviceID,
+    //   "customer_id": "${accountDetails["id"]}",
+    // });print(body);
+    //
+    // Map<String, String> headers = {
+    //   'Content-Type': 'application/json',
+    // };
+    // ApiResponseModel responseData = await postApiCall(
+    //   postUrl: removepushNotificationUrl,
+    //   headers: headers,
+    //   body: body,
+    //   context: context,
+    // );
+    //
+    // if (responseData.statusCode == 200) {
+    //   print(responseData.responseValue);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.clear();
       Navigator.of(context).pushReplacement(
@@ -183,13 +188,13 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           builder: (BuildContext context) => SignIn(),
         ),
       );
-    } else {
-      Map response = responseData.responseValue;
-      String errorMessage = response["message"];
-      print(errorMessage);
-      print(errorMessage);
     }
-  }
+    // else {
+    //   Map response = responseData.responseValue;
+    //   String errorMessage = response["message"];
+    //   print(errorMessage);
+    // }
+  //}
 
   @override
   Widget build(BuildContext contexts) {
@@ -690,7 +695,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                   size: 20,
                                 ),
                                 onTap: () async {
-                                  removePushNotification(context);
+                                  removePushNotification();
                                   // SharedPreferences prefs =
                                   //     await SharedPreferences.getInstance();
                                   // prefs.clear();

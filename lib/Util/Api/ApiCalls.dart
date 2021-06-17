@@ -10,8 +10,8 @@ Future<ApiResponseModel> getApiCall({
   Map<String, String> headers,
   BuildContext context,
 }) async {
-  print("getApiCall: " + getUrl);
-  print("Headers: " + headers.toString());
+  //print("getApiCall: " + getUrl);
+  //print("Headers: " + headers.toString());
   http.Response response = await http.get(
     Uri.parse(getUrl),
     headers: headers,
@@ -26,8 +26,8 @@ Future<ApiResponseModel> getApiCall({
   } else if (response.statusCode == 200) {
     return ApiResponseModel(responseValue: jsonResponse, statusCode: 200);
   } else {
-    print('Response status: ${response.body}');
-    return ApiResponseModel(responseValue: jsonResponse, statusCode: 400);
+    //print('Response status: ${response.body}');
+    //return ApiResponseModel(responseValue: jsonResponse, statusCode: 400);
   }
 }
 
@@ -37,7 +37,7 @@ Future<ApiResponseModel> postApiCall({
   Map<String, String> headers,
   BuildContext context,
 }) async {
-  print("PostApiCall: " + postUrl);
+ print("PostApiCall: " + postUrl);
   print('body');
   print(body);
   http.Response response = await http.post(
@@ -66,9 +66,9 @@ Future<ApiResponseModel> putApiCall({
   Map<String, String> headers,
   BuildContext context,
 }) async {
-  print("PutApiCall: " + postUrl);
+  //print("PutApiCall: " + postUrl);
   // print("Headers: " + headers.toString());
-  print("body: " + body);
+  //print("body: " + body);
   http.Response response = await http.put(
     Uri.parse(postUrl),
     body: body,

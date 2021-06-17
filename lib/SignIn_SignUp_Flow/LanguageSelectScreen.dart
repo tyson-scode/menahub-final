@@ -206,7 +206,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                                           preferences.getString("guestId");
                                       print('guestID = $guestId');
                                     }
-                                    preferences.clear();
+                                   // preferences.clear();
                                     preferences.setString("userType", "guest");
                                     if (guestId != "") {
                                       preferences.setString("guestId", guestId);

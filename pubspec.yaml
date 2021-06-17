@@ -17,7 +17,7 @@ dependencies:
   flutter_rating_bar: ^4.0.0
   #pagination	
   flutter_paginator: ^0.0.6
-  shared_preferences: ^2.0.4
+  shared_preferences: ^2.0.6
   #drop down	
   flutter_dropdown: ^0.0.8
   # get system path	

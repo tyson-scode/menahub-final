@@ -26,6 +26,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SignIn extends StatefulWidget {
+  SignIn({this.deviceID});
+  final deviceID;
   @override
   _SignInState createState() => _SignInState();
 }
@@ -38,6 +40,7 @@ class _SignInState extends State<SignIn> {
   bool emptyEmailValidation = false;
   bool emailValidation = false;
   String customer_ID;
+  var deviceID;
   @override
   void dispose() {
     super.dispose();
@@ -107,7 +110,15 @@ class _SignInState extends State<SignIn> {
   //   }
   // }
   signInApiCall(BuildContext _context) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    deviceID = preferences.getString("firebasetoken");
+    print('deviceID : $deviceID');
     print("sign api called");
+    // SharedPreferences preferences = await SharedPreferences.getInstance();
+    // deviceID = preferences.getString("firebasetoken");
+    //print(deviceID);
+    // SharedPreferences preference = await SharedPreferences.getInstance();
+    // deviceID = preference.getString("firebasetoken");
 
     FocusManager.instance.primaryFocus.unfocus();
     final progress = ProgressHUD.of(_context);
@@ -180,23 +191,23 @@ class _SignInState extends State<SignIn> {
       context: context,
     );
     if (responseData.statusCode == 200) {
-      Map data = responseData.responseValue;
-      pushNotification(context);
-      setState(() {
-        customer_ID = data["id"].toString();
-        print(customer_ID);
-      });
+      Map data = responseData.responseValue;print("DATA $data");
+      pushNotification( customer_ID = data["id"].toString()
+      );
+      // setState(() {
+      //   customer_ID = data["id"].toString();
+      //   print(customer_ID);
+      // });
     } else {
       print(responseData);
     }
   }
 
-  pushNotification(BuildContext _context) async {
+  pushNotification(customer_ID) async {
     print("pushNotification called");
-    SharedPreferences preference = await SharedPreferences.getInstance();
-    String deviceID = preference.getString("firebasetoken");
-    print("preference.getString(firebasetoken)");
-    print(preference.getString("firebasetoken"));
+    // SharedPreferences preferences = await SharedPreferences.getInstance();
+    // var deviceID = preferences.getString("firebasetoken");
+    // print('deviceID : $deviceID');
     var body = jsonEncode({
       "device_type": Platform.isAndroid
           ? "Android"
@@ -213,7 +224,7 @@ class _SignInState extends State<SignIn> {
         postUrl: pushNotificationUrl,
         headers: headers,
         context: context,
-        body: body);
+        body: body);print('body : $body');
 
     if (responseData.statusCode == 200) {
       print(responseData.responseValue);
@@ -224,7 +235,8 @@ class _SignInState extends State<SignIn> {
           ),
         ),
       );
-    } else {
+    }
+    else {
       Map response = responseData.responseValue;
       String errorMessage = response["message"];
       print(errorMessage);
