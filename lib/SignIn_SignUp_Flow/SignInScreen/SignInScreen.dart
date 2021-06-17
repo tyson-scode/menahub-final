@@ -26,8 +26,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SignIn extends StatefulWidget {
-  SignIn({this.deviceID});
-  final deviceID;
+  SignIn({this.deviceID1,this.router});
+  String deviceID1;
+  final router;
   @override
   _SignInState createState() => _SignInState();
 }
@@ -42,6 +43,11 @@ class _SignInState extends State<SignIn> {
   String customer_ID;
   var deviceID;
   @override
+  void initState() {
+    super.initState();
+    print(widget.deviceID1);
+  }
+
   void dispose() {
     super.dispose();
     emailTextfield.text = "";
@@ -109,9 +115,19 @@ class _SignInState extends State<SignIn> {
   //     print(errorMessage);
   //   }
   // }
-  signInApiCall(BuildContext _context) async {
+  token()async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     deviceID = preferences.getString("firebasetoken");
+  }
+  // routerToken()async{
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //   widget.deviceID1 = preferences.getString("firebasetoken");
+  // }
+
+  signInApiCall(BuildContext _context) async {
+    widget.router=="token"?
+    null:
+    token();
     print('deviceID : $deviceID');
     print("sign api called");
     // SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -142,6 +158,7 @@ class _SignInState extends State<SignIn> {
       prefs.clear();
       await prefs.setString('token', responseData.toString());
       print(prefs.getString('token'));
+
       progress.dismiss();
       getValues();
       // Navigator.of(context).pushReplacement(
@@ -205,8 +222,6 @@ class _SignInState extends State<SignIn> {
 
   pushNotification(customer_ID) async {
     print("pushNotification called");
-    // SharedPreferences preferences = await SharedPreferences.getInstance();
-    // var deviceID = preferences.getString("firebasetoken");
     // print('deviceID : $deviceID');
     var body = jsonEncode({
       "device_type": Platform.isAndroid
@@ -214,7 +229,7 @@ class _SignInState extends State<SignIn> {
           : Platform.isIOS
               ? "IOS"
               : "Null",
-      "device_id": deviceID,
+      "device_id": widget.router=="token"? widget.deviceID1 : deviceID,
       "customer_id": customer_ID
     });
     Map<String, String> headers = {
@@ -228,6 +243,8 @@ class _SignInState extends State<SignIn> {
 
     if (responseData.statusCode == 200) {
       print(responseData.responseValue);
+      widget.router=="token"?token1():
+      getToken();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (BuildContext context) => DashBoard(
@@ -253,7 +270,14 @@ class _SignInState extends State<SignIn> {
       print(errorMessage);
     }
   }
-
+getToken() async{
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  await preferences.setString('notificationToken', deviceID);
+}
+token1() async{
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  await preferences.setString('notificationToken', widget.deviceID1);
+}
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

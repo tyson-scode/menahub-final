@@ -39,14 +39,20 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   String countryCode;
   String userType;
   String notificationToken;
-  var deviceID;
+  String deviceID;
 
   @override
   void initState() {
     super.initState();
     getValues();
+    get();
   }
+get() async{
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  deviceID = preferences.getString("notificationToken");
+  print('deviceID : $deviceID');
 
+}
   onGoBack(dynamic value) {
     setValues(value);
     setState(() {});
@@ -153,7 +159,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   removePushNotification() async {
    // print("remove pushNotification called");
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    deviceID = preferences.getString("firebasetoken");
+    deviceID = preferences.getString("notificationToken");
     print('deviceID : $deviceID');
     // String notificationToken = deviceID;
     // //print("preference.getString(firebasetoken)");
@@ -185,7 +191,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       prefs.clear();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (BuildContext context) => SignIn(),
+          builder: (BuildContext context) => SignIn(deviceID1: deviceID,router:"token"),
         ),
       );
     }

@@ -37,9 +37,9 @@ Future<ApiResponseModel> postApiCall({
   Map<String, String> headers,
   BuildContext context,
 }) async {
- print("PostApiCall: " + postUrl);
-  print('body');
-  print(body);
+ // print("PostApiCall: " + postUrl);
+ //  print('body');
+ //  print(body);
   http.Response response = await http.post(
     Uri.parse(postUrl),
     body: body,
