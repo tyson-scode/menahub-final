@@ -1,20 +1,20 @@
 //base Urls
 var lang = "default";
-final baseUrl = "https://menahub.com/rest/";
-// final baseUrl = "https://magento2blog.thestagings.com/rest/";
+//final baseUrl = "https://menahub.com/rest/";
+final baseUrl = "https://magento2blog.thestagings.com/rest/";
 final paymentUrl = "https://magento2blog.thestagings.com/";
 // final paymentUrl = "https://menahub.com/";
 
 //final baseUrl = "https://uat2.menahub.com/rest/";
 
-final bannerSliderBaseUrl =
-    "https://menahub.com/pub/media/mageplaza/bannerslider/banner/image/";
-final imageBaseUrl = "https://menahub.com/pub/media/catalog/product/";
-
 // final bannerSliderBaseUrl =
-//     "https://magento2blog.thestagings.com/pub/media/mageplaza/bannerslider/banner/image/";
-// final imageBaseUrl =
-//     "https://magento2blog.thestagings.com/pub/media/catalog/product/";
+//     "https://menahub.com/pub/media/mageplaza/bannerslider/banner/image/";
+// final imageBaseUrl = "https://menahub.com/pub/media/catalog/product/";
+
+ final bannerSliderBaseUrl =
+   "https://magento2blog.thestagings.com/pub/media/mageplaza/bannerslider/banner/image/";
+ final imageBaseUrl =
+    "https://magento2blog.thestagings.com/pub/media/catalog/product/";
 // final bannerSliderBaseUrl =
 //     "https://uat2.menahub.com/pub/media/mageplaza/bannerslider/banner/image/";
 // final imageBaseUrl = "https://uat2.menahub.com/pub/media/catalog/product/";

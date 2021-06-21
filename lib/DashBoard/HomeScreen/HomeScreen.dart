@@ -848,7 +848,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       null
                                                   ? viewMoreNavigation(
                                                       productId: mobiletype[
-                                                          slider1position],
+                                                          slider2position],
                                                       title: "")
                                                   : null;
                                             },

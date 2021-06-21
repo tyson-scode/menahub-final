@@ -245,6 +245,7 @@ class _SignInState extends State<SignIn> {
       print(responseData.responseValue);
       widget.router=="token"?token1():
       getToken();
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (BuildContext context) => DashBoard(

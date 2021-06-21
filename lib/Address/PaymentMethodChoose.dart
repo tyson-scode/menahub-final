@@ -179,6 +179,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
         "additional_data": null
       }
     });
+    print('body : $body');
 //    print(body['paymentMethod']);
     ApiResponseModel responseData = await postApiCall(
       postUrl: "$placeOrderApi",

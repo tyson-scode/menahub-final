@@ -22,6 +22,7 @@ import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/AppLoader.dart';
 import 'package:menahub/config/CustomLoader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'SellerListScreen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -90,6 +91,9 @@ class _ParticularProductsDetailsScreenState
   var price;
 
   var specialPrice;
+  var alternateText;
+  var sellerRating;
+  String shortDescription;
   @override
   void initState() {
     getLocalInformation();
@@ -161,6 +165,7 @@ class _ParticularProductsDetailsScreenState
         print("price=$price");
         int descriptionIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "description");
+        int sellerRatingsIndex = customAttributes.indexWhere((f) => f['attribute_code'] == "menahub_rating");
         int shortdescriptionIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "short_description");
         int productDetailsIndex = customAttributes
@@ -180,14 +185,21 @@ class _ParticularProductsDetailsScreenState
         Map deliverydetailsindexMap = deliverydetailsindex.isNegative
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[deliverydetailsindex.abs()];
+        Map sellerRatingsIndexMap = sellerRatingsIndex.isNegative
+            ? {"attribute_code": "null", "value": "5"}
+        : customAttributes[sellerRatingsIndex.abs()];
         productBrand = productBrandIndexMap["value"];
 
         deliveryDetails = deliverydetailsindexMap["value"];
         warrantyDetails = warrantydetailsindexMap["value"];
+        sellerRating = sellerRatingsIndexMap["value"];
+        print("sellerRating : $sellerRating");
         Map productDescriptionMap = descriptionIndex.isNegative
             ? customAttributes[shortdescriptionIndex.abs()]
             : customAttributes[descriptionIndex.abs()];
         productDescription = productDescriptionMap["value"];
+        Map shortDescriptionMap = customAttributes[shortdescriptionIndex.abs()];
+shortDescription = shortDescriptionMap["value"];
         Map productDetailsMap = productDetailsIndex.isNegative
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[productDetailsIndex.abs()];
@@ -209,6 +221,13 @@ class _ParticularProductsDetailsScreenState
           if (item["attribute_code"] == "special_price") {
             specialPrice = item["value"];
           }
+          if (item["attribute_code"] == "alternate_text") {
+            alternateText = item["value"];
+          }
+          // if (item["attribute_code"] == "menahub_rating") {
+          //   sellerRating = item["value"];
+          // }
+
         }
         if (widget.apiType != "id") {
           sellerDataList = extensionAttributes["seller_data"];
@@ -828,7 +847,6 @@ class _ParticularProductsDetailsScreenState
                                                   ),
                                                 )
                                               : Container(),
-                                          sizedBoxheight10,
                                           // Padding(
                                           //   padding: const EdgeInsets.only(left: 20.0),
                                           //   child: Text(
@@ -840,6 +858,17 @@ class _ParticularProductsDetailsScreenState
                                           //     ),
                                           //   ),
                                           // ),
+
+                                          Visibility(
+                                            visible: alternateText!=null,
+                                            child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 20.0,top: 10),
+                                                child: Text("$alternateText")
+                                            ),
+                                          ),
+                                          sizedBoxheight10,
+
                                           if (productDetials != null)
                                             // if (productDetials["price"] != 0)
                                             Padding(
@@ -847,6 +876,7 @@ class _ParticularProductsDetailsScreenState
                                                   left: 20.0),
                                               child: Row(
                                                 children: [
+
                                                   productDetials["extension_attributes"]
                                                               [
                                                               "custom_final_price"] ==
@@ -978,6 +1008,14 @@ class _ParticularProductsDetailsScreenState
                                                 ],
                                               ),
                                             ),
+                                          Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20,
+                                                  right: 20,
+                                                  bottom: 0),
+                                              child:Html(data: shortDescription,),
+                                          ),
+
                                           Padding(
                                             padding: const EdgeInsets.only(
                                                 left: 20.0, top: 10),
@@ -1178,6 +1216,19 @@ class _ParticularProductsDetailsScreenState
                                           Divider(
                                             thickness: 1,
                                           ),
+                                          Padding(padding:
+                                          const EdgeInsets.fromLTRB(
+                                              20, 10, 20, 0),
+                                          child:Row(
+                                              children:[
+                                                Text("Ships from: "),
+                                                Text("Mena Hub",
+                                                  style: TextStyle(
+                                                    fontWeight:
+                                                    FontWeight.bold,
+                                                    color: Colors.black),
+                                                ),
+  ],),),
                                           if (sellers != null)
                                             Padding(
                                               padding:
@@ -1201,6 +1252,37 @@ class _ParticularProductsDetailsScreenState
                                                 ],
                                               ),
                                             ),
+
+                                          Visibility(
+                                            visible: sellerRating!="Not Available",
+                                            child: Padding(
+                                                padding:
+                                                const EdgeInsets.fromLTRB(
+                                                    14, 10, 20, 10),
+                                                child:Column(
+                                                  children: [
+                                                    Text("Seller Rating"),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(left: 2),
+                                                      child: SmoothStarRating(
+                                                        allowHalfRating: true,
+                                                        isReadOnly: true,
+                                                        starCount: 5,
+                                                        rating: double.parse(
+                                                          sellerRating
+                                                        ),
+                                                        size: 18.0,
+                                                        color: orangeColor,
+                                                        borderColor: orangeColor,
+                                                        spacing: 0.0,
+                                                      ),
+                                                    ),
+
+
+                                                  ],
+                                                )
+                                            ),
+                                          ),
 
                                           if (otherSellersData.isNotEmpty ==
                                               true)
