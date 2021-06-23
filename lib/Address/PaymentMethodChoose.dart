@@ -106,12 +106,12 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
       context: context,
       body: body,
     );
-    print(responseData.responseValue);
+    //print(responseData.responseValue);
 
     if (responseData.statusCode == 200) {
       overlay.hide();
 
-      getPaymentInformation();
+     getPaymentInformation();
     } else {
       overlay.hide();
     }
@@ -122,6 +122,7 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
     overlay.show();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.get("token");
+    print("token : $token");
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': "Bearer $token"
@@ -131,11 +132,12 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
       headers: headers,
       context: context,
     );
-    print(responseData.responseValue);
+   // print(responseData.responseValue);
     if (responseData.statusCode == 200) {
       overlay.hide();
 
       Map responseMap = responseData.responseValue;
+      print("$responseMap");
       placeOrder(paymentInformation: responseMap);
     } else {
       overlay.hide();
@@ -187,13 +189,15 @@ class _PaymentMethodChooseState extends State<PaymentMethodChoose> {
       context: context,
       body: body,
     );
-    print(responseData.responseValue);
+    // print("$placeOrderApi");
+    // print(responseData.responseValue);
     orderId = responseData.responseValue;
     Navigator.of(context).pop();
 
     if (responseData.statusCode == 200) {
+      // print("${responseData.statusCode}");
       overlay.hide();
-      print(orderId);
+      // print(orderId);
       Navigator.push(
         context,
         MaterialPageRoute(

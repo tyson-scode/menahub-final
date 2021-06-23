@@ -14,6 +14,7 @@ import 'package:menahub/ProductsDetails/ProductsDetailsScreen.dart';
 import 'package:menahub/ReviewScreen/ReviewScreen.dart';
 import 'package:menahub/SearchScreen/SearchScreen.dart';
 import 'package:menahub/SignIn_SignUp_Flow/SignInScreen/SignInScreen.dart';
+import 'package:menahub/Template/HomeScreen/Block2.dart';
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:menahub/Util/Api/ApiResponseModel.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
@@ -74,7 +75,7 @@ class _ParticularProductsDetailsScreenState
   String configure;
   bool reviewVisible = false;
   List relatedProduct;
-  List productDetailsList = ["", "", "", ""];
+  String productDetailsList;
   Map productDetials;
   String productID;
   Map relatedproductDetials;
@@ -83,6 +84,7 @@ class _ParticularProductsDetailsScreenState
   List configoptions;
   List configdetails;
   List otherSellersData = [];
+  List productList = [];
   Map sellers;
   Map othersellers;
   bool userType;
@@ -93,7 +95,14 @@ class _ParticularProductsDetailsScreenState
   var specialPrice;
   var alternateText;
   var sellerRating;
+  var count;
   String shortDescription;
+  List product = [];
+  int totalPageSize = 0;
+  int page = 1;
+  bool apiupdate = false;
+  ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     getLocalInformation();
@@ -143,18 +152,26 @@ class _ParticularProductsDetailsScreenState
 
     Map productDetails = response.responseValue;
     if (response.statusCode == 200) {
-      List bannerImageList = productDetails["media_gallery_entries"];
       setState(() {
         this.productDetials = productDetails;
         // print("product=$productDetails");
+        relatedProduct = productDetails["product_links"];
+        for (var i = 0; i < relatedProduct.length; i++) {
+          var singleProduct = relatedProduct[i]["linked_product_sku"];
+          product.add(singleProduct);
+        }
+        print("product : $product");
+        getRelatedProduct();
         productID = productDetials["id"].toString();
         print("productID=${productID}");
-
+        List bannerImageList = productDetails["media_gallery_entries"];
         List imageList =
             bannerImageList.map((e) => e["file"].toString()).toList();
         imgList = imageList;
         List customAttributes = productDetails["custom_attributes"];
-        relatedProduct = productDetails["product_links"];
+
+        // count = relatedProduct.length;
+
         int pricedetailsindex =
             customAttributes.indexWhere((f) => f['attribute_code'] == "cost");
 
@@ -165,7 +182,8 @@ class _ParticularProductsDetailsScreenState
         print("price=$price");
         int descriptionIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "description");
-        int sellerRatingsIndex = customAttributes.indexWhere((f) => f['attribute_code'] == "menahub_rating");
+        int sellerRatingsIndex = customAttributes
+            .indexWhere((f) => f['attribute_code'] == "menahub_rating");
         int shortdescriptionIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "short_description");
         int productDetailsIndex = customAttributes
@@ -186,20 +204,22 @@ class _ParticularProductsDetailsScreenState
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[deliverydetailsindex.abs()];
         Map sellerRatingsIndexMap = sellerRatingsIndex.isNegative
-            ? {"attribute_code": "null", "value": "5"}
-        : customAttributes[sellerRatingsIndex.abs()];
+            ? {"attribute_code": "null", "value": "0"}
+            : customAttributes[sellerRatingsIndex.abs()];
         productBrand = productBrandIndexMap["value"];
 
         deliveryDetails = deliverydetailsindexMap["value"];
         warrantyDetails = warrantydetailsindexMap["value"];
         sellerRating = sellerRatingsIndexMap["value"];
-        print("sellerRating : $sellerRating");
         Map productDescriptionMap = descriptionIndex.isNegative
-            ? customAttributes[shortdescriptionIndex.abs()]
+            ? customAttributes[descriptionIndex.abs()]
             : customAttributes[descriptionIndex.abs()];
         productDescription = productDescriptionMap["value"];
-        Map shortDescriptionMap = customAttributes[shortdescriptionIndex.abs()];
-shortDescription = shortDescriptionMap["value"];
+        Map shortDescriptionMap = shortdescriptionIndex.isNegative
+            ? {"attribute_code": "null", "value": "Not Available"}
+            : customAttributes[shortdescriptionIndex.abs()];
+        shortDescription = shortDescriptionMap["value"];
+        // print("shortDescription : $shortDescription");
         Map productDetailsMap = productDetailsIndex.isNegative
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[productDetailsIndex.abs()];
@@ -224,11 +244,16 @@ shortDescription = shortDescriptionMap["value"];
           if (item["attribute_code"] == "alternate_text") {
             alternateText = item["value"];
           }
-          // if (item["attribute_code"] == "menahub_rating") {
-          //   sellerRating = item["value"];
-          // }
+          if (item["attribute_code"] == "menahub_rating") {
+            sellerRating = item["value"];
+          }
 
         }
+
+        // String listAsStr = product.toString(); // get list as string
+        // listAsStr = listAsStr.substring(1,listAsStr.length - 1); // removing first and last bracket
+        // print("listAsStr : $listAsStr");
+
         if (widget.apiType != "id") {
           sellerDataList = extensionAttributes["seller_data"];
           otherSellersData = extensionAttributes["assigned_seller_data"];
@@ -241,7 +266,9 @@ shortDescription = shortDescriptionMap["value"];
             print('othersellers=$othersellers');
           }
         }
+        // print("count : $count");
       });
+
     } else {
       Map errorMessage = response.responseValue;
       setState(() {
@@ -592,8 +619,78 @@ shortDescription = shortDescriptionMap["value"];
     }
   }
 
+  getRelatedProduct() async {
+    String listAsStr = product.toString(); // get list as string
+    listAsStr = listAsStr.substring(
+        1, listAsStr.length - 1); // removing first and last bracket
+    print(listAsStr.replaceAll(' ', ''));
+
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    ApiResponseModel response = await getApiCall(
+      getUrl:
+          "https://magento2blog.thestagings.com/rest/default/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10",
+      headers: headers,
+      context: context,
+    );
+    print(
+        "https://magento2blog.thestagings.com/rest/default/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10");
+    if (response.statusCode == 200) {
+      Map responseMap = response.responseValue;
+      print("responseMap : $responseMap");
+      List listItem = responseMap["items"];
+      setState(() {
+        productList = listItem;
+        totalPageSize = responseMap["total_count"];
+      });
+    } else {}
+  }
+
+  updateProductList() async {
+    String listAsStr = product.toString(); // get list as string
+    listAsStr = listAsStr.substring(
+        1, listAsStr.length - 1);
+    if (productList.length == totalPageSize) {
+    } else {
+      page += 1;
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+      };
+
+      ApiResponseModel response = await getApiCall(
+        getUrl: "https://magento2blog.thestagings.com/rest/default/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=$page",
+        headers: headers,
+        context: context,
+      );
+      if (response.statusCode == 200) {
+        Map responseMap = response.responseValue;
+        List listItem = responseMap["items"];
+        print(listItem.length);
+        setState(() {
+          productList.addAll(listItem);
+          apiupdate = false;
+        });
+      } else {}
+    }
+  }
+
+
+  navigationViewAllProduct(String value) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ParticularProductsDetailsScreen(
+          productSkuId: value,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // double sellerPercentage = double.parse(sellerRating) * 20;
+
     return MaterialApp(
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
@@ -860,12 +957,11 @@ shortDescription = shortDescriptionMap["value"];
                                           // ),
 
                                           Visibility(
-                                            visible: alternateText!=null,
+                                            visible: alternateText != null,
                                             child: Padding(
                                                 padding: const EdgeInsets.only(
-                                                    left: 20.0,top: 10),
-                                                child: Text("$alternateText")
-                                            ),
+                                                    left: 20.0, top: 10),
+                                                child: Text("$alternateText")),
                                           ),
                                           sizedBoxheight10,
 
@@ -876,7 +972,6 @@ shortDescription = shortDescriptionMap["value"];
                                                   left: 20.0),
                                               child: Row(
                                                 children: [
-
                                                   productDetials["extension_attributes"]
                                                               [
                                                               "custom_final_price"] ==
@@ -1008,12 +1103,18 @@ shortDescription = shortDescriptionMap["value"];
                                                 ],
                                               ),
                                             ),
-                                          Padding(
+                                          Visibility(
+                                            visible: shortDescription !=
+                                                "Not Available",
+                                            child: Padding(
                                               padding: const EdgeInsets.only(
-                                                  left: 20,
+                                                  left: 10,
                                                   right: 20,
                                                   bottom: 0),
-                                              child:Html(data: shortDescription,),
+                                              child: Html(
+                                                data: shortDescription,
+                                              ),
+                                            ),
                                           ),
 
                                           Padding(
@@ -1216,19 +1317,22 @@ shortDescription = shortDescriptionMap["value"];
                                           Divider(
                                             thickness: 1,
                                           ),
-                                          Padding(padding:
-                                          const EdgeInsets.fromLTRB(
-                                              20, 10, 20, 0),
-                                          child:Row(
-                                              children:[
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                20, 10, 20, 0),
+                                            child: Row(
+                                              children: [
                                                 Text("Ships from: "),
-                                                Text("Mena Hub",
+                                                Text(
+                                                  "Mena Hub",
                                                   style: TextStyle(
-                                                    fontWeight:
-                                                    FontWeight.bold,
-                                                    color: Colors.black),
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black),
                                                 ),
-  ],),),
+                                              ],
+                                            ),
+                                          ),
                                           if (sellers != null)
                                             Padding(
                                               padding:
@@ -1252,37 +1356,43 @@ shortDescription = shortDescriptionMap["value"];
                                                 ],
                                               ),
                                             ),
+                                          Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 10, 20, 0),
+                                              child: Text("Seller Rating")),
 
-                                          Visibility(
-                                            visible: sellerRating!="Not Available",
-                                            child: Padding(
-                                                padding:
-                                                const EdgeInsets.fromLTRB(
-                                                    14, 10, 20, 10),
-                                                child:Column(
-                                                  children: [
-                                                    Text("Seller Rating"),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(left: 2),
-                                                      child: SmoothStarRating(
-                                                        allowHalfRating: true,
-                                                        isReadOnly: true,
-                                                        starCount: 5,
-                                                        rating: double.parse(
-                                                          sellerRating
+                                          Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      14, 0, 20, 10),
+                                              child: Column(
+                                                children: [
+                                                  //Text("Seller Rating"),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 2),
+                                                    child: Row(
+                                                      children: [
+                                                        SmoothStarRating(
+                                                          allowHalfRating: true,
+                                                          isReadOnly: true,
+                                                          starCount: 5,
+                                                          rating: double.parse(
+                                                              sellerRating),
+                                                          size: 18.0,
+                                                          color: orangeColor,
+                                                          borderColor:
+                                                              orangeColor,
+                                                          spacing: 0.0,
                                                         ),
-                                                        size: 18.0,
-                                                        color: orangeColor,
-                                                        borderColor: orangeColor,
-                                                        spacing: 0.0,
-                                                      ),
+                                                        Text(
+                                          "${double.parse(sellerRating).round() * 20.round()}% of 100"),
+                                                      ],
                                                     ),
-
-
-                                                  ],
-                                                )
-                                            ),
-                                          ),
+                                                  ),
+                                                ],
+                                              )),
 
                                           if (otherSellersData.isNotEmpty ==
                                               true)
@@ -1486,7 +1596,7 @@ shortDescription = shortDescriptionMap["value"];
                                                       const EdgeInsets.only(
                                                           left: 20,
                                                           right: 20,
-                                                          bottom: 0),
+                                                          bottom: 10),
                                                   child: Column(
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
@@ -1510,110 +1620,181 @@ shortDescription = shortDescriptionMap["value"];
                                                 )
                                               : Container(),
                                           relatedProduct.isNotEmpty == true
-                                              ? Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 20,
-                                                          right: 20,
-                                                          bottom: 0),
-                                                  child: Text(
-                                                    LocaleKeys.RELATED_PRODUCTS
-                                                            .tr() +
-                                                        " :",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                )
+                                              ? Column(
+                                                children: [
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 20,
+                                                              right: 20,
+                                                              bottom: 10),
+                                                      child: Text(
+                                                        LocaleKeys.RELATED_PRODUCTS
+                                                                .tr() +
+                                                            " :",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold),
+                                                      ),
+                                                    ),
+                                                ],
+                                              )
                                               : Container(),
                                           relatedProduct.isNotEmpty
-                                              ? ListView.builder(
-                                                  padding:
-                                                      EdgeInsets.only(top: 0),
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      NeverScrollableScrollPhysics(),
-                                                  scrollDirection:
-                                                      Axis.vertical,
-                                                  itemCount:
-                                                      relatedProduct.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return Container(
-                                                      height: 30,
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                left: 20,
-                                                                right: 20,
-                                                                bottom: 10),
-                                                        child: InkWell(
-                                                          onTap: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) =>
-                                                                    //     ProductsDetailsScreen(
-                                                                    //   productId:
-                                                                    //       '144',
-                                                                    //   title:
-                                                                    //       "relatedProduct",
-                                                                    // ),
-                                                                    ParticularProductsDetailsScreen(
-                                                                  productSkuId:
-                                                                      "${relatedProduct[index]["linked_product_sku"]}",
+                                              ?
+                                          Container(
+
+                                                  color: Colors.white,
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 0),
+                                                  height: 200,
+
+                                                child: ListView.builder(
+                                                    shrinkWrap: true,
+                                                    controller: ScrollController(
+    keepScrollOffset: false),
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    itemCount:
+                                                        productList.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      Map customAttributesMap =
+                                                          productList[index];
+                                                      List custom =
+                                                          customAttributesMap[
+                                                              "custom_attributes"];
+                                                      int producImageIndex =
+                                                          custom.indexWhere((f) =>
+                                                              f['attribute_code'] ==
+                                                              "image");
+                                                      Map productDescriptionMap =
+                                                          custom[
+                                                              producImageIndex
+                                                                  .abs()];
+                                                      var productImage =
+                                                          productDescriptionMap[
+                                                              "value"];
+                                                      print("productImage : $productImage");
+
+                                                       Map extension = productList[index]["extension_attributes"];
+
+                                                      print("extension_attributes : $extension");
+                                                      // extensionAttributesMap[
+                                                      // "extension_attributes"];
+                                                      // print("extension : ${extension[index]["custom_final_price"]}");
+
+                                                      // var specialPrice;
+                                                      // for (var item in custom) {
+                                                      //   if (item[
+                                                      //           "attribute_code"] ==
+                                                      //       "special_price") {
+                                                      //     specialPrice =
+                                                      //         item["value"];
+                                                      //   }
+                                                      // }
+                                                      // String price = double.parse(
+                                                      //     productList[index]["price"]).toStringAsFixed(2).toString();
+
+                                                      return InkWell(
+                                                        onTap: () {
+                                                          navigationViewAllProduct(productList[index]["sku"]);
+                                                          // Navigator.push(
+                                                          //   context,
+                                                          //   MaterialPageRoute(
+                                                          //     builder: (context) => ParticularProductsDetailsScreen(
+                                                          //       productSkuId: productList[index]["sku"],
+                                                          //     ),
+                                                          //   ),
+                                                          // );
+                                                        },
+                                                        child: Card(
+                                                          child: Container(
+                                                            color: Colors.white,
+                                                            width: (MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width /
+                                                                    2.5) -
+                                                                20,
+                                                            margin:
+                                                                EdgeInsets.all(
+                                                                    5),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Expanded(
+                                                                  child:
+                                                                      Container(
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            borderRadius:
+                                                                                BorderRadius.all(Radius.circular(5)),
+                                                                            image:
+                                                                                DecorationImage(
+                                                                              image: NetworkImage("$imageBaseUrl$productImage"),
+                                                                              fit: BoxFit.contain,
+                                                                            ),
+                                                                          ),
+                                                                          child:
+                                                                              null),
                                                                 ),
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              // Expanded(
-                                                              //   flex: 2,
-                                                              //   child:
-                                                              //       Container(
-                                                              //     child: Image.network(
-                                                              //         "$imageBaseUrl$relatedimgList",
-                                                              //         fit: BoxFit
-                                                              //             .contain,
-                                                              //         height:
-                                                              //             500,
-                                                              //         width:
-                                                              //             500),
-                                                              //   ),
-                                                              // ),
-                                                              Expanded(
-                                                                flex: 2,
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .all(
-                                                                          2.0),
-                                                                  child: Text(
-                                                                    '${relatedProduct[index]["linked_product_sku"]}',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          12,
-                                                                      color:
-                                                                          orangeColor,
-                                                                      decoration:
-                                                                          TextDecoration
-                                                                              .underline,
-                                                                    ),
+                                                                sizedBoxheight5,
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      left:
+                                                                          7.0),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Container(
+                                                                        height:
+                                                                            15,
+                                                                        width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width,
+                                                                        child:
+                                                                            Text(
+                                                                          "${productList[index]["name"]}",softWrap: true,
+                                                                              maxLines: 1,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      sizedBoxheight5,
+                                                                      Text(
+                                                                        "QAR ${double.parse((productList[index]["extension_attributes"]["custom_final_price"])).toStringAsFixed(2).toString()}",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              14,
+                                                                          color:
+                                                                              secondaryColor,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ],
+                                                                )
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    );
-                                                  },
+                                                      );
+                                                    },
+                                                  ),
                                                 )
                                               : Container(),
 
