@@ -152,6 +152,7 @@ abstract class  LocaleKeys {
   static const Specification = 'Specification';
   static const Brand = 'Brand';
   static const Sold_By = 'Sold_By';
+  static const Sold_by = 'Sold by';
   static const WRITE_A_REVIEW = 'WRITE_A_REVIEW';
   static const required_field = 'required_field';
   static const View_all = 'View_all';

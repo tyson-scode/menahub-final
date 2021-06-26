@@ -498,7 +498,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                   : _items.isEmpty == true
                       ? Center(
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 4,
+                            height: MediaQuery.of(context).size.height / 3,
                             width: MediaQuery.of(context).size.width -
                                 MediaQuery.of(context).size.width / 4,
                             decoration: BoxDecoration(

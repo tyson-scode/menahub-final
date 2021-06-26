@@ -44,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> sliderList1 = [];
   List<String> titleList = [];
   List mobiletype = [];
+  List mobileLinkId = [];
 
   List<String> sliderList2 = [];
   //slider indicator
@@ -260,8 +261,8 @@ class _HomeScreenState extends State<HomeScreen> {
         List imageList =
             bannerImageList.map((e) => e["image"].toString()).toList();
         sliderList1 = imageList;
-        List titlelist =
-            bannerImageList.map((e) => e["title"].toString()).toList();
+        mobileLinkId =
+            bannerImageList.map((e) => e["mobile_link_id"].toString()).toList();
         mobiletype =
             bannerImageList.map((e) => e["mobile_type"].toString()).toList();
         print("mobiletype");
@@ -269,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
         print(mobiletype);
 
         print(sliderData1);
-        titleList = titlelist;
+        // titleList = titlelist;
         print(titleList);
       });
     } else {}
@@ -521,13 +522,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 .width,
                                             child: GestureDetector(
                                               onTap: () {
-                                                mobiletype[slider1position] !=
-                                                        null
-                                                    ? viewMoreNavigation(
-                                                        productId: mobiletype[
-                                                            slider1position],
-                                                        title: " ")
-                                                    : null;
+                                                var data = mobiletype[slider1position];
+                                                if(data == ""){
+                                                }
+                                                else if(data == "0") {
+                                                  print("product");
+                                                }
+                                                else if(data == "1") {
+                                                  print("category");
+                                                }
+                                                else if(data == "2") {
+                                                  print("productlist");
+                                                }
+
+                                                // mobiletype[slider1position] !=
+                                                //         null
+                                                //     ? viewMoreNavigation(
+                                                //         productId: mobiletype[
+                                                //             slider1position],
+                                                //         title: " ")
+                                                //     : null;
                                               },
                                               child: ClipRRect(
                                                 child: Image.network(

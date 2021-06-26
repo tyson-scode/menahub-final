@@ -32,6 +32,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Color unselectedbtncolor = Colors.grey[200];
   Color unselectedtextcolor = Colors.black;
   bool subListType = false;
+  List categoriesMap = [];
 
   @override
   initState() {
@@ -50,14 +51,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         headers: headers,
         context: context);
     if (responseData.statusCode == 200) {
-      Map categoriesMap = responseData.responseValue[0][0];
+      categoriesMap = responseData.responseValue[0];
 
-      List categoriesList = categoriesMap["children"];
-      print('category MAp=$categoriesMap');
-      print('categoriesList MAp=$categoriesList');
-
+      // List categoriesList = categoriesMap["children"];
+      // print('category MAp=$categoriesMap');
+      print('category MAp=${categoriesMap[0]["name"]}');
+      // print('categoriesList MAp=$categoriesList');
+      //
       setState(() {
-        categoriesLists = categoriesList;
+        categoriesLists = categoriesMap;
+
         for (var i = 0; i < categoriesLists.length; i++)
           colorLists.add(Color(Random().nextInt(0xffffffff)));
       });
@@ -96,14 +99,18 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   padding: const EdgeInsets.only(left: 20),
                   child: Row(
                     children: [
-                      Text(
-                        values["name"],
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: rightMenuTappedIndex == index
-                              ? appBarColor
-                              : blackColor,
+                      Container(
+                        width: MediaQuery.of(context).size.width/1.7,
+
+                        child: Text(
+                          values["name"],
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: rightMenuTappedIndex == index
+                                ? appBarColor
+                                : blackColor,
+                          ),softWrap: true,maxLines: 3,overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Icon(
@@ -169,6 +176,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       });
                     },
                     child: Container(
+                      width: MediaQuery.of(context).size.width ,
                       color: whiteColor,
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -177,12 +185,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "See all ${values["name"]}",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: secondaryColor,
+                            Container(
+                              width: MediaQuery.of(context).size.width/1.2,
+
+                              child: Text(
+                                "See all ${values["name"]}",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: secondaryColor,
+                                ),softWrap: true,maxLines: 3,overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             // Icon(
@@ -335,14 +347,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "${values["name"]} (${values["product_count"]})",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: leftMenuTappedIndex == index
-                              ? appBarColor
-                              : blackColor,
+                      Container(
+                        width: MediaQuery.of(context).size.width/1.8,
+              child: Text(
+                          "${values["name"]} (${values["product_count"]})",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: leftMenuTappedIndex == index
+                                ? appBarColor
+                                : blackColor,
+                          ),softWrap: true,maxLines: 2,overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (subList.isNotEmpty)
@@ -476,7 +491,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           body: Container(
             width: double.infinity,
             height: double.infinity,
-            child: categoriesLists.isEmpty == true
+            child:
+            categoriesMap.isEmpty == true
                 ? Center(
                     child: CustomerLoader(
                       dotType: DotType.circle,
@@ -486,7 +502,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       duration: Duration(milliseconds: 1000),
                     ),
                   )
-                : Column(
+                :
+            Column(
                     children: [
                       //search
                       InkWell(
@@ -531,13 +548,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       ),
                       Expanded(
                         child: ListView.builder(
-                          padding: EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.only(top:  10),
                           shrinkWrap: true,
                           scrollDirection: Axis.vertical,
-                          itemCount: categoriesLists.length,
+                          itemCount: categoriesMap.length,
                           itemBuilder: (context, index) {
                             return categoriesList(
-                                categoriesLists[index], index);
+                                categoriesMap[index], index);
                           },
                         ),
                       )
