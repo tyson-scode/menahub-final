@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:menahub/Address/SelectAddressScreen.dart';
@@ -12,11 +14,19 @@ import 'package:menahub/Util/Api/ApiResponseModel.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:menahub/config/AppLoader.dart';
 import 'package:menahub/config/CustomDialogBox%20.dart';
 import 'package:menahub/config/CustomLoader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:menahub/DashBoard/MyAccountScreen/ChooseCountryScreen.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MyAccountScreen extends StatefulWidget {
   @override
@@ -28,13 +38,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   String mobileNumber;
   String countryCode;
   String userType;
+  String notificationToken;
+  String deviceID;
 
   @override
   void initState() {
     super.initState();
     getValues();
+    get();
   }
+get() async{
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  deviceID = preferences.getString("notificationToken");
+  print('deviceID : $deviceID');
 
+}
   onGoBack(dynamic value) {
     setValues(value);
     setState(() {});
@@ -43,10 +61,11 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   getValues() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userType = prefs.getString("userType");
+
     if (userType == "guest") {
       Fluttertoast.showToast(
-        msg:
-            "You have logged in as Guest User. Please Sign In to see the Account Details",
+        msg: LocaleKeys.guest_user.tr(),
+
         // toastLength: Toast.LENGTH_LONG,
         // gravity: ToastGravity.CENTER,
         // timeInSecForIosWeb: 10,
@@ -85,9 +104,6 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           accountDetails = data;
           mobileNumber = mobilenumberIndexMap["value"];
           countryCode = mobilenumberCodeIndexMap["value"];
-          print("GET PROFILE");
-          print("Account Details = $accountDetails");
-          print("extensionAttributes Details = $extensionAttributes");
         });
       } else {
         print(responseData);
@@ -140,16 +156,65 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     }
   }
 
+  removePushNotification() async {
+   // print("remove pushNotification called");
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    deviceID = preferences.getString("notificationToken");
+    print('deviceID : $deviceID');
+    // String notificationToken = deviceID;
+    // //print("preference.getString(firebasetoken)");
+    // //print(preference.getString("firebasetoken"));
+    // var body = jsonEncode({
+    //   "device_type":
+    //   Platform.isAndroid
+    //       ? "Android"
+    //       : Platform.isIOS
+    //           ? "IOS"
+    //           : "Null",
+    //   "device_id": deviceID,
+    //   "customer_id": "${accountDetails["id"]}",
+    // });print(body);
+    //
+    // Map<String, String> headers = {
+    //   'Content-Type': 'application/json',
+    // };
+    // ApiResponseModel responseData = await postApiCall(
+    //   postUrl: removepushNotificationUrl,
+    //   headers: headers,
+    //   body: body,
+    //   context: context,
+    // );
+    //
+    // if (responseData.statusCode == 200) {
+    //   print(responseData.responseValue);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.clear();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (BuildContext context) => SignIn(deviceID1: deviceID,router:"token"),
+        ),
+      );
+    }
+    // else {
+    //   Map response = responseData.responseValue;
+    //   String errorMessage = response["message"];
+    //   print(errorMessage);
+    // }
+  //}
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext contexts) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.grey.shade200,
         body: userType == "guest"
-            ? guestUser(context: context)
+            ? guestUser(context: contexts)
             : accountDetails == null
                 ? Center(
                     child: CustomerLoader(
@@ -252,10 +317,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                         ),
                                       );
                                     },
-                                    title: Text('All Orders'),
+                                    title: Text(LocaleKeys.all_Orders.tr()),
                                     trailing: Icon(
-                                      Icons.keyboard_arrow_right,
-                                      size: 30,
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 20,
                                     ),
                                   ),
                                   Padding(
@@ -309,7 +374,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                                           const EdgeInsets.only(
                                                               top: 8),
                                                       child: Text(
-                                                        'Quote Request',
+                                                        LocaleKeys.Quote_Request
+                                                            .tr(),
                                                         style: TextStyle(
                                                             fontSize: 12),
                                                         textAlign:
@@ -349,7 +415,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                                           const EdgeInsets.only(
                                                               top: 8),
                                                       child: Text(
-                                                        'Order',
+                                                        LocaleKeys.Order.tr(),
                                                         style: TextStyle(
                                                             fontSize: 12),
                                                       ),
@@ -387,7 +453,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                                           const EdgeInsets.only(
                                                               top: 8),
                                                       child: Text(
-                                                        'Unpaid',
+                                                        LocaleKeys.Unpaid.tr(),
                                                         style: TextStyle(
                                                             fontSize: 12),
                                                       ),
@@ -425,7 +491,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                                           const EdgeInsets.only(
                                                               top: 8),
                                                       child: Text(
-                                                        'Returns',
+                                                        LocaleKeys.Returns.tr(),
                                                         style: TextStyle(
                                                             fontSize: 12),
                                                       ),
@@ -467,10 +533,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 title: Transform(
                                     transform: Matrix4.translationValues(
                                         -16, 0.0, 0.0),
-                                    child: Text('My Wishlist')),
+                                    child: Text(LocaleKeys.My_Wishlist.tr())),
                                 trailing: Icon(
-                                  Icons.keyboard_arrow_right,
-                                  size: 30,
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 20,
                                 ),
                               ),
                               Divider(
@@ -494,10 +560,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 title: Transform(
                                     transform: Matrix4.translationValues(
                                         -16, 0.0, 0.0),
-                                    child: Text('Address Book')),
+                                    child: Text(LocaleKeys.Address_Book.tr())),
                                 trailing: Icon(
-                                  Icons.keyboard_arrow_right,
-                                  size: 30,
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 20,
                                 ),
                               ),
                               Divider(
@@ -511,10 +577,11 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 title: Transform(
                                     transform: Matrix4.translationValues(
                                         -16, 0.0, 0.0),
-                                    child: Text('Profile Details')),
+                                    child:
+                                        Text(LocaleKeys.Profile_Details.tr())),
                                 trailing: Icon(
-                                  Icons.keyboard_arrow_right,
-                                  size: 30,
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 20,
                                 ),
                                 onTap: () {
                                   Navigator.push(
@@ -553,10 +620,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 title: Transform(
                                     transform: Matrix4.translationValues(
                                         -16, 0.0, 0.0),
-                                    child: Text('Country')),
+                                    child: Text(LocaleKeys.Country.tr())),
                                 trailing: Icon(
-                                  Icons.keyboard_arrow_right,
-                                  size: 30,
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 20,
                                 ),
                               ),
                               Divider(
@@ -570,10 +637,11 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 title: Transform(
                                     transform: Matrix4.translationValues(
                                         -16, 0.0, 0.0),
-                                    child: Text('Reset Password')),
+                                    child:
+                                        Text(LocaleKeys.Reset_Password.tr())),
                                 trailing: Icon(
-                                  Icons.keyboard_arrow_right,
-                                  size: 30,
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 20,
                                 ),
                                 onTap: () {
                                   Navigator.push(
@@ -611,10 +679,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                   title: Transform(
                                       transform: Matrix4.translationValues(
                                           -16, 0.0, 0.0),
-                                      child: Text('Language')),
+                                      child: Text(LocaleKeys.Language.tr())),
                                   trailing: Icon(
-                                    Icons.keyboard_arrow_right,
-                                    size: 30,
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 20,
                                   ),
                                 ),
                               ),
@@ -627,30 +695,29 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 title: Transform(
                                     transform: Matrix4.translationValues(
                                         -16, 0.0, 0.0),
-                                    child: Text('Logout')),
+                                    child: Text(LocaleKeys.Logout.tr())),
                                 trailing: Icon(
-                                  Icons.keyboard_arrow_right,
-                                  size: 30,
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 20,
                                 ),
                                 onTap: () async {
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  prefs.clear();
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          SignIn(),
-                                    ),
-                                  );
+                                  removePushNotification();
+                                  // SharedPreferences prefs =
+                                  //     await SharedPreferences.getInstance();
+                                  // prefs.clear();
+                                  // Navigator.of(context).pushReplacement(
+                                  //   MaterialPageRoute(
+                                  //     builder: (BuildContext context) =>
+                                  //         SignIn(),
+                                  //   ),
+                                  // );
                                 },
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
+
+                        /* Container(
                           height: height / 15,
                           width: width,
                           child: Row(
@@ -720,20 +787,33 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                               child: Text('About Us'),
                             )
                           ],
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 20),
-                              child: Text('App Version 4.2101.5'),
-                            ),
-                          ],
-                        ),
+                        ),*/
+                        // Row(
+                        //   crossAxisAlignment: CrossAxisAlignment.center,
+                        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //   children: <Widget>[
+                        //     Padding(
+                        //       padding: const EdgeInsets.only(bottom: 20),
+                        //       child: Text('App Version 4.2101.5'),
+                        //     ),
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),
+        persistentFooterButtons: [
+          Center(
+            child: Container(
+              child: Text(
+                LocaleKeys.app_version.tr(),
+                style: TextStyle(
+                  color: Colors.black,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

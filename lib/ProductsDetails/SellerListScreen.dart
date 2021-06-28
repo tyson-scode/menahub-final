@@ -4,6 +4,10 @@ import 'package:menahub/CustomWidget/CustomButton.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SellerListScreen extends StatefulWidget {
   final List sellerDataList;
@@ -16,12 +20,15 @@ class SellerListScreen extends StatefulWidget {
 class _SellerListScreenState extends State<SellerListScreen> {
   int tappedIndex;
   String productImage;
+  String shoptitle;
+  String price;
   //seller List
   sellerLists(Map values, index) {
     return InkWell(
       onTap: () {
         setState(() {
           tappedIndex = index;
+          print(tappedIndex);
         });
       },
       child: Container(
@@ -38,7 +45,9 @@ class _SellerListScreenState extends State<SellerListScreen> {
                   Row(
                     children: [
                       Text(
-                        "QAR ${values["price"]}",
+                        // "QAR ${double.parse((values["extension_attributes"]["custom_final_price"])).toStringAsFixed(2).toString()}",
+
+                        "QAR ${double.parse(values["price"]).toStringAsFixed(2)}",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -46,24 +55,24 @@ class _SellerListScreenState extends State<SellerListScreen> {
                         ),
                       ),
                       sizedBoxwidth20,
-                      Text(
-                        "QAR 9000.00",
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.lineThrough,
-                          color: greyColor,
-                        ),
-                      ),
+                      // Text(
+                      //   "QAR 9000.00",
+                      //   style: TextStyle(
+                      //     fontSize: 10,
+                      //     fontWeight: FontWeight.w600,
+                      //     decoration: TextDecoration.lineThrough,
+                      //     color: greyColor,
+                      //   ),
+                      // ),
                       sizedBoxwidth20,
-                      Text(
-                        "7% off",
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: greyColor,
-                        ),
-                      ),
+                      // Text(
+                      //   "7% off",
+                      //   style: TextStyle(
+                      //     fontSize: 10,
+                      //     fontWeight: FontWeight.w600,
+                      //     color: greyColor,
+                      //   ),
+                      // ),
                     ],
                   ),
                   // sizedBoxheight10,
@@ -114,6 +123,7 @@ class _SellerListScreenState extends State<SellerListScreen> {
                   //               fontWeight: FontWeight.w600,
                   //               fontSize: 12,
                   //             ),
+
                   //           ),
                   //           sizedBoxheight10,
                   //           Row(
@@ -175,7 +185,41 @@ class _SellerListScreenState extends State<SellerListScreen> {
                   //   ],
                   // ),
 
-                  Html(data: values["description"])
+                  Html(data: values["description"]),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 0, right: 0, bottom: 20),
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              LocaleKeys.Shop_Title.tr() +
+                                  " : ${values["shop_title"]}",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: customButton(
+                                title: LocaleKeys.View_Product.tr(),
+                                backgroundColor: primaryColor,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -195,7 +239,7 @@ class _SellerListScreenState extends State<SellerListScreen> {
                                 color: greyColor,
                               ),
                               Text(
-                                "Select Seller",
+                                LocaleKeys.Selected_Seller.tr(),
                                 style: TextStyle(
                                   color: greyColor,
                                 ),
@@ -221,18 +265,29 @@ class _SellerListScreenState extends State<SellerListScreen> {
     List bannerImageList = widget.productDetails["media_gallery_entries"];
     List imageList = bannerImageList.map((e) => e["file"].toString()).toList();
     productImage = imageList.first;
+
+    print("sellerDataList");
+    print(widget.sellerDataList);
+    // Map extensionAttributes = widget.productDetails["extension_attributes"];
+    // print(extensionAttributes["custom_final_price"]);
+    // price = extensionAttributes["custom_final_price"];
+    // print(price);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: whiteColor,
           elevation: 0,
           title: Text(
-            "${widget.sellerDataList.length} Sellers Available",
+            "${widget.sellerDataList.length}  " +
+                LocaleKeys.Sellers_Available.tr(),
             style: TextStyle(
               color: blackColor,
               fontSize: 16,
@@ -291,40 +346,6 @@ class _SellerListScreenState extends State<SellerListScreen> {
                     return sellerLists(widget.sellerDataList[index], index);
                   },
                 ), //view product
-                Container(
-                  height: 50,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            "Sole By: MH Seller - D005",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: customButton(
-                              title: "View product",
-                              backgroundColor: primaryColor,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                )
               ],
             ),
           ),

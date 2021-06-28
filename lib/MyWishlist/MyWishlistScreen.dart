@@ -12,6 +12,10 @@ import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/CustomLoader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MyWishlistScreen extends StatefulWidget {
   @override
@@ -23,11 +27,36 @@ class _MyWishlistScreenState extends State<MyWishlistScreen> {
   bool errorStatus = false;
 
   List _items = [];
+  var cartCount = 0;
 
   @override
   void initState() {
     super.initState();
     getValues();
+    getCartCount();
+  }
+
+  getCartCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.get("token");
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': "Bearer $token"
+    };
+
+    ApiResponseModel response = await getApiCall(
+      getUrl: cartsUrl,
+      headers: headers,
+      context: context,
+    );
+    Map responseData = response.responseValue;
+    if (response.statusCode == 200) {
+      List cartList = responseData["items"];
+      print(cartList.length);
+      setState(() {
+        cartCount = cartList.length;
+      });
+    } else {}
   }
 
   getValues() async {
@@ -172,7 +201,7 @@ class _MyWishlistScreenState extends State<MyWishlistScreen> {
                                 image: DecorationImage(
                                   image: NetworkImage(
                                       "$imageBaseUrl${productImageMap["value"]}"),
-                                  fit: BoxFit.fill,
+                                  fit: BoxFit.scaleDown,
                                 ),
                               ),
                               child: null,
@@ -239,7 +268,7 @@ class _MyWishlistScreenState extends State<MyWishlistScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "QAR ${values['price']}",
+                                              "QAR ${values['price'].toStringAsFixed(2).toString()}",
                                               style: TextStyle(
                                                 color: secondaryColor,
                                                 fontSize: 16,
@@ -308,6 +337,9 @@ class _MyWishlistScreenState extends State<MyWishlistScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
@@ -315,7 +347,7 @@ class _MyWishlistScreenState extends State<MyWishlistScreen> {
           backgroundColor: appBarColor,
           brightness: lightBrightness,
           title: Text(
-            "My Wishlist",
+            LocaleKeys.My_Wishlist.tr(),
             style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
           ),
           leading: IconButton(
@@ -356,7 +388,7 @@ class _MyWishlistScreenState extends State<MyWishlistScreen> {
                   badgeColor: redColor,
                   position: BadgePosition(top: 5, end: 0),
                   badgeContent: Text(
-                    '2',
+                    cartCount.toString(),
                     style: TextStyle(
                       fontSize: 10,
                       color: whiteColor,

@@ -1,34 +1,78 @@
 {
   "project_info": {
-    "project_number": "782923906108",
-    "project_id": "menahub",
-    "storage_bucket": "menahub.appspot.com"
+    "project_number": "1007920405146",
+    "firebase_url": "https://snappy-mapper-309019-default-rtdb.firebaseio.com",
+    "project_id": "snappy-mapper-309019",
+    "storage_bucket": "snappy-mapper-309019.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:782923906108:android:895359ae0b025441d45739",
+        "mobilesdk_app_id": "1:1007920405146:android:3432ef1962f5c34f00dd23",
         "android_client_info": {
-          "package_name": "com.scodes.menahub"
+          "package_name": "com.ignovete.menahubAndr"
         }
       },
       "oauth_client": [
         {
-          "client_id": "782923906108-8pfq361ath35ae6np9idlqb30kjc9dhn.apps.googleusercontent.com",
+          "client_id": "1007920405146-tt8cal3nm1j6gmjot9bcvvj0jtk0tnvt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC6LaxE4ZkpLBTwBp1IOPtVl1pwuyrPrGA"
+          "current_key": "AIzaSyCfIBaiaM6Hg-LfWsTmzLZUzfMtrdiMGK0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "782923906108-8pfq361ath35ae6np9idlqb30kjc9dhn.apps.googleusercontent.com",
+              "client_id": "1007920405146-tt8cal3nm1j6gmjot9bcvvj0jtk0tnvt.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1007920405146-lu3a6gmgp83kuv48o8uug5jrvmpuel10.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ignovete.menahub"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007920405146:android:b1a14ab76d5044f600dd23",
+        "android_client_info": {
+          "package_name": "com.scodes.menahub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007920405146-tt8cal3nm1j6gmjot9bcvvj0jtk0tnvt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfIBaiaM6Hg-LfWsTmzLZUzfMtrdiMGK0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1007920405146-tt8cal3nm1j6gmjot9bcvvj0jtk0tnvt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1007920405146-lu3a6gmgp83kuv48o8uug5jrvmpuel10.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ignovete.menahub"
+              }
             }
           ]
         }

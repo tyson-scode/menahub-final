@@ -1,7 +1,53 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:menahub/SplashScreen/SplashScreen.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:http/http.dart' as http;
+import 'package:menahub/Util/Api/ApiCalls.dart';
+import 'package:menahub/Util/Api/ApiUrls.dart';
+import 'package:overlay_support/overlay_support.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+/// Define a top-level named handler which background/terminated messages will
+/// call.
+///
+/// To verify things are working, check out the native platform logs.
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+  print("FirebaseMessaging Handling a background message ${message.data}");
+  print("FirebaseMessaging Handling a background message ${message.messageId}");
+
+  log('FirebaseMessaging FirebaseMessaging: ${jsonEncode(message.notification)}');
+}
+
+Future<void> _createNotificationChannel(
+    String id, String name, String description) async {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  var androidNotificationChannel = AndroidNotificationChannel(
+    id,
+    name,
+    description,
+  );
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(androidNotificationChannel);
+}
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,30 +55,60 @@ void main() async {
   await FlutterDownloader.initialize(
       debug: true // optional: set false to disable printing logs to console
       );
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  // Set the background messaging handler early on, as a named top-level function
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  _createNotificationChannel('Test1', 'SamPle', 'MENHUB');
+
+  /// Create an Android Notification Channel.
+  ///
+  /// We use this channel in the `AndroidManifest.xml` file to override the
+  /// default FCM channel to enable heads up notifications.
+  /// Update the iOS foreground notification presentation options to allow
+  /// heads up notifications.
+  ///
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  // await Permission.camera.request();
+  // await Permission.microphone.request();
+  // await Permission.storage.request();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
+        AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
+        AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+    if (swAvailable && swInterceptAvailable) {
+      AndroidServiceWorkerController serviceWorkerController =
+          AndroidServiceWorkerController.instance();
+      serviceWorkerController.serviceWorkerClient = AndroidServiceWorkerClient(
+        shouldInterceptRequest: (request) async {
+          print(request);
+          return null;
+        },
+      );
+    }
+  }
   runApp(
     EasyLocalization(
-      saveLocale: true,
+      // saveLocale: true,
       child: MyApp(),
-      supportedLocales: [
-        Locale('en'),
-        Locale('ar'),
-      ],
+      supportedLocales: [Locale('en'), Locale('ar')],
+      fallbackLocale: Locale('en'),
       path: 'assets/language',
+      assetLoader: CodegenLoader(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
-    );
-  }
+class MyApp extends StatefulWidget {
+  _MyAppState createState() => _MyAppState();
 }
 
 /*
@@ -46,7 +122,6 @@ return MaterialApp(
       ),
     );
 */
-
 class OrderStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -399,5 +474,103 @@ class OrderStatus extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _MyAppState extends State<MyApp> {
+  FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  @override
+  void initState() {
+    super.initState();
+    getuserToken();
+    _messaging.getInitialMessage().then((RemoteMessage message) {
+      print('FirebaseMessaging getInitialMessage listen ${message}');
+
+      if (message != null) {
+        log('FirebaseMessaging getInitialMessage: ${jsonEncode(message.senderId)}');
+        print(
+            'FirebaseMessaging getInitialMessage: ${jsonEncode(message.data)}');
+      }
+    });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('FirebaseMessaging new onMessage listen${message.messageType}');
+
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+      print('FirebaseMessaging new onMessage listen${message.senderId}');
+      if (notification != null && android != null) {
+        if (message.data != null) {
+          log('FirebaseMessaging onMessage: ${jsonEncode(message.data)}');
+        }
+      }
+    });
+
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      //FCM Handling
+      if (message.data != null) {
+        log('FirebaseMessaging onMessageOpenedApp: ${jsonEncode(message.data)}');
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text(message.notification.title),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [Text(message.notification.body)],
+                  ),
+                ),
+              );
+            });
+      }
+    });
+    // ignore: missing_return
+    FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
+      print('FirebaseMessaging new onMessage listen${message.messageType}');
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+      print('FirebaseMessaging new onMessage listen${message.senderId}');
+      if (notification != null && android != null) {
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text(message.notification.title),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [Text(message.notification.body)],
+                  ),
+                ),
+              );
+            });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return OverlaySupport(
+      child: MaterialApp(
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: Locale(context.locale.languageCode),
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen(),
+      ),
+    );
+  }
+
+  void getuserToken() async {
+    _messaging.getToken().then((token) async {
+      SharedPreferences preference = await SharedPreferences.getInstance();
+      await preference.setString("firebasetoken", token.toString());
+      print(preference.getString("firebasetoken"));
+      print('Token: $token');
+      log('Token: $token');
+    }).catchError((e) {
+      print(e);
+    });
   }
 }

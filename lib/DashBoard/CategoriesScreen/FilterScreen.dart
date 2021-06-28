@@ -3,6 +3,8 @@ import 'package:menahub/CustomWidget/CustomButton.dart';
 import 'package:menahub/ProductsDetails/ProductsDetailsScreen.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
 
 class FilterScreen extends StatefulWidget {
   final Map filterMap;
@@ -26,11 +28,13 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   void initState() {
     super.initState();
+
     widget.filterMap.removeWhere((key, value) => key == "Category");
     List filterKeysList = widget.filterMap.keys.toList();
     this.leftMenuItemList = filterKeysList;
     rightMenuItemList = widget.filterMap[leftMenuItemList.first];
-    print(widget.filterMap);
+    print(filterKeysList);
+    print(rightMenuItemList);
   }
 
 //right side  items
@@ -50,12 +54,15 @@ class _FilterScreenState extends State<FilterScreen> {
       onTap: () {
         setState(() {
           rightMenuTappedIndex = index;
+
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (contexts) => ProductsDetailsScreen(
+                filter: rightMenuItemList[index],
                 productId: values["value"],
                 title: values["display"],
+                router: "search",
               ),
             ),
           );
@@ -71,14 +78,20 @@ class _FilterScreenState extends State<FilterScreen> {
               Row(
                 children: [
                   sizedBoxwidth10,
-                  Text(
-                    values["display"],
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: rightMenuTappedIndex == index
-                          ? secondaryColor
-                          : blackColor,
+                  Container(
+                    width: 150,
+                    child: Text(
+                      values["display"],
+                      softWrap: true,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: rightMenuTappedIndex == index
+                            ? secondaryColor
+                            : blackColor,
+                      ),
                     ),
                   ),
                 ],
@@ -148,6 +161,8 @@ class _FilterScreenState extends State<FilterScreen> {
               padding: const EdgeInsets.all(15),
               child: Text(
                 name,
+                softWrap: true,
+                maxLines: 2,
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -165,6 +180,9 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         top: false,
@@ -179,7 +197,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   child: Container(
                     child: Center(
                         child: Text(
-                      'Clear',
+                      LocaleKeys.clear.tr(),
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -194,7 +212,7 @@ class _FilterScreenState extends State<FilterScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: customButton(
-                        title: "APPLY",
+                        title: LocaleKeys.Apply.tr(),
                         backgroundColor: secondaryColor,
                       ),
                     ),
@@ -207,7 +225,7 @@ class _FilterScreenState extends State<FilterScreen> {
             centerTitle: false,
             iconTheme: IconThemeData(color: Colors.black),
             title: Text(
-              "Filters",
+              LocaleKeys.Filter.tr(),
               style: TextStyle(color: Colors.white),
             ),
             leading: IconButton(

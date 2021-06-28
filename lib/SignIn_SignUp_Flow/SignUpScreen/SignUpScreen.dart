@@ -15,7 +15,10 @@ import 'package:menahub/config/CustomBackground.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:pin_entry_text_field/pin_entry_text_field.dart';
+import 'package:menahub/Util/otpVeri.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -24,6 +27,8 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final formKey = new GlobalKey<FormState>();
+  GlobalKey<PinEntryTextFieldState> _myKey = GlobalKey();
+
   TextEditingController firstNameTextfield = TextEditingController();
   TextEditingController lastNameTextfield = TextEditingController();
   TextEditingController emailTextfield = TextEditingController();
@@ -31,8 +36,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController confirmPasswordTextfield = TextEditingController();
   TextEditingController mobileTextfield = TextEditingController();
   TextEditingController otpTextfield = TextEditingController();
+
   bool _autoValidate = false;
-  String countryCode = "+ 91";
+  String countryCode = "+91";
   String otp = "";
   BuildContext context;
   createCart(BuildContext _context) async {
@@ -77,10 +83,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
         body: body,
         headers: headers,
         context: context);
-    print(responseData.responseValue);
     if (responseData.statusCode == 200) {
+      //_myKey.currentState.clearTextFields();
+      print(responseData.responseValue);
+      Map response = responseData.responseValue[0];
+      bool status = response["status"];
+      print(response);
+      print(status);
+      status == true
+          ? Fluttertoast.showToast(
+              msg: LocaleKeys.OTP_Sent.tr(),
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 10,
+              backgroundColor: Colors.black,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            )
+          : Fluttertoast.showToast(
+              msg: LocaleKeys.error.tr(),
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 10,
+              backgroundColor: Colors.black,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
       progress.dismiss();
+      _myKey.currentState.clearTextFields();
     } else {
+      //_myKey.currentState.clearTextFields();
       print(responseData);
       progress.dismiss();
     }
@@ -91,7 +123,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final progress = ProgressHUD.of(context);
     progress.show();
     setState(() => this.context = context);
-
     print("verify otp called");
     print("OTP:" + otp);
     var body = jsonEncode({"telephone": mobileTextfield.text, "otp": otp});
@@ -100,11 +131,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     };
     ApiResponseModel responseData = await postApiCall(
         postUrl: verifyOtpApi, body: body, headers: headers, context: context);
-    // print("verify OTP: " + responseData.toString());
+    print("verify OTP: " + responseData.toString());
+    print("verify OTP: " + body.toString());
+
     if (responseData.statusCode == 200) {
       Map response = responseData.responseValue[0];
 
       bool status = response["status"];
+      print(" status=$status");
       if (status == true) {
         var body = jsonEncode({
           "customer": {
@@ -133,6 +167,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         print("signinapi" + responseData.responseValue.toString());
         if (responseData.statusCode == 200) {
           print("Navigator pop");
+          print(responseData);
           progress.dismiss();
           Navigator.pushReplacement(
             context,
@@ -140,9 +175,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
               builder: (context) => SignIn(),
             ),
           );
+          Fluttertoast.showToast(
+            msg: LocaleKeys.account_created.tr(),
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 10,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         } else {
+          progress.dismiss();
+
           Map response = responseData.responseValue;
           String errorMessage = response["message"];
+          print('error=$errorMessage');
           Fluttertoast.showToast(
             msg: errorMessage,
             toastLength: Toast.LENGTH_SHORT,
@@ -164,10 +211,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       } else {
         print("verify OTP: failed" + response.toString());
+
         progress.dismiss();
         setState(() {
           Fluttertoast.showToast(
-            msg: "Please Enter Valid OTP",
+            msg: LocaleKeys.OTP_Valid.tr(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
@@ -175,6 +223,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             textColor: Colors.white,
             fontSize: 16.0,
           );
+          _myKey.currentState.clearTextFields();
         });
       }
     } else {
@@ -185,6 +234,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         bottomNavigationBar: SafeArea(
@@ -194,18 +246,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
               padding: const EdgeInsets.all(10.0),
               child: InkWell(
                 onTap: () {
+                  // ignore: deprecated_member_use
                   Navigator.pop(context);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Already have an account?",
+                      LocaleKeys.already_account.tr(),
                       style: TextStyle(fontSize: 16, color: lightGreyColor),
                     ),
                     sizedBoxwidth5,
                     Text(
-                      "Sign In",
+                      LocaleKeys.sign_in.tr(),
                       style: TextStyle(fontSize: 16, color: Colors.blue),
                     ),
                   ],
@@ -230,7 +283,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     SingleChildScrollView(
                       child: Form(
                         key: formKey,
-                        // ignore: deprecated_member_use
                         autovalidate: _autoValidate,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -246,7 +298,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     onTap: () async {
                                       SharedPreferences preferences =
                                           await SharedPreferences.getInstance();
-                                      preferences.clear();
+                                      //preferences.clear();
                                       preferences.setString(
                                           "userType", "guest");
                                       Navigator.of(context).pushReplacement(
@@ -259,7 +311,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       );
                                     },
                                     child: Text(
-                                      "Skip",
+                                      LocaleKeys.skip.tr(),
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500),
@@ -286,14 +338,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Create",
+                                    LocaleKeys.create.tr(),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         fontSize: 25,
                                         fontWeight: FontWeight.w500),
                                   ),
                                   Text(
-                                    "New Account",
+                                    LocaleKeys.New_Account.tr(),
                                     style: TextStyle(
                                         fontSize: 20,
                                         color: lightGreyColor,
@@ -302,19 +354,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   sizedBoxheight20,
                                   customTextBox(
                                     icons: "assets/icon/profileIcon.png",
-                                    hintText: "Full Name",
+                                    hintText: LocaleKeys.Full_Name.tr(),
                                     controller: firstNameTextfield,
                                   ),
                                   sizedBoxheight10,
                                   customTextBox(
                                     icons: "assets/icon/profileIcon.png",
-                                    hintText: "Last Name",
+                                    hintText: LocaleKeys.Last_Name.tr(),
                                     controller: lastNameTextfield,
                                   ),
                                   sizedBoxheight10,
                                   customTextBox(
                                     icons: "assets/icon/emailIcon.png",
-                                    hintText: "Email",
+                                    hintText: LocaleKeys.Email.tr(),
                                     controller: emailTextfield,
                                     keyboardType: TextInputType.emailAddress,
                                     emailField: true,
@@ -323,7 +375,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   sizedBoxheight10,
                                   customTextBox(
                                     icons: "assets/icon/lockIcon.png",
-                                    hintText: "Password",
+                                    hintText: LocaleKeys.Password.tr(),
                                     controller: passwordTextfield,
                                     passwordField: true,
                                     keyboardType: TextInputType.visiblePassword,
@@ -331,7 +383,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   sizedBoxheight10,
                                   customTextBox(
                                     icons: "assets/icon/lockIcon.png",
-                                    hintText: "Re-enter Password",
+                                    hintText: LocaleKeys.RePassword.tr(),
                                     controller: confirmPasswordTextfield,
                                     passwordField: true,
                                     keyboardType: TextInputType.visiblePassword,
@@ -358,11 +410,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             DropdownButton<String>(
                                               underline: Container(),
                                               value: countryCode,
-                                              items: <String>[
-                                                '+ 91',
-                                                '+ 971',
-                                                '+ 974'
-                                              ].map((String value) {
+                                              items: <String>['+91', '+974']
+                                                  .map((String value) {
                                                 return new DropdownMenuItem<
                                                     String>(
                                                   value: value,
@@ -395,7 +444,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                   contentPadding:
                                                       EdgeInsets.only(
                                                           left: 15, right: 15),
-                                                  hintText: "Mobile Number",
+                                                  hintText:
+                                                      LocaleKeys.Mobile.tr(),
                                                   hintStyle: TextStyle(
                                                     fontWeight: FontWeight.w500,
                                                     color: greyColor,
@@ -403,13 +453,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                 ),
                                                 validator: (value) {
                                                   if (value.isEmpty) {
-                                                    return 'Please Enter Mobile Number';
+                                                    return LocaleKeys
+                                                        .valid_mobile1
+                                                        .tr();
                                                   }
-                                                  if (value.length < 10) {
-                                                    return 'Please Enter Valid Mobile NUmber';
+                                                  if (countryCode == '+91' &&
+                                                      value.length < 10) {
+                                                    return LocaleKeys
+                                                        .valid_mobile
+                                                        .tr();
                                                   }
-                                                  if (value.length > 10) {
-                                                    return 'Please Enter Valid Mobile NUmber';
+                                                  if (countryCode == '+91' &&
+                                                      value.length > 10) {
+                                                    return LocaleKeys
+                                                        .valid_mobile
+                                                        .tr();
+                                                  }
+                                                  if (countryCode == '+974' &&
+                                                      value.length < 8) {
+                                                    return LocaleKeys
+                                                        .valid_mobile
+                                                        .tr();
+                                                  }
+                                                  if (countryCode == '+974' &&
+                                                      value.length > 8) {
+                                                    return LocaleKeys
+                                                        .valid_mobile
+                                                        .tr();
                                                   }
                                                   return null;
                                                 },
@@ -426,25 +496,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       if (formKey.currentState.validate()) {
                                         if (passwordTextfield.text ==
                                             confirmPasswordTextfield.text) {
-                                          Fluttertoast.showToast(
-                                            msg:
-                                                "Your OTP has been sent to your mobile number",
-                                            // toastLength: Toast.LENGTH_LONG,
-                                            // gravity: ToastGravity.CENTER,
-                                            // timeInSecForIosWeb: 10,
-                                            // backgroundColor: Colors.red,
-                                            // textColor: Colors.white,
-                                            // fontSize: 16.0,
-                                          );
+                                          signUpOtp(context);
+                                          // Fluttertoast.showToast(
+                                          //   msg:
+                                          //       "Your OTP has been sent to your mobile number",
+                                          //   // toastLength: Toast.LENGTH_LONG,
+                                          //   // gravity: ToastGravity.CENTER,
+                                          //   // timeInSecForIosWeb: 10,
+                                          //   // backgroundColor: Colors.red,
+                                          //   // textColor: Colors.white,
+                                          //   // fontSize: 16.0,
+                                          // );
                                         } else {
                                           Fluttertoast.showToast(
-                                            msg: "Some Error Occurs..",
-                                            // toastLength: Toast.LENGTH_LONG,
-                                            // gravity: ToastGravity.CENTER,
-                                            // timeInSecForIosWeb: 10,
-                                            // backgroundColor: Colors.red,
-                                            // textColor: Colors.white,
-                                            // fontSize: 16.0,
+                                            msg: LocaleKeys.match_password.tr(),
+                                            toastLength: Toast.LENGTH_LONG,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 10,
+                                            backgroundColor: Colors.black,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0,
                                           );
                                         }
                                       } else {
@@ -452,12 +523,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           _autoValidate = true;
                                         });
                                       }
+                                      _myKey.currentState.clearTextFields();
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                           left: 20, right: 20),
                                       child: customGradientButton(
-                                          title: "GENERATE OTP",
+                                          title: LocaleKeys.generate_OTP.tr(),
                                           backgroundColor: primaryColor),
                                     ),
                                   ),
@@ -467,7 +539,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     padding:
                                         const EdgeInsets.only(left: 0, top: 0),
                                     child: Text(
-                                      'OTP',
+                                      LocaleKeys.OTP.tr(),
                                       textAlign: TextAlign.start,
                                     ),
                                   ),
@@ -512,11 +584,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   Padding(
                                     padding: const EdgeInsets.only(),
                                     child: PinEntryTextField(
+                                      fields: 4,
+                                      key: _myKey,
                                       showFieldAsBox: false,
                                       onSubmit: (String pin) {
                                         otp = pin;
                                       },
                                     ),
+
+                                    //child: pinEntryTextField
+                                    // PinEntryTextField(
+                                    //   showFieldAsBox: false,
+                                    //   onSubmit: (String pin) {
+                                    //     otp = pin;
+                                    //   },
+                                    // ),
                                   ),
 
                                   // customTextBox(
@@ -528,17 +610,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       if (formKey.currentState.validate()) {
                                         if (passwordTextfield.text ==
                                             confirmPasswordTextfield.text) {
-                                          verifyotp(context);
+                                          // verifyotp(context);
+                                          if (otp.isNotEmpty) {
+                                            verifyotp(context);
+                                          } else {
+                                            Fluttertoast.showToast(
+                                              msg: LocaleKeys.valid_OTP.tr(),
+                                              toastLength: Toast.LENGTH_LONG,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 10,
+                                              backgroundColor: Colors.black,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0,
+                                            );
+                                          }
                                         } else {
                                           Fluttertoast.showToast(
-                                            msg:
-                                                "Password and Confirm Password Do not match",
-                                            // toastLength: Toast.LENGTH_LONG,
-                                            // gravity: ToastGravity.CENTER,
-                                            // timeInSecForIosWeb: 10,
-                                            // backgroundColor: Colors.red,
-                                            // textColor: Colors.white,
-                                            // fontSize: 16.0,
+                                            msg: LocaleKeys.match_password.tr(),
+                                            toastLength: Toast.LENGTH_LONG,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 10,
+                                            backgroundColor: Colors.black,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0,
                                           );
                                         }
                                       } else {
@@ -551,7 +645,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       padding: const EdgeInsets.only(
                                           left: 20, right: 20),
                                       child: customGradientButton(
-                                          title: "SUBMIT",
+                                          title: LocaleKeys.SUBMIT.tr(),
                                           backgroundColor: primaryColor),
                                     ),
                                   ),

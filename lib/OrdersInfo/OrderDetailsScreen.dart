@@ -7,10 +7,16 @@ import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/CustomLoader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/translation/codegen_loader.g.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
   final String orderId;
-  OrderDetailsScreen({this.orderId});
+  final String incId;
+
+  OrderDetailsScreen({this.orderId, this.incId});
   @override
   _OrderDetailsScreenState createState() => _OrderDetailsScreenState();
 }
@@ -63,6 +69,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     var screenSize = MediaQuery.of(context).size;
 
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         //appbar
@@ -75,7 +84,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             },
           ),
           title: Text(
-            "Order Detalis",
+            LocaleKeys.Order_Detalis.tr(),
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           ),
           centerTitle: false,
@@ -113,14 +122,17 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   Column(
                                     children: [
                                       Text(
-                                        "Order Placed",
+                                        LocaleKeys.Order_Placed.tr(),
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w400),
                                       ),
                                       sizedBoxheight5,
                                       Text(
-                                        "15 April 2020",
+                                        DateFormat('dd/MM/yyyy').format(
+                                            DateFormat('yyyy-MM-dd HH:mm:ss')
+                                                .parse(orderDetails[
+                                                    "created_at"])),
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w400),
@@ -135,7 +147,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                   Column(
                                     children: [
                                       Text(
-                                        "Order ID",
+                                        LocaleKeys.Order_ID.tr(),
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w400),
@@ -206,7 +218,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                 bottom: 5,
                               ),
                               child: Text(
-                                "SHIPPING ADDRESS",
+                                LocaleKeys.SHIPPING_ADDRESS.tr(),
                                 style: TextStyle(
                                   color: greyColor,
                                 ),
@@ -223,7 +235,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Home",
+                                    LocaleKeys.home.tr(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -265,7 +277,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                 bottom: 5,
                               ),
                               child: Text(
-                                "PRICE DETAILS",
+                                LocaleKeys.PRICE_DETAILS.tr(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: greyColor,
@@ -288,7 +300,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Sub Total (${orderDetails["total_item_count"]} items)",
+                                        LocaleKeys.Sub_Total.tr() +
+                                            "(${orderDetails["total_qty_ordered"]} " +
+                                            LocaleKeys.items.tr() +
+                                            ")",
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -310,7 +325,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Tax",
+                                        LocaleKeys.Tax.tr(),
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -332,7 +347,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Shipping",
+                                        LocaleKeys.Shipping.tr(),
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -354,7 +369,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Discounts",
+                                        LocaleKeys.Discounts.tr(),
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -398,7 +413,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Total",
+                                        LocaleKeys.Total.tr(),
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -420,7 +435,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Grand Total",
+                                        LocaleKeys.Grand_Total.tr(),
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -468,7 +483,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                       ),
                                       sizedBoxwidth10,
                                       Text(
-                                        "Email InVoice",
+                                        LocaleKeys.Email_InVoice.tr(),
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600),
                                       ),

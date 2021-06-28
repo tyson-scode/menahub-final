@@ -5,6 +5,7 @@ import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/StaticFunction.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProductList extends StatefulWidget {
   const ProductList(
@@ -19,11 +20,14 @@ class ProductList extends StatefulWidget {
 
 class _ProductListState extends State<ProductList> {
   bool wishlistStatus = false;
+  String price;
 
   @override
   Widget build(BuildContext context) {
     List customAttributes = widget.productDetails["custom_attributes"];
     print(customAttributes);
+    Map extensionAttributes = widget.productDetails["extension_attributes"];
+    price = extensionAttributes["custom_final_price"];
     int producImageIndex =
         customAttributes.indexWhere((f) => f['attribute_code'] == "image");
     Map productDescriptionMap = customAttributes[producImageIndex.abs()];
@@ -88,7 +92,7 @@ class _ProductListState extends State<ProductList> {
                     Row(
                       children: [
                         Text(
-                          "QAR ${widget.productDetails['price']}",
+                          "QAR ${price}.00",
                           style: TextStyle(
                               color: secondaryColor,
                               fontSize: 14,

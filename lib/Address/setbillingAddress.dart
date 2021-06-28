@@ -17,20 +17,33 @@ import 'AddNewAddressScreen.dart';
 import 'PaymentMethodChoose.dart';
 import 'editaddress.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:menahub/translation/codegen_loader.g.dart';
-import 'package:menahub/translation/locale_keys.g.dart';
-import 'package:easy_localization/easy_localization.dart';
 
-class SelectAddressScreen extends StatefulWidget {
+class SelectbillingAddressScreen extends StatefulWidget {
   final String cartId;
   final String router;
+  final Map screenInfo;
+  final Map billingAddress;
+  final Map shippingAddress;
+  final Map paymentMethods;
+  final int paymentid;
+  final bool agree;
+  SelectbillingAddressScreen(
+      {this.screenInfo,
+      this.billingAddress,
+      this.cartId,
+      this.shippingAddress,
+      this.router,
+      this.paymentMethods,
+      this.paymentid,
+      this.agree});
 
-  SelectAddressScreen({this.cartId, this.router});
   @override
-  _SelectAddressScreenState createState() => _SelectAddressScreenState();
+  _SelectbillingAddressScreenState createState() =>
+      _SelectbillingAddressScreenState();
 }
 
-class _SelectAddressScreenState extends State<SelectAddressScreen> {
+class _SelectbillingAddressScreenState
+    extends State<SelectbillingAddressScreen> {
   List addressList = [];
   List addressListID = [];
 
@@ -46,8 +59,6 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
   void initState() {
     super.initState();
     getAddressList();
-    print("cartID=${widget.cartId}");
-    // getbillAddressList();
   }
 
   onGoBack(dynamic value) {
@@ -108,6 +119,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
     );
     //Navigator.of(context).pop();
 
+    // print(responseData.responseValue);
     if (responseData.statusCode == 200) {
       setState(() {
         getAddressList();
@@ -132,11 +144,10 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
       headers: headers,
       context: context,
     );
+    // print(responseData.responseValue);
     if (responseData.statusCode == 200) {
       Map addressDetails = responseData.responseValue;
-
       List itemList = addressDetails["addresses"];
-
       setState(() {
         addressList = itemList;
         apiLoader = true;
@@ -176,56 +187,58 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
   //   }
   // }
 
-  estimateShippingMethod(BuildContext _context) async {
-    final overlay = LoadingOverlay.of(context);
-    overlay.show();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.get("token");
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': "Bearer $token"
-    };
-    if (selectAddressDetails == null) {
-      Map addressDetails = addressList[0];
-      Map regionMap = addressDetails["region"];
-      selectAddressDetails = {
-        "customer_id": addressDetails["customer_id"],
-        "street": addressDetails["street"],
-        "city": addressDetails["city"],
-        "region": regionMap["regionMap"],
-        "country_id": addressDetails["country_id"],
-        "postcode": addressDetails["postcode"],
-        "firstname": addressDetails["firstname"],
-        "lastname": addressDetails["lastname"],
-        "company": addressDetails["company"],
-        "telephone": addressDetails["telephone"],
-        "save_in_address_book": "1"
-      };
-    }
-
-    var body = jsonEncode({"address": selectAddressDetails});
-    ApiResponseModel responseData = await postApiCall(
-      postUrl: "$estimateShippingMethodsApi",
-      headers: headers,
-      context: context,
-      body: body,
-    );
-    if (responseData.statusCode == 200) {
-      overlay.hide();
-      // Navigator.of(context).pop();
-      List responseList = responseData.responseValue;
-      Map responseMap = responseList[0];
-      shippingInformation(
-          estimateShippingResponse: responseMap,
-          shippingAddress: selectAddressDetails,
-          billingAddress: selectAddressDetails);
-      // progress.dismiss();
-    } else {
-      //  progress.dismiss();
-      overlay.hide();
-      // Navigator.of(context).pop();
-    }
-  }
+  // estimateShippingMethod(BuildContext _context) async {
+  //   final overlay = LoadingOverlay.of(context);
+  //   overlay.show();
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   var token = prefs.get("token");
+  //   Map<String, String> headers = {
+  //     'Content-Type': 'application/json',
+  //     'Authorization': "Bearer $token"
+  //   };
+  //   if (selectAddressDetails == null) {
+  //     Map addressDetails = addressList[0];
+  //     Map regionMap = addressDetails["region"];
+  //     selectAddressDetails = {
+  //       "customer_id": addressDetails["customer_id"],
+  //       "street": addressDetails["street"],
+  //       "city": addressDetails["city"],
+  //       "region": regionMap["regionMap"],
+  //       "country_id": addressDetails["country_id"],
+  //       "postcode": addressDetails["postcode"],
+  //       "firstname": addressDetails["firstname"],
+  //       "lastname": addressDetails["lastname"],
+  //       "company": addressDetails["company"],
+  //       "telephone": addressDetails["telephone"],
+  //       "save_in_address_book": "1"
+  //     };
+  //   }
+  //
+  //   var body = jsonEncode({"address": widget.shippingAddress});
+  //   ApiResponseModel responseData = await postApiCall(
+  //     postUrl: "$estimateShippingMethodsApi",
+  //     headers: headers,
+  //     context: context,
+  //     body: body,
+  //   );
+  //   // print(responseData.responseValue);
+  //   if (responseData.statusCode == 200) {
+  //     overlay.hide();
+  //     // Navigator.of(context).pop();
+  //     List responseList = responseData.responseValue;
+  //     Map responseMap = responseList[0];
+  //     // print("responseMap: " + responseMap.toString());
+  //     shippingInformation(
+  //         estimateShippingResponse: responseMap,
+  //         shippingAddress: widget.shippingAddress,
+  //         billingAddress: selectAddressDetails);
+  //     // progress.dismiss();
+  //   } else {
+  //     //  progress.dismiss();
+  //     overlay.hide();
+  //     // Navigator.of(context).pop();
+  //   }
+  // }
 
   shippingInformation(
       {Map estimateShippingResponse,
@@ -244,8 +257,8 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
         "shipping_address": {
           "customerAddressId": shippingAddress["save_in_address_book"],
           "countryId": shippingAddress["country_id"],
-          "regionCode": shippingAddress["region"],
-          "region": shippingAddress["region"],
+          "regionCode": "DOHA", // shippingAddress["region"],
+          "region": "DOHA", // shippingAddress["region"],
           "customerId": shippingAddress["customer_id"],
           "street": shippingAddress["street"],
           "company": shippingAddress["company"],
@@ -282,17 +295,19 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
           "customAttributes": [],
           "saveInAddressBook": null
         },
-        "shipping_method_code": estimateShippingResponse["method_code"],
-        "shipping_carrier_code": estimateShippingResponse["carrier_code"],
+        "shipping_method_code": widget.paymentMethods["method_code"],
+        "shipping_carrier_code": widget.paymentMethods["carrier_code"],
         "extension_attributes": {}
       }
     });
+    // print(body);
     ApiResponseModel responseData = await postApiCall(
       postUrl: "$shippingInformationApi",
       headers: headers,
       context: context,
       body: body,
     );
+    // print(responseData.responseValue);
     Navigator.of(context).pop();
 
     if (responseData.statusCode == 200) {
@@ -303,9 +318,11 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => PaymentMethodChoose(
-            paymentMethods: estimateShippingResponse,
+            agree: widget.agree,
+            paymentid: widget.paymentid,
+            router: "billing",
             screenInfo: responseMap,
-            shippingAddress: shippingAddress,
+            shippingAddress: widget.shippingAddress,
             billingAddress: billingAddress,
             cartId: widget.cartId,
           ),
@@ -326,7 +343,9 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
         ? InkWell(
             onTap: () async {
               selectIndex = index;
+
               Map regionMap = addressDetails["region"];
+
               selectAddressDetails = {
                 "customer_id": addressDetails["customer_id"],
                 "street": addressDetails["street"],
@@ -340,8 +359,6 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                 "telephone": addressDetails["telephone"],
                 "save_in_address_book": addressDetails["id"],
               };
-              // final progress = ProgressHUD.of(context);
-              // progress.show();
               final overlay = LoadingOverlay.of(context);
               overlay.show();
               SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -358,16 +375,17 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                 context: context,
                 body: body,
               );
-
+              //print(responseData.responseValue);
               // Navigator.of(context).pop();
 
               if (responseData.statusCode == 200) {
                 overlay.hide();
                 List responseList = responseData.responseValue;
-                print(responseList);
-                // Map responseMap = responseList[0];
+                Map responseMap = responseList[0];
+                print("responseMap: " + responseMap.toString());
                 setState(() {
                   addressListID = responseList;
+                  print(addressListID.length);
                 });
                 // shippingInformation(
                 //     estimateShippingResponse: responseMap,
@@ -394,8 +412,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          LocaleKeys.Address_Title.tr() +
-                              ":${addressDetails["company"] == null ? LocaleKeys.home.tr() : LocaleKeys.Work.tr()}",
+                          "Address Title:${addressDetails["company"] == null ? "Home" : "Work"}",
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -415,7 +432,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                     bottom: 5,
                                   ),
                                   child: Text(
-                                    LocaleKeys.default_.tr(),
+                                    "Default",
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: whiteColor,
@@ -444,7 +461,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                   ),
                                   sizedBoxwidth5,
                                   Text(
-                                    LocaleKeys.Edit.tr(),
+                                    "Edit",
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
@@ -476,7 +493,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                   ),
                                   sizedBoxwidth5,
                                   Text(
-                                    LocaleKeys.Delete.tr(),
+                                    "Delete",
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
@@ -491,7 +508,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                     ),
                     sizedBoxheight10,
                     Text(
-                      LocaleKeys.Shipping_Address.tr(),
+                      "Shipping Address",
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -504,7 +521,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                         Expanded(
                             flex: 4,
                             child: Text(
-                              LocaleKeys.Address.tr(),
+                              "Address",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: greyColor,
@@ -528,7 +545,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                         Expanded(
                             flex: 4,
                             child: Text(
-                              LocaleKeys.Mobile.tr(),
+                              "Mobile Number",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: greyColor,
@@ -546,69 +563,6 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                         ),
                       ],
                     ),
-                    sizedBoxheight10,
-                    // widget.router != "account"
-                    //     ? Text(
-                    //         "Billing Address",
-                    //         style: TextStyle(
-                    //           fontSize: 12,
-                    //           fontWeight: FontWeight.w600,
-                    //         ),
-                    //       )
-                    //     : Container(),
-                    // sizedBoxheight10,
-                    // widget.router != "account"
-                    //     ? Row(
-                    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //         children: [
-                    //           Expanded(
-                    //               flex: 4,
-                    //               child: Text(
-                    //                 "Address",
-                    //                 style: TextStyle(
-                    //                   fontSize: 12,
-                    //                   color: greyColor,
-                    //                 ),
-                    //               )),
-                    //           Expanded(
-                    //             flex: 6,
-                    //             child: Text(
-                    //               "${billAddressDetails["firstname"]}, ${billAddressDetails["street"][0]}, ${billAddressDetails["postcode"]}",
-                    //               style: TextStyle(
-                    //                 fontSize: 12,
-                    //                 fontWeight: FontWeight.w600,
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       )
-                    //     : Container(),
-                    // sizedBoxheight5,
-                    // widget.router != "account"
-                    //     ? Row(
-                    //         children: [
-                    //           Expanded(
-                    //               flex: 4,
-                    //               child: Text(
-                    //                 "Mobile Number",
-                    //                 style: TextStyle(
-                    //                   fontSize: 12,
-                    //                   color: greyColor,
-                    //                 ),
-                    //               )),
-                    //           Expanded(
-                    //             flex: 6,
-                    //             child: Text(
-                    //               billAddressDetails["telephone"],
-                    //               style: TextStyle(
-                    //                 fontSize: 12,
-                    //                 fontWeight: FontWeight.w600,
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       )
-                    //     : Container(),
                     sizedBoxheight10,
                   ],
                 ),
@@ -629,8 +583,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        LocaleKeys.Address_Title.tr() +
-                            ":${addressDetails["company"] == null ? LocaleKeys.home.tr() : LocaleKeys.Work.tr()}",
+                        "Address Title:${addressDetails["company"] == null ? "Home" : "Work"}",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -650,7 +603,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                   bottom: 5,
                                 ),
                                 child: Text(
-                                  LocaleKeys.default_set.tr(),
+                                  "Default",
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: whiteColor,
@@ -679,7 +632,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                 ),
                                 sizedBoxwidth5,
                                 Text(
-                                  LocaleKeys.Edit.tr(),
+                                  "Edit",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -711,7 +664,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                 ),
                                 sizedBoxwidth5,
                                 Text(
-                                  LocaleKeys.Delete.tr(),
+                                  "Delete",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -726,7 +679,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                   ),
                   sizedBoxheight10,
                   Text(
-                    LocaleKeys.Shipping_Address.tr(),
+                    "Shipping Address",
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -763,7 +716,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                       Expanded(
                           flex: 4,
                           child: Text(
-                            LocaleKeys.Mobile.tr(),
+                            "Mobile Number",
                             style: TextStyle(
                               fontSize: 12,
                               color: greyColor,
@@ -782,13 +735,6 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                     ],
                   ),
                   sizedBoxheight10,
-                  // Text(
-                  //   "Billing Address",
-                  //   style: TextStyle(
-                  //     fontSize: 12,
-                  //     fontWeight: FontWeight.w600,
-                  //   ),
-                  // ),
                 ],
               ),
             ),
@@ -818,7 +764,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
               backgroundColor: appBarColor,
               brightness: lightBrightness,
               title: Text(
-                LocaleKeys.Select_Address.tr(),
+                "Select Billing Address",
                 style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
               ),
               flexibleSpace: Container(
@@ -886,7 +832,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                                 top: 0),
                                             // Center(
                                             child: Text(
-                                              LocaleKeys.add_address.tr(),
+                                              'Add an address so we can get cracking on the delivery!',
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 fontSize: 16,
@@ -909,7 +855,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                                         ),
                                                 ),
                                               );
-                                              // print(router);
+                                              print(router);
                                               if (router ==
                                                   "getAddressRefersh") {
                                                 setState(() {
@@ -938,8 +884,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                                           fontSize: 18),
                                                     ),
                                                     Text(
-                                                      LocaleKeys.Add_New_Address
-                                                          .tr(),
+                                                      "Add New Address",
                                                       style: TextStyle(
                                                           color: whiteColor),
                                                     ),
@@ -1019,8 +964,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                                           fontSize: 18),
                                                     ),
                                                     Text(
-                                                      LocaleKeys.Add_New_Address
-                                                          .tr(),
+                                                      "Add New Address",
                                                       style: TextStyle(
                                                           color: whiteColor),
                                                     ),
@@ -1030,92 +974,6 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                             ),
                                           ),
                                         ),
-                                        Visibility(
-                                          visible: addressListID.length == 0
-                                              ? false
-                                              : true,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                              top: 20,
-                                              bottom: 0,
-                                              left: 10,
-                                              right: 10,
-                                            ),
-                                            child: Container(
-                                                alignment: Alignment.topLeft,
-                                                child: Text(
-                                                  LocaleKeys.Shipping_Methods
-                                                      .tr(),
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14),
-                                                )),
-                                          ),
-                                        ),
-                                        Padding(
-                                            padding: EdgeInsets.only(
-                                              top: 0,
-                                              bottom: 80,
-                                              left: 10,
-                                              right: 10,
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                ListView.builder(
-                                                  shrinkWrap: true,
-                                                  itemCount:
-                                                      addressListID.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return Column(
-                                                      children: [
-                                                        RadioListTile(
-                                                          value: index,
-                                                          groupValue: value,
-                                                          onChanged: (ind) =>
-                                                              setState(() {
-                                                            value = ind;
-                                                            method_code =
-                                                                '${addressListID[index]["method_code"]}';
-                                                            carrier_code =
-                                                                '${addressListID[index]["carrier_code"]}';
-                                                            print(
-                                                                'carrier_code=$carrier_code, method_code = $method_code  ');
-                                                            print(
-                                                                'value = $value');
-                                                          }),
-                                                          title: Text(
-                                                            'QAR ${addressListID[index]["amount"]}' +
-                                                                '     ' +
-                                                                '${addressListID[index]["carrier_code"]}' +
-                                                                '     ' +
-                                                                '${addressListID[index]["method_code"]}',
-                                                            style: TextStyle(
-                                                                fontSize: 12),
-                                                          ),
-                                                          // Column(
-                                                          //   children: [
-                                                          //     Text(
-                                                          //         'QAR ${addressListID[index]["amount"]}'),
-                                                          //     Text(
-                                                          //         '${addressListID[index]["carrier_code"]}'),
-                                                          //     Text(
-                                                          //         '${addressListID[index]["method_code"]}'),
-                                                          //   ],
-                                                          // ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                ),
-                                              ],
-                                            )),
                                       ],
                                     ),
                             ),
@@ -1146,62 +1004,16 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                                         width: screenSize.width,
                                         child: InkWell(
                                           onTap: () {
-                                            Map shippingDetails = {
-                                              "carrier_code": carrier_code,
-                                              "method_code": method_code,
-                                            };
-                                            selectIndex != null &&
-                                                    carrier_code == null
-                                                ? _scrollController.animateTo(
-                                                    _scrollController.position
-                                                        .maxScrollExtent,
-                                                    duration: Duration(
-                                                        milliseconds: 500),
-                                                    curve: Curves.ease)
-                                                : null;
-                                            selectIndex == null
-                                                ? Fluttertoast.showToast(
-                                                    msg: LocaleKeys
-                                                        .SelectAddress.tr(),
-                                                    toastLength:
-                                                        Toast.LENGTH_SHORT,
-                                                    gravity:
-                                                        ToastGravity.CENTER,
-                                                    timeInSecForIosWeb: 1,
-                                                    backgroundColor:
-                                                        Colors.black,
-                                                    textColor: Colors.white,
-                                                    fontSize: 16.0,
-                                                  )
-                                                : carrier_code == null
-                                                    ? Fluttertoast.showToast(
-                                                        msg: LocaleKeys
-                                                                .SelectShipping
-                                                            .tr(),
-                                                        toastLength:
-                                                            Toast.LENGTH_SHORT,
-                                                        gravity:
-                                                            ToastGravity.CENTER,
-                                                        timeInSecForIosWeb: 1,
-                                                        backgroundColor:
-                                                            Colors.black,
-                                                        textColor: Colors.white,
-                                                        fontSize: 16.0,
-                                                      )
-                                                    :
-                                                    // estimateShippingMethod(context);
-
-                                                    shippingInformation(
-                                                        estimateShippingResponse:
-                                                            shippingDetails,
-                                                        billingAddress:
-                                                            selectAddressDetails,
-                                                        shippingAddress:
-                                                            selectAddressDetails);
-                                            ;
+                                            shippingInformation(
+                                                estimateShippingResponse:
+                                                    widget.paymentMethods,
+                                                billingAddress:
+                                                    selectAddressDetails,
+                                                shippingAddress:
+                                                    widget.shippingAddress);
                                           },
                                           child: customButton(
-                                              title: LocaleKeys.Continue.tr(),
+                                              title: "CONTINUE",
                                               backgroundColor: secondaryColor),
                                         ),
                                       ),

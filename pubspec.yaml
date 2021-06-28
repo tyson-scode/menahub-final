@@ -1,68 +1,78 @@
 name: menahub
 description: ecommerce app
-publish_to: 'none' 
+publish_to: 'none'
 version: 1.0.0+2
-
 environment:
   sdk: ">=2.7.0 <3.0.0"
-
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.2
-  hexcolor: ^1.0.6
-  badges: ^1.1.6
-  modal_bottom_sheet: ^1.0.0+1
-  carousel_slider: ^2.3.1
-  dotted_border: ^1.0.7
+  hexcolor: ^2.0.4
+  badges: ^2.0.1
+  modal_bottom_sheet: ^2.0.0
+  carousel_slider: ^4.0.0
+  dotted_border: ^2.0.0
   http: ^0.13.0
   flutter_rating_bar: ^4.0.0
-  #pagination
+  #pagination	
   flutter_paginator: ^0.0.6
-  shared_preferences: ^2.0.4
-  #drop down
+  shared_preferences: ^2.0.6
+  #drop down	
   flutter_dropdown: ^0.0.8
-  # get system path
+  # get system path	
   path_provider: ^2.0.1
-  #file download from path 
+  #file download from path 	
   flutter_downloader: ^1.5.2
   open_file: ^3.1.0
-  #loader 
+  #loader 	
   flutter_progress_hud: ^2.0.0
-  #Toast
-  fluttertoast: ^7.1.8
-  #language change 
+  #Toast	
+  fluttertoast: ^8.0.7
+  #language change 	
   easy_localization: ^3.0.0
   smooth_star_rating: ^1.1.1
-  #alert box 
+  #alert box
   rflutter_alert: ^2.0.2
-  awesome_dialog: ^1.3.2
-  #remove html element 
-  html: 
-  #load html tag 
-  flutter_html: 
-  #location 
+  awesome_dialog: ^2.1.0
+  #remove html element 	
+  html:
+  #load html tag 	
+  flutter_html:
+  #location 	
   google_map_location_picker: ^4.1.7
   google_maps_flutter: ^2.0.1
   flutter_localizations:
     sdk: flutter
-  #vicky
-  pinput: ^1.1.0
-  #sahana
-  email_validator: '^1.0.5'
-  dotted_line: ^2.0.2
-  otp_text_field: ^1.1.0
-  pin_entry_text_field: ^0.1.4
+  intl: "^0.17.0"
 
-    
+  #vicky	
+  pinput: ^1.1.0
+  #sahana	
+  email_validator: ^2.0.1
+  dotted_line: ^3.0.0
+  otp_text_field: ^1.1.0
+  #  firebase_auth: ^0.15.1+1	
+  flutter_inappwebview: ^5.3.2
+  #  firebase_messaging: ^10.0.0
+  #  firebase_core: ^1.2.0
+  #  firebase_auth: "^0.20.1"
+  firebase_core: ^0.7.0
+  firebase_messaging: ^8.0.0-dev.15
+  flutter_local_notifications: ^4.0.1+2
+  overlay_support: ^1.2.1
+
+
+#dependency_overrides:	
+#  intl: ^0.17.0-nullsafety.2	
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-flutter:
 
+flutter:
   uses-material-design: true
+  generate: true
   assets:
     - assets/
     - assets/icon/

@@ -3,11 +3,13 @@ import 'package:menahub/DashBoard/DashBoard.dart';
 import 'package:menahub/MyOrdersScreen/MyOrdersScreen.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/config/CustomLoader.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/Api/ApiResponseModel.dart';
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class OrderSuccessScreen extends StatefulWidget {
   final id;
@@ -19,6 +21,8 @@ class OrderSuccessScreen extends StatefulWidget {
 class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   List productList = [];
   Map billingAddress;
+  Map shippingAddress;
+
   Map shippingAddressDetails;
   Map orderDetails;
   String orderId;
@@ -48,6 +52,13 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
         print('Order Details : $orderDetails');
         productList = data["items"];
         billingAddress = data["billing_address"];
+        shippingAddress = data["shipping_address"];
+
+        // print('Order productList : $productList');
+        //
+        // print('billingAddress Details : $billingAddress');
+        // print('shippingAddress Details : $shippingAddress');
+
         //response split by shipping address details
         Map extensionAttributesMap = data["extension_attributes"];
         List shippingAssignmentsList =
@@ -56,6 +67,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
         Map shippingInfo = shippingAssignmentsMap["shipping"];
         shippingAddressDetails = shippingInfo[
             "address"]; //print("shipping :" + shippingAddressDetails.toString());
+        // print('shippingAddress Details : $shippingAddressDetails');
       });
     } else {
       print(responseData);
@@ -75,6 +87,9 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
     // var created_at_converted =
     //     DateFormat('dd/MM/yyyy').format(crearted_at_date);
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: orderDetails == null
@@ -138,7 +153,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
                                 child: Text(
-                                  'Order Request Successful',
+                                  LocaleKeys.order_request.tr(),
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 18),
                                 ),
@@ -146,7 +161,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
                                 child: Text(
-                                  'Thanks for your Order Request',
+                                  LocaleKeys.order_thanks.tr(),
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 12),
                                 ),
@@ -174,7 +189,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                'Order Request Summary',
+                                LocaleKeys.summary.tr(),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -198,7 +213,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                             child: RichText(
                               text: TextSpan(
-                                text: 'Request ID : ',
+                                text: LocaleKeys.Request_ID.tr() + ': ',
                                 style: TextStyle(color: Colors.black),
                                 children: <TextSpan>[
                                   TextSpan(
@@ -228,7 +243,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                             child: RichText(
                               text: TextSpan(
-                                text: 'Order Date: ',
+                                text: LocaleKeys.Order_Date.tr() + ': ',
                                 style: TextStyle(color: Colors.black),
                                 children: <TextSpan>[
                                   TextSpan(
@@ -263,7 +278,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                             child: RichText(
                               text: TextSpan(
-                                text: 'Store: ',
+                                text: LocaleKeys.Store.tr() + ': ',
                                 style: TextStyle(color: Colors.black),
                                 children: <TextSpan>[
                                   TextSpan(
@@ -296,7 +311,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                             child: RichText(
                               text: TextSpan(
-                                text: 'Order Request:',
+                                text: LocaleKeys.Order_Req.tr() + ': ',
                                 style: TextStyle(color: Colors.black),
                                 children: <TextSpan>[
                                   TextSpan(
@@ -327,7 +342,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                               child: RichText(
                                 text: TextSpan(
-                                  text: 'Ship To: ',
+                                  text: LocaleKeys.Ship_To.tr() + ': ',
                                   style: TextStyle(color: Colors.black),
                                   children: <TextSpan>[
                                     TextSpan(
@@ -360,7 +375,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                               child: RichText(
                                 text: TextSpan(
-                                  text: 'Billing To: ',
+                                  text: LocaleKeys.Billing_To.tr() + ': ',
                                   style: TextStyle(color: Colors.black),
                                   children: <TextSpan>[
                                     TextSpan(
@@ -407,7 +422,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                                       const Color(0xFFF5BB2A),
                                     ])),
                                 child: Text(
-                                  'View More Order Details',
+                                  LocaleKeys.more_order.tr(),
                                   style: TextStyle(
                                     color: Colors.white,
                                   ),
@@ -443,7 +458,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                                       const Color(0xFF4F7180),
                                     ])),
                                 child: Text(
-                                  'Back To Shopping',
+                                  LocaleKeys.back_shopping.tr(),
                                   style: TextStyle(
                                     color: Colors.white,
                                   ),

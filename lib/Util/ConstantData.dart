@@ -16,6 +16,3 @@ Color secondaryColor = HexColor("#F78500");
 //appbar
 Brightness dartBrightness = Brightness.light;
 Brightness lightBrightness = Brightness.dark;
-
-// urls
-String baseUrl = "";

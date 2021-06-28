@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:menahub/ProductsDetails/ParticularProductsDetailsScreen.dart';
 import 'package:menahub/ProductsDetails/ProductsDetailsScreen.dart';
@@ -21,6 +23,10 @@ import 'package:menahub/Util/Widget.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:menahub/config/CustomLoader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:menahub/translation/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
+
+import '../DashBoard.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -37,6 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
   List sampleBlockList7 = [];
   List<String> sliderList1 = [];
   List<String> titleList = [];
+  List mobiletype1 = [];
+  List mobiletype2 = [];
+  List mobileLinkId = [];
 
   List<String> sliderList2 = [];
   //slider indicator
@@ -66,7 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     getLocalInformation();
-    getSlider();
+    getSlider1();
+    getSlider2();
     getProductList();
   }
 
@@ -170,7 +180,17 @@ class _HomeScreenState extends State<HomeScreen> {
   getLocalInformation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String type = prefs.getString("userType");
+
     if (type == "guest") {
+      // Fluttertoast.showToast(
+      //   msg: "You have logged in as Guest User...",
+      //   // toastLength: Toast.LENGTH_LONG,
+      //   // gravity: ToastGravity.CENTER,
+      //   // timeInSecForIosWeb: 10,
+      //   // backgroundColor: Colors.red,
+      //   // textColor: Colors.white,
+      //   // fontSize: 16.0,
+      // );
       setState(() {
         userType = true;
       });
@@ -182,7 +202,51 @@ class _HomeScreenState extends State<HomeScreen> {
     print(userType);
   }
 
-  getSlider() async {
+  // pushNotification(BuildContext _context) async {
+  //   print("pushNotification called");
+  //   SharedPreferences preference = await SharedPreferences.getInstance();
+  //   String deviceID = preference.getString("firebasetoken");
+  //   print("preference.getString(firebasetoken)");
+  //   print(preference.getString("firebasetoken"));
+  //   var body = jsonEncode({
+  //     "device_type": Platform.isAndroid
+  //         ? "Android"
+  //         : Platform.isIOS
+  //             ? "IOS"
+  //             : "Null",
+  //     "device_id": deviceID,
+  //     "customer_id": customer_ID,
+  //   });
+  //   Map<String, String> headers = {
+  //     'Content-Type': 'application/json',
+  //   };
+  //   ApiResponseModel responseData = await postApiCall(
+  //       postUrl: pushNotificationUrl,
+  //       headers: headers,
+  //       context: context,
+  //       body: body);
+  //
+  //   if (responseData.statusCode == 200) {
+  //     print(responseData.responseValue);
+  //   } else {
+  //     Map response = responseData.responseValue;
+  //     String errorMessage = response["message"];
+  //     print(errorMessage);
+  //     // Fluttertoast.showToast(
+  //     //   msg: errorMessage,
+  //     //   toastLength: Toast.LENGTH_SHORT,
+  //     //   gravity: ToastGravity.BOTTOM,
+  //     //   timeInSecForIosWeb: 1,
+  //     //   backgroundColor: Colors.white,
+  //     //   textColor: Colors.black,
+  //     //   fontSize: 16.0,
+  //     // );
+  //
+  //     print(errorMessage);
+  //   }
+  // }
+
+  getSlider1() async {
     Map<String, String> headers = {
       'Content-Type': 'application/json',
     };
@@ -199,10 +263,47 @@ class _HomeScreenState extends State<HomeScreen> {
         List imageList =
             bannerImageList.map((e) => e["image"].toString()).toList();
         sliderList1 = imageList;
-        List titlelist =
-            bannerImageList.map((e) => e["title"].toString()).toList();
+        mobileLinkId =
+            bannerImageList.map((e) => e["mobile_link_id"].toString()).toList();
+        mobiletype1 =
+            bannerImageList.map((e) => e["mobile_type"].toString()).toList();
+        print("mobiletype");
+
+        print(mobiletype1);
+
         print(sliderData1);
-        titleList = titlelist;
+        // titleList = titlelist;
+        print(titleList);
+      });
+    } else {}
+  }
+  getSlider2() async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+    };
+    ApiResponseModel slider1 = await getApiCall(
+      getUrl: "${sliderblocks}1",
+      headers: headers,
+      context: context,
+    );
+    List sliderData1 = slider1.responseValue;
+
+    if (slider1.statusCode == 200) {
+      List bannerImageList = sliderData1;
+      setState(() {
+        List imageList =
+            bannerImageList.map((e) => e["image"].toString()).toList();
+        sliderList2 = imageList;
+        mobileLinkId =
+            bannerImageList.map((e) => e["mobile_link_id"].toString()).toList();
+        mobiletype2 =
+            bannerImageList.map((e) => e["mobile_type"].toString()).toList();
+        print("mobiletype");
+
+        print(mobiletype2);
+
+        print(sliderData1);
+        // titleList = titlelist;
         print(titleList);
       });
     } else {}
@@ -355,6 +456,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: ProgressHUD(
@@ -424,8 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       enabled: false,
                                       decoration: new InputDecoration(
                                         border: InputBorder.none,
-                                        hintText:
-                                            'Search by Products, Brands & More...',
+                                        hintText: LocaleKeys.search.tr(),
                                         hintStyle:
                                             TextStyle(color: Colors.white),
                                         prefixIcon: const Icon(
@@ -451,7 +554,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 .size
                                                 .width,
                                             child: GestureDetector(
-                                              onTap: () {},
+                                              onTap: () {
+                                                var data = mobiletype1[slider1position];
+                                                if(data == ""){
+                                                }
+                                                else if(data == "0") {
+                                                  print("product");
+                                                }
+                                                else if(data == "1") {
+                                                  print("category");
+                                                }
+                                                else if(data == "2") {
+                                                  print("productlist");
+                                                }
+
+                                                // mobiletype[slider1position] !=
+                                                //         null
+                                                //     ? viewMoreNavigation(
+                                                //         productId: mobiletype[
+                                                //             slider1position],
+                                                //         title: " ")
+                                                //     : null;
+                                              },
                                               child: ClipRRect(
                                                 child: Image.network(
                                                     "$bannerSliderBaseUrl$item",
@@ -474,7 +598,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                       onPageChanged: (index, reason) {
                                         setState(() {
-                                          print(titleList[index]);
                                           slider1position = index;
                                         });
                                       },
@@ -526,7 +649,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     InkWell(
                                       onTap: () {
                                         viewMoreNavigation(
-                                            productId: v1, title: "");
+                                            productId: v1, title: blockName1);
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -543,7 +666,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               top: 4,
                                               bottom: 4),
                                           child: Text(
-                                            "View All",
+                                            LocaleKeys.view_all.tr(),
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: secondaryColor,
@@ -626,7 +749,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     top: 4,
                                                     bottom: 4),
                                                 child: Text(
-                                                  "View All",
+                                                  LocaleKeys.view_all.tr(),
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: secondaryColor,
@@ -713,7 +836,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   top: 4,
                                                   bottom: 4),
                                               child: Text(
-                                                "View All",
+                                                LocaleKeys.view_all.tr(),
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   color: secondaryColor,
@@ -766,18 +889,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                   CarouselSlider(
                                     items: sliderList2
                                         .map(
-                                          (item) => Container(
-                                            height: 150,
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            child: Image.network(
-                                                "$bannerSliderBaseUrl$item",
-                                                fit: BoxFit.fill,
-                                                height: 150,
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width),
+                                          (item) => GestureDetector(
+                                            onTap: () {
+                                              var data = mobiletype2[slider2position];
+                                              if(data == ""){
+                                              }
+                                              else if(data == "0") {
+                                                print("product");
+                                              }
+                                              else if(data == "1") {
+                                                print("category");
+                                              }
+                                              else if(data == "2") {
+                                                print("productlist");
+                                              }
+
+                                            },
+                                            child: Container(
+                                              height: 150,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              child: Image.network(
+                                                  "$bannerSliderBaseUrl$item",
+                                                  fit: BoxFit.fill,
+                                                  height: 150,
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width),
+                                            ),
                                           ),
                                         )
                                         .toList(),
@@ -864,7 +1004,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     top: 4,
                                                     bottom: 4),
                                                 child: Text(
-                                                  "View All",
+                                                  LocaleKeys.view_all.tr(),
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: whiteColor,
@@ -1032,7 +1172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     top: 4,
                                                     bottom: 4),
                                                 child: Text(
-                                                  "View All",
+                                                  LocaleKeys.view_all.tr(),
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: whiteColor,
@@ -1187,7 +1327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               top: 4,
                                               bottom: 4),
                                           child: Text(
-                                            "View All",
+                                            LocaleKeys.view_all.tr(),
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: secondaryColor,
@@ -1316,7 +1456,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   top: 4,
                                                   bottom: 4),
                                               child: Text(
-                                                "View All",
+                                                LocaleKeys.view_all.tr(),
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   color: secondaryColor,

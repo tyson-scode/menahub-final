@@ -50,22 +50,60 @@ Widget reviewCard({BuildContext context, Map reviewDetails}) {
                             style: TextStyle(
                                 fontSize: 14.0, fontWeight: FontWeight.w600),
                             textAlign: TextAlign.left,
-                          )
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              SmoothStarRating(
-                allowHalfRating: true,
-                isReadOnly: true,
-                starCount: 5,
-                rating: 4,
-                size: 18.0,
-                color: Colors.red,
-                borderColor: Colors.red,
-                spacing: 0.0,
+              Column(
+                children: [
+                  SmoothStarRating(
+                    allowHalfRating: true,
+                    isReadOnly: true,
+                    starCount: 5,
+                    rating: double.parse(
+                        reviewDetails["rating_votes"][0]["rating_id"]),
+                    size: 18.0,
+                    color: Colors.red,
+                    borderColor: Colors.red,
+                    spacing: 0.0,
+                  ),
+                  // SmoothStarRating(
+                  //   allowHalfRating: true,
+                  //   isReadOnly: true,
+                  //   starCount: 5,
+                  //   rating: double.parse(
+                  //       reviewDetails["rating_votes"][1]["rating_id"]),
+                  //   size: 18.0,
+                  //   color: Colors.red,
+                  //   borderColor: Colors.red,
+                  //   spacing: 0.0,
+                  // ),
+                  // SmoothStarRating(
+                  //   allowHalfRating: true,
+                  //   isReadOnly: true,
+                  //   starCount: 5,
+                  //   rating: double.parse(
+                  //       reviewDetails["rating_votes"][2]["rating_id"]),
+                  //   size: 18.0,
+                  //   color: Colors.red,
+                  //   borderColor: Colors.red,
+                  //   spacing: 0.0,
+                  // ),
+                  // SmoothStarRating(
+                  //   allowHalfRating: true,
+                  //   isReadOnly: true,
+                  //   starCount: 5,
+                  //   rating: double.parse(
+                  //       reviewDetails["rating_votes"][3]["rating_id"]),
+                  //   size: 18.0,
+                  //   color: Colors.red,
+                  //   borderColor: Colors.red,
+                  //   spacing: 0.0,
+                  // ),
+                ],
               ),
             ],
           ),

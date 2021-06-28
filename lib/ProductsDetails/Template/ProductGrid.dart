@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:menahub/ProductsDetails/ParticularProductsDetailsScreen.dart';
@@ -5,6 +7,7 @@ import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/StaticFunction.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProductGrid extends StatefulWidget {
   const ProductGrid(
@@ -22,6 +25,7 @@ class _ProductGridState extends State<ProductGrid> {
   @override
   Widget build(BuildContext context) {
     List customAttributes = widget.productDetails["custom_attributes"];
+    Map extensionAttributes = widget.productDetails["extension_attributes"];
     int producImageIndex =
         customAttributes.indexWhere((f) => f['attribute_code'] == "image");
     Map productDescriptionMap = customAttributes[producImageIndex.abs()];
@@ -119,11 +123,11 @@ class _ProductGridState extends State<ProductGrid> {
                     ),
                     sizedBoxheight5,
                     Text(
-                      "QAR ${widget.productDetails['price']}",
+                      "QAR ${double.parse(extensionAttributes["custom_final_price"]).toStringAsFixed(2)}",
                       style: TextStyle(
                         fontSize: 12,
-                        color: appBarColor,
-                        fontWeight: FontWeight.w600,
+                        color: orangeColor,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     sizedBoxheight5,

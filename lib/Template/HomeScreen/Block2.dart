@@ -20,10 +20,13 @@ class _Block2State extends State<Block2> {
   bool wishlistStatus = false;
   @override
   Widget build(BuildContext context) {
-    double productPrice = widget.productDetails["price"] == null
-        ? 0.0
-        : double.parse(widget.productDetails['price']);
-    // print('product price = $productPrice');
+    // String productPrice = widget.productDetails["price"] == null
+    //     ? 0.0
+    //     : double.parse(widget.productDetails["price"]).toStringAsFixed(2);
+    // double productPrice = widget.productDetails["price"] == null
+    //     ? 0.0
+    //     : double.parse(widget.productDetails["price"]);
+
     return InkWell(
       onTap: () {
         widget.onstate(widget.productDetails['sku'].toString(), false);
@@ -100,7 +103,7 @@ class _Block2State extends State<Block2> {
                     ),
                     sizedBoxheight5,
                     Text(
-                      "QAR $productPrice",
+                      "QAR ${double.parse(widget.productDetails['price']).toStringAsFixed(2)}",
                       style: TextStyle(
                         fontSize: 14,
                         color: secondaryColor,

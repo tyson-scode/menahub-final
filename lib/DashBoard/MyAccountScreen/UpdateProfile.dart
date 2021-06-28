@@ -12,6 +12,7 @@ import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/AppLoader.dart';
 import 'package:menahub/config/CustomLoader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class UpdateProfile extends StatefulWidget {
   UpdateProfile({this.userProfile});
@@ -28,7 +29,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   TextEditingController passwordTextfield = TextEditingController();
   TextEditingController mobileTextfield = TextEditingController();
   bool _autoValidate = false;
-  String countryCode = "+ 91";
+  String countryCode = "+91";
   String gender;
   int genderID;
 
@@ -137,6 +138,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
@@ -211,6 +215,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           ),
                           sizedBoxheight10,
                           customTextBox(
+                            enabled: false,
                             icons: "assets/icon/emailIcon.png",
                             hintText: "Email",
                             controller: emailTextfield,
@@ -282,7 +287,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                     DropdownButton<String>(
                                       underline: Container(),
                                       value: countryCode,
-                                      items: <String>['+ 91', '+ 974']
+                                      items: <String>['+91', '+974']
                                           .map((String value) {
                                         return new DropdownMenuItem<String>(
                                           value: value,
@@ -292,14 +297,15 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                           ),
                                         );
                                       }).toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          countryCode = value;
-                                        });
-                                      },
+                                      // onChanged: (value) {
+                                      //   setState(() {
+                                      //     countryCode = value;
+                                      //   });
+                                      // },
                                     ),
                                     Expanded(
                                       child: TextFormField(
+                                        enabled: false,
                                         controller: mobileTextfield,
                                         keyboardType: TextInputType.phone,
                                         decoration: new InputDecoration(

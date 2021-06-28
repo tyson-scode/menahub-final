@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:flutter/material.dart';
+import 'package:menahub/Util/ConstantData.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class NotificationScreen extends StatefulWidget {
   @override
@@ -12,6 +17,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(

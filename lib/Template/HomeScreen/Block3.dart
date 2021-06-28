@@ -51,7 +51,7 @@ class Block3 extends StatelessWidget {
               ),
               sizedBoxheight5,
               Container(
-                height: 30,
+                // height: 30,
                 width: MediaQuery.of(context).size.width,
                 child: Text(
                   productDetails['name'],
