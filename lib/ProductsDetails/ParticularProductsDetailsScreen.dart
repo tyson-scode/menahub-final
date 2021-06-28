@@ -155,6 +155,10 @@ class _ParticularProductsDetailsScreenState
     if (response.statusCode == 200) {
       setState(() {
         this.productDetials = productDetails;
+<<<<<<< HEAD
+=======
+        // print("product=$productDetails");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
         relatedProduct = productDetails["product_links"];
         for (var i = 0; i < relatedProduct.length; i++) {
           var singleProduct = relatedProduct[i]["linked_product_sku"];
@@ -162,6 +166,10 @@ class _ParticularProductsDetailsScreenState
         }
         getRelatedProduct();
         productID = productDetials["id"].toString();
+<<<<<<< HEAD
+=======
+        print("productID=${productID}");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
         List bannerImageList = productDetails["media_gallery_entries"];
         List imageList =
             bannerImageList.map((e) => e["file"].toString()).toList();
@@ -177,6 +185,10 @@ class _ParticularProductsDetailsScreenState
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[pricedetailsindex.abs()];
         price = pricedetailsindexMap["value"];
+<<<<<<< HEAD
+=======
+        print("price=$price");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
         int descriptionIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "description");
         int sellerRatingsIndex = customAttributes
@@ -216,18 +228,35 @@ class _ParticularProductsDetailsScreenState
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[shortdescriptionIndex.abs()];
         shortDescription = shortDescriptionMap["value"];
+<<<<<<< HEAD
+=======
+        // print("shortDescription : $shortDescription");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
         Map productDetailsMap = productDetailsIndex.isNegative
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[productDetailsIndex.abs()];
         details = productDetailsMap["value"];
         Map extensionAttributes = productDetails["extension_attributes"];
+<<<<<<< HEAD
         configdetails = extensionAttributes["configurable_product_options"];
 
         print('configdetails=$configdetails');
+=======
+        // print("product description = $productDescription");
+        configdetails = extensionAttributes["configurable_product_options"];
+        // configdetails = extensionAttributes["config_options"];
+
+        print('configdetails=$configdetails');
+        // configoptions = configdetails == null ? null : configdetails[0];
+>>>>>>> f660247654c5766707855cf91f64c84767364984
         configoptions =
             configdetails == null ? null : configdetails[0]["values"];
         print('configoptions=$configoptions');
 
+<<<<<<< HEAD
+=======
+        // configoptions = configoptionslist[0];
+>>>>>>> f660247654c5766707855cf91f64c84767364984
 
         for (var item in customAttributes) {
           if (item["attribute_code"] == "special_price") {
@@ -241,6 +270,13 @@ class _ParticularProductsDetailsScreenState
           }
         }
 
+<<<<<<< HEAD
+=======
+        // String listAsStr = product.toString(); // get list as string
+        // listAsStr = listAsStr.substring(1,listAsStr.length - 1); // removing first and last bracket
+        // print("listAsStr : $listAsStr");
+
+>>>>>>> f660247654c5766707855cf91f64c84767364984
         if (widget.apiType != "id") {
           sellerDataList = extensionAttributes["seller_data"];
           otherSellersData = extensionAttributes["assigned_seller_data"];
@@ -253,6 +289,7 @@ class _ParticularProductsDetailsScreenState
             print('othersellers=$othersellers');
           }
         }
+        // print("count : $count");
       });
     } else {
       Map errorMessage = response.responseValue;
@@ -491,6 +528,8 @@ class _ParticularProductsDetailsScreenState
     Map responseData = response.responseValue;
     if (response.statusCode == 200) {
       List cartList = responseData["items"];
+      print("cartList.length");
+
       print(cartList.length);
       setState(() {
         cartCount = cartList.length;
@@ -512,6 +551,8 @@ class _ParticularProductsDetailsScreenState
     Map responseData = response.responseValue;
     if (response.statusCode == 200) {
       List cartList = responseData["items"];
+      print("cartList.length");
+
       print(cartList.length);
       setState(() {
         cartCount = cartList.length;
@@ -601,8 +642,15 @@ class _ParticularProductsDetailsScreenState
 
   getRelatedProduct() async {
     String listAsStr = product.toString(); // get list as string
+<<<<<<< HEAD
     listAsStr = listAsStr.substring(
         1, listAsStr.length - 1); // removing first and last bracket
+=======
+    print("listAsStr :${listAsStr.length}");
+    listAsStr = listAsStr.substring(
+        1, listAsStr.length - 1); // removing first and last bracket
+    print(product.length);
+>>>>>>> f660247654c5766707855cf91f64c84767364984
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -613,6 +661,11 @@ class _ParticularProductsDetailsScreenState
       headers: headers,
       context: context,
     );
+<<<<<<< HEAD
+=======
+    print(
+     "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
     if (response.statusCode == 200) {
       Map responseMap = response.responseValue;
       print("responseMap : $responseMap");
@@ -623,17 +676,34 @@ class _ParticularProductsDetailsScreenState
         // productList = listItem;
         updateProductList();
           totalPageSize = responseMap["total_count"];
+<<<<<<< HEAD
+=======
+          print("totalPageSize : $totalPageSize");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
       });
     } else {}
   }
 
   updateProductList() async {
+<<<<<<< HEAD
     var tempCount = relatedProduct.length;
 
     if(tempCount<=10) {
       String listAsStr = product.toString(); // get list as string
       listAsStr = listAsStr.substring(
           1, listAsStr.length - 1); // removing first and last bracket
+=======
+    print("called");
+    var tempCount = relatedProduct.length;
+    print("tempCount : $tempCount");
+
+    if(tempCount<=10) {
+      String listAsStr = product.toString(); // get list as string
+      print("listAsStr :${listAsStr.length}");
+      listAsStr = listAsStr.substring(
+          1, listAsStr.length - 1); // removing first and last bracket
+      print(product.length);
+>>>>>>> f660247654c5766707855cf91f64c84767364984
 
       Map<String, String> headers = {
         'Content-Type': 'application/json',
@@ -644,6 +714,11 @@ class _ParticularProductsDetailsScreenState
         headers: headers,
         context: context,
       );
+<<<<<<< HEAD
+=======
+      print(
+          "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
       if (response.statusCode == 200) {
         Map responseMap = response.responseValue;
         print("responseMap : $responseMap");
@@ -656,6 +731,10 @@ class _ParticularProductsDetailsScreenState
            loader = true;
            // updateProductList();
           totalPageSize = responseMap["total_count"];
+<<<<<<< HEAD
+=======
+          print("totalPageSize : $totalPageSize");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
         });
       } else {}
     }
@@ -664,16 +743,33 @@ class _ParticularProductsDetailsScreenState
         updateProduct.removeRange(0, 10);
       }
       var j = 10;
+<<<<<<< HEAD
       var count = updateProductCount.length;
+=======
+      // updateProduct.removeRange(0, 9);
+      var count = updateProductCount.length;
+      print("count: $count");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
       for (var i = count; i <count+j; i++) {
         var singleProduct = product[i];
         var singleProductCount = product[i];
         updateProduct.add(singleProduct);
         updateProductCount.add(singleProductCount);
       }
+<<<<<<< HEAD
       String listAsStr = updateProduct.toString(); // get list as string
       listAsStr = listAsStr.substring(
           1, listAsStr.length - 1); // removing first and last bracket
+=======
+      print("updateProduct : $updateProduct");
+      print("updateProductCount : $updateProductCount");
+      String listAsStr = updateProduct.toString(); // get list as string
+      print("listAsStr :${listAsStr.length}");
+      listAsStr = listAsStr.substring(
+          1, listAsStr.length - 1); // removing first and last bracket
+      print(product.length);
+
+>>>>>>> f660247654c5766707855cf91f64c84767364984
       Map<String, String> headers = {
         'Content-Type': 'application/json',
       };
@@ -683,7 +779,12 @@ class _ParticularProductsDetailsScreenState
         headers: headers,
         context: context,
       );
+<<<<<<< HEAD
 
+=======
+      print(
+          "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
       if (response.statusCode == 200) {
         Map responseMap = response.responseValue;
         print("responseMap : $responseMap");
@@ -698,6 +799,45 @@ class _ParticularProductsDetailsScreenState
       else{}
     }
 
+<<<<<<< HEAD
+=======
+
+
+      // String listAsStr = product.toString(); // get list as string
+    // listAsStr = listAsStr.substring(1, listAsStr.length - 1);
+    // print("productList.length : ${totalPageSize}");
+    //
+    // if (productList.length == totalPageSize) {
+    //   print("productList.length : ${totalPageSize}");
+    // } else {
+    //   page += 10;
+    //   print("page : $page");
+    //   Map<String, String> headers = {
+    //     'Content-Type': 'application/json',
+    //   };
+    //
+    //   ApiResponseModel response = await getApiCall(
+    //     getUrl:
+    //         "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=${page}",
+    //     headers: headers,
+    //     context: context,
+    //   );
+    //   print(
+    //       "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=${10 + page}");
+    //   if (response.statusCode == 200) {
+    //     Map responseMap = response.responseValue;
+    //     List listItem = responseMap["items"];
+    //     print(listItem.length);
+    //     setState(() {
+    //       productList.addAll(listItem);
+    //       totalPageSize = responseMap["total_count"];
+    //       print("count : $totalPageSize");
+    //
+    //       apiupdate = false;
+    //     });
+    //   } else {}
+    // }
+>>>>>>> f660247654c5766707855cf91f64c84767364984
   }
 
   navigationViewAllProduct(String value) {
@@ -713,6 +853,7 @@ class _ParticularProductsDetailsScreenState
 
   @override
   Widget build(BuildContext context) {
+    // double sellerPercentage = double.parse(sellerRating) * 20;
     return MaterialApp(
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
@@ -749,7 +890,27 @@ class _ParticularProductsDetailsScreenState
                       ),
                     ),
                   );
+<<<<<<< HEAD
 
+=======
+                  // if (userType == true) {
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => SignIn(),
+                  //     ),
+                  //   );
+                  // } else {
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => MyCartScreen(
+                  //         router: "nav",
+                  //       ),
+                  //     ),
+                  //   );
+                  // }
+>>>>>>> f660247654c5766707855cf91f64c84767364984
                 },
                 child: Badge(
                     padding: EdgeInsets.all(4.5),
@@ -1629,11 +1790,30 @@ class _ParticularProductsDetailsScreenState
                                                               var productImage =
                                                                   productDescriptionMap[
                                                                       "value"];
+<<<<<<< HEAD
+=======
+                                                              print(
+                                                                  "productImage : $productImage");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
 
                                                               Map extension =
                                                                   productList[index][
                                                                       "extension_attributes"];
 
+<<<<<<< HEAD
+=======
+                                                              print(
+                                                                  "extension_attributes : $extension");
+                                                              // var specialPrice;
+                                                              // for (var item in custom) {
+                                                              //   if (item[
+                                                              //           "attribute_code"] ==
+                                                              //       "special_price") {
+                                                              //     specialPrice =
+                                                              //         item["value"];
+                                                              //   }
+                                                              // }
+>>>>>>> f660247654c5766707855cf91f64c84767364984
                                                               return InkWell(
                                                                 onTap: () {
                                                                   navigationViewAllProduct(
@@ -1736,8 +1916,15 @@ class _ParticularProductsDetailsScreenState
                                                                     _scrollController.position.maxScrollExtent) {
                                                                     setState(() {
                                                                       if (updateProductCount.length == totalPageSize) {
+<<<<<<< HEAD
                                                                       } else {
                                                                         if(loader==true){
+=======
+                                                                        print("sucess");
+                                                                      } else {
+                                                                        if(loader==true){
+print("loaderstopped");
+>>>>>>> f660247654c5766707855cf91f64c84767364984
                                                                         }else {
                                                                           apiupdate =
                                                                           true;
@@ -1746,7 +1933,32 @@ class _ParticularProductsDetailsScreenState
                                                                       }
                                                                     });
                                                                 }
+<<<<<<< HEAD
 
+=======
+                                                            // setState(() {
+                                                            //   if (updateProductCount
+                                                            //           .length ==
+                                                            //       totalPageSize) {
+                                                            //     print("sucess");
+                                                            //   } else {
+                                                            //     apiupdate = true;
+                                                            //     updateProductList();
+                                                            //   }
+                                                            // });
+                                                            // if (_scrollController.position.pixels ==
+                                                            //     _scrollController.position.maxScrollExtent) {
+                                                            //   if (!apiupdate) {
+                                                            //     setState(() {
+                                                            //       if (productList.length == totalPageSize) {
+                                                            //       } else {
+                                                            //         apiupdate = true;
+                                                            //          updateProductList();
+                                                            //       }
+                                                            //     });
+                                                            //   }
+                                                            // }
+>>>>>>> f660247654c5766707855cf91f64c84767364984
                                                           },
                                                         ),
                                                       ),

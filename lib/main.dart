@@ -8,6 +8,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+<<<<<<< HEAD
+=======
+//import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+>>>>>>> f660247654c5766707855cf91f64c84767364984
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:menahub/SplashScreen/SplashScreen.dart';
@@ -16,7 +20,10 @@ import 'package:menahub/translation/locale_keys.g.dart';
 import 'package:http/http.dart' as http;
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
+<<<<<<< HEAD
 import 'package:overlay_support/overlay_support.dart';
+=======
+>>>>>>> f660247654c5766707855cf91f64c84767364984
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Define a top-level named handler which background/terminated messages will
@@ -47,7 +54,10 @@ Future<void> _createNotificationChannel(
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(androidNotificationChannel);
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> f660247654c5766707855cf91f64c84767364984
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -504,8 +514,11 @@ class _MyAppState extends State<MyApp> {
         }
       }
     });
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> f660247654c5766707855cf91f64c84767364984
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       //FCM Handling
       if (message.data != null) {
@@ -551,6 +564,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return OverlaySupport(
       child: MaterialApp(
         localizationsDelegates: context.localizationDelegates,
@@ -559,6 +573,14 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         home: SplashScreen(),
       ),
+=======
+    return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: Locale(context.locale.languageCode),
+      debugShowCheckedModeBanner: false,
+      home: SplashScreen(),
+>>>>>>> f660247654c5766707855cf91f64c84767364984
     );
   }
 
