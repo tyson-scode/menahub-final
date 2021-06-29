@@ -22,6 +22,7 @@ import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 import 'package:menahub/config/AppLoader.dart';
 import 'package:menahub/config/CustomLoader.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'SellerListScreen.dart';
@@ -80,6 +81,7 @@ class _ParticularProductsDetailsScreenState
   List sellerDataList = [];
   List configoptions;
   List configdetails;
+  List sellerData = [];
   List otherSellersData = [];
   List productList = [];
   Map sellers;
@@ -155,10 +157,6 @@ class _ParticularProductsDetailsScreenState
     if (response.statusCode == 200) {
       setState(() {
         this.productDetials = productDetails;
-<<<<<<< HEAD
-=======
-        // print("product=$productDetails");
->>>>>>> f660247654c5766707855cf91f64c84767364984
         relatedProduct = productDetails["product_links"];
         for (var i = 0; i < relatedProduct.length; i++) {
           var singleProduct = relatedProduct[i]["linked_product_sku"];
@@ -166,10 +164,6 @@ class _ParticularProductsDetailsScreenState
         }
         getRelatedProduct();
         productID = productDetials["id"].toString();
-<<<<<<< HEAD
-=======
-        print("productID=${productID}");
->>>>>>> f660247654c5766707855cf91f64c84767364984
         List bannerImageList = productDetails["media_gallery_entries"];
         List imageList =
             bannerImageList.map((e) => e["file"].toString()).toList();
@@ -185,10 +179,6 @@ class _ParticularProductsDetailsScreenState
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[pricedetailsindex.abs()];
         price = pricedetailsindexMap["value"];
-<<<<<<< HEAD
-=======
-        print("price=$price");
->>>>>>> f660247654c5766707855cf91f64c84767364984
         int descriptionIndex = customAttributes
             .indexWhere((f) => f['attribute_code'] == "description");
         int sellerRatingsIndex = customAttributes
@@ -228,36 +218,19 @@ class _ParticularProductsDetailsScreenState
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[shortdescriptionIndex.abs()];
         shortDescription = shortDescriptionMap["value"];
-<<<<<<< HEAD
-=======
-        // print("shortDescription : $shortDescription");
->>>>>>> f660247654c5766707855cf91f64c84767364984
         Map productDetailsMap = productDetailsIndex.isNegative
             ? {"attribute_code": "null", "value": "Not Available"}
             : customAttributes[productDetailsIndex.abs()];
         details = productDetailsMap["value"];
         Map extensionAttributes = productDetails["extension_attributes"];
-<<<<<<< HEAD
         configdetails = extensionAttributes["configurable_product_options"];
+        sellerData = extensionAttributes["seller_data"];
+        print("seller_data :$sellerData");
 
         print('configdetails=$configdetails');
-=======
-        // print("product description = $productDescription");
-        configdetails = extensionAttributes["configurable_product_options"];
-        // configdetails = extensionAttributes["config_options"];
-
-        print('configdetails=$configdetails');
-        // configoptions = configdetails == null ? null : configdetails[0];
->>>>>>> f660247654c5766707855cf91f64c84767364984
         configoptions =
             configdetails == null ? null : configdetails[0]["values"];
         print('configoptions=$configoptions');
-
-<<<<<<< HEAD
-=======
-        // configoptions = configoptionslist[0];
->>>>>>> f660247654c5766707855cf91f64c84767364984
-
         for (var item in customAttributes) {
           if (item["attribute_code"] == "special_price") {
             specialPrice = item["value"];
@@ -270,13 +243,6 @@ class _ParticularProductsDetailsScreenState
           }
         }
 
-<<<<<<< HEAD
-=======
-        // String listAsStr = product.toString(); // get list as string
-        // listAsStr = listAsStr.substring(1,listAsStr.length - 1); // removing first and last bracket
-        // print("listAsStr : $listAsStr");
-
->>>>>>> f660247654c5766707855cf91f64c84767364984
         if (widget.apiType != "id") {
           sellerDataList = extensionAttributes["seller_data"];
           otherSellersData = extensionAttributes["assigned_seller_data"];
@@ -642,16 +608,8 @@ class _ParticularProductsDetailsScreenState
 
   getRelatedProduct() async {
     String listAsStr = product.toString(); // get list as string
-<<<<<<< HEAD
     listAsStr = listAsStr.substring(
         1, listAsStr.length - 1); // removing first and last bracket
-=======
-    print("listAsStr :${listAsStr.length}");
-    listAsStr = listAsStr.substring(
-        1, listAsStr.length - 1); // removing first and last bracket
-    print(product.length);
->>>>>>> f660247654c5766707855cf91f64c84767364984
-
     Map<String, String> headers = {
       'Content-Type': 'application/json',
     };
@@ -661,64 +619,38 @@ class _ParticularProductsDetailsScreenState
       headers: headers,
       context: context,
     );
-<<<<<<< HEAD
-=======
-    print(
-     "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10");
->>>>>>> f660247654c5766707855cf91f64c84767364984
     if (response.statusCode == 200) {
       Map responseMap = response.responseValue;
       print("responseMap : $responseMap");
       List listItem = responseMap["items"];
+      print("listItem : $listItem");
       Map search = responseMap["search_criteria"];
       pageSize = search["page_size"];
       setState(() {
         // productList = listItem;
         updateProductList();
-          totalPageSize = responseMap["total_count"];
-<<<<<<< HEAD
-=======
-          print("totalPageSize : $totalPageSize");
->>>>>>> f660247654c5766707855cf91f64c84767364984
+        totalPageSize = responseMap["total_count"];
+        print("totalPageSize : $totalPageSize");
       });
     } else {}
   }
 
   updateProductList() async {
-<<<<<<< HEAD
     var tempCount = relatedProduct.length;
-
-    if(tempCount<=10) {
+    if (tempCount <= 10) {
       String listAsStr = product.toString(); // get list as string
       listAsStr = listAsStr.substring(
           1, listAsStr.length - 1); // removing first and last bracket
-=======
-    print("called");
-    var tempCount = relatedProduct.length;
-    print("tempCount : $tempCount");
-
-    if(tempCount<=10) {
-      String listAsStr = product.toString(); // get list as string
-      print("listAsStr :${listAsStr.length}");
-      listAsStr = listAsStr.substring(
-          1, listAsStr.length - 1); // removing first and last bracket
-      print(product.length);
->>>>>>> f660247654c5766707855cf91f64c84767364984
 
       Map<String, String> headers = {
         'Content-Type': 'application/json',
       };
       ApiResponseModel response = await getApiCall(
         getUrl:
-        "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10",
+            "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10",
         headers: headers,
         context: context,
       );
-<<<<<<< HEAD
-=======
-      print(
-          "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10");
->>>>>>> f660247654c5766707855cf91f64c84767364984
       if (response.statusCode == 200) {
         Map responseMap = response.responseValue;
         print("responseMap : $responseMap");
@@ -726,65 +658,37 @@ class _ParticularProductsDetailsScreenState
         Map search = responseMap["search_criteria"];
         pageSize = search["page_size"];
         setState(() {
-           productList = listItem;
-           apiupdate = false;
-           loader = true;
-           // updateProductList();
+          productList = listItem;
+          apiupdate = false;
+          loader = true;
+          // updateProductList();
           totalPageSize = responseMap["total_count"];
-<<<<<<< HEAD
-=======
-          print("totalPageSize : $totalPageSize");
->>>>>>> f660247654c5766707855cf91f64c84767364984
         });
       } else {}
-    }
-    else {
+    } else {
       if (updateProduct.isNotEmpty) {
         updateProduct.removeRange(0, 10);
       }
       var j = 10;
-<<<<<<< HEAD
       var count = updateProductCount.length;
-=======
-      // updateProduct.removeRange(0, 9);
-      var count = updateProductCount.length;
-      print("count: $count");
->>>>>>> f660247654c5766707855cf91f64c84767364984
-      for (var i = count; i <count+j; i++) {
+      for (var i = count; i < count + j; i++) {
         var singleProduct = product[i];
         var singleProductCount = product[i];
         updateProduct.add(singleProduct);
         updateProductCount.add(singleProductCount);
       }
-<<<<<<< HEAD
       String listAsStr = updateProduct.toString(); // get list as string
       listAsStr = listAsStr.substring(
           1, listAsStr.length - 1); // removing first and last bracket
-=======
-      print("updateProduct : $updateProduct");
-      print("updateProductCount : $updateProductCount");
-      String listAsStr = updateProduct.toString(); // get list as string
-      print("listAsStr :${listAsStr.length}");
-      listAsStr = listAsStr.substring(
-          1, listAsStr.length - 1); // removing first and last bracket
-      print(product.length);
-
->>>>>>> f660247654c5766707855cf91f64c84767364984
       Map<String, String> headers = {
         'Content-Type': 'application/json',
       };
       ApiResponseModel response = await getApiCall(
         getUrl:
-        "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10",
+            "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10",
         headers: headers,
         context: context,
       );
-<<<<<<< HEAD
-
-=======
-      print(
-          "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=10");
->>>>>>> f660247654c5766707855cf91f64c84767364984
       if (response.statusCode == 200) {
         Map responseMap = response.responseValue;
         print("responseMap : $responseMap");
@@ -792,52 +696,9 @@ class _ParticularProductsDetailsScreenState
         setState(() {
           productList.addAll(listItem);
           apiupdate = false;
-
         });
-
-      }
-      else{}
+      } else {}
     }
-
-<<<<<<< HEAD
-=======
-
-
-      // String listAsStr = product.toString(); // get list as string
-    // listAsStr = listAsStr.substring(1, listAsStr.length - 1);
-    // print("productList.length : ${totalPageSize}");
-    //
-    // if (productList.length == totalPageSize) {
-    //   print("productList.length : ${totalPageSize}");
-    // } else {
-    //   page += 10;
-    //   print("page : $page");
-    //   Map<String, String> headers = {
-    //     'Content-Type': 'application/json',
-    //   };
-    //
-    //   ApiResponseModel response = await getApiCall(
-    //     getUrl:
-    //         "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=${page}",
-    //     headers: headers,
-    //     context: context,
-    //   );
-    //   print(
-    //       "$baseUrl$lang/V1/products?searchCriteria[filter_groups][0][filters][0][field]=sku&searchCriteria[filter_groups][0][filters][0][condition_type]=in&searchCriteria[filter_groups][0][filters][0][value]=${listAsStr.replaceAll(' ', '')}&searchCriteria[filter_groups][2][filters][0][field]=visibility&searchCriteria[filter_groups][2][filters][0][value]=4&searchCriteria[filter_groups][3][filters][0][field]=status&searchCriteria[filter_groups][3][filters][0][value]=1&searchCriteria[pageSize]=${10 + page}");
-    //   if (response.statusCode == 200) {
-    //     Map responseMap = response.responseValue;
-    //     List listItem = responseMap["items"];
-    //     print(listItem.length);
-    //     setState(() {
-    //       productList.addAll(listItem);
-    //       totalPageSize = responseMap["total_count"];
-    //       print("count : $totalPageSize");
-    //
-    //       apiupdate = false;
-    //     });
-    //   } else {}
-    // }
->>>>>>> f660247654c5766707855cf91f64c84767364984
   }
 
   navigationViewAllProduct(String value) {
@@ -890,27 +751,6 @@ class _ParticularProductsDetailsScreenState
                       ),
                     ),
                   );
-<<<<<<< HEAD
-
-=======
-                  // if (userType == true) {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => SignIn(),
-                  //     ),
-                  //   );
-                  // } else {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => MyCartScreen(
-                  //         router: "nav",
-                  //       ),
-                  //     ),
-                  //   );
-                  // }
->>>>>>> f660247654c5766707855cf91f64c84767364984
                 },
                 child: Badge(
                     padding: EdgeInsets.all(4.5),
@@ -1560,6 +1400,97 @@ class _ParticularProductsDetailsScreenState
                                                   ),
                                                 ],
                                               )),
+                                          Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 0, 20, 0),
+                                              child: Text("Response Rate")),
+                                          if(sellerData[0]["response_rate"]==100)
+
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                14, 0, 20, 0),
+                                            child: LinearPercentIndicator(
+                                              width: 100,
+                                              lineHeight: 6,
+                                              percent: sellerData[0]["response_rate"]*0.01,
+                                              backgroundColor: Colors.grey,
+                                              progressColor: orangeColor,
+                                            ),
+                                          )
+                                          else
+                                            Padding(
+                                              padding: const EdgeInsets.fromLTRB(
+                                                  14, 0, 20, 0),
+                                              child: LinearPercentIndicator(
+                                                width: 100,
+                                                lineHeight: 6,
+                                                percent: double.parse(sellerData[0]["response_rate"]).toInt()*0.01,
+                                                backgroundColor: Colors.grey,
+                                                progressColor: orangeColor,
+                                              ),
+                                            ),
+
+                                          if(sellerData[0]["response_rate"]==100)
+                                          Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 0, 20, 10),
+                                              child: Text("${sellerData[0]["response_rate"]}%"))
+                                          else
+    Padding(
+    padding:
+    const EdgeInsets.fromLTRB(
+    20, 0, 20, 10),
+    child: Text("${double.parse(sellerData[0]["response_rate"]).toInt()}%")),
+                                          Padding(
+                                              padding:
+                                              const EdgeInsets.fromLTRB(
+                                                  20, 0, 20, 0),
+                                              child: Text("Always In Stock")),
+                                          if(sellerData[0]["always_in_stock"]==100)
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                14, 0, 20, 0),
+                                            child: LinearPercentIndicator(
+                                              width: 100,
+                                              lineHeight: 6,
+                                              percent: 1,
+                                              // sellerData[0]["always_in_stock"]*0.01,
+                                              backgroundColor: Colors.grey,
+                                              progressColor: orangeColor,
+                                            ),
+                                          )
+                                          else
+                                            Padding(
+                                              padding: const EdgeInsets.fromLTRB(
+                                                  14, 0, 20, 0),
+                                              child: LinearPercentIndicator(
+                                                width: 100,
+                                                lineHeight: 6,
+                                                percent:double.parse(sellerData[0]["always_in_stock"]).toInt()*0.01,
+                                                backgroundColor: Colors.grey,
+                                                progressColor: orangeColor,
+                                              ),
+                                            ),
+                                          if(sellerData[0]["always_in_stock"]==100)
+
+                                            Padding(
+                                              padding:
+                                              const EdgeInsets.fromLTRB(
+                                                  20, 0, 20, 0),
+                                              child: Text(
+                                                  "${sellerData[0]["always_in_stock"]}%"
+                                              ))
+                                          else
+                                            Padding(
+                                                padding:
+                                                const EdgeInsets.fromLTRB(
+                                                    20, 0, 20, 0),
+                                                child: Text(
+    "${double.parse(sellerData[0]["always_in_stock"]).toInt()}%"
+                                                )),
+
 
                                           if (otherSellersData.isNotEmpty ==
                                               true)
@@ -1764,18 +1695,22 @@ class _ParticularProductsDetailsScreenState
                                                       Expanded(
                                                         child: NotificationListener<
                                                             ScrollEndNotification>(
-                                                          child: ListView.builder(
+                                                          child:
+                                                              ListView.builder(
                                                             shrinkWrap: true,
                                                             controller:
                                                                 _scrollController,
                                                             scrollDirection:
                                                                 Axis.horizontal,
                                                             itemCount:
-                                                                productList.length,
+                                                                productList
+                                                                    .length,
                                                             itemBuilder:
-                                                                (context, index) {
+                                                                (context,
+                                                                    index) {
                                                               Map customAttributesMap =
-                                                                  productList[index];
+                                                                  productList[
+                                                                      index];
                                                               List custom =
                                                                   customAttributesMap[
                                                                       "custom_attributes"];
@@ -1790,50 +1725,31 @@ class _ParticularProductsDetailsScreenState
                                                               var productImage =
                                                                   productDescriptionMap[
                                                                       "value"];
-<<<<<<< HEAD
-=======
-                                                              print(
-                                                                  "productImage : $productImage");
->>>>>>> f660247654c5766707855cf91f64c84767364984
-
                                                               Map extension =
-                                                                  productList[index][
+                                                                  productList[
+                                                                          index]
+                                                                      [
                                                                       "extension_attributes"];
-
-<<<<<<< HEAD
-=======
-                                                              print(
-                                                                  "extension_attributes : $extension");
-                                                              // var specialPrice;
-                                                              // for (var item in custom) {
-                                                              //   if (item[
-                                                              //           "attribute_code"] ==
-                                                              //       "special_price") {
-                                                              //     specialPrice =
-                                                              //         item["value"];
-                                                              //   }
-                                                              // }
->>>>>>> f660247654c5766707855cf91f64c84767364984
                                                               return InkWell(
                                                                 onTap: () {
                                                                   navigationViewAllProduct(
                                                                       productList[
                                                                               index]
-                                                                          ["sku"]);
+                                                                          [
+                                                                          "sku"]);
                                                                 },
                                                                 child: Card(
-                                                                  child: Container(
-                                                                    color:
-                                                                        Colors.white,
-                                                                    width: (MediaQuery.of(
-                                                                                    context)
-                                                                                .size
-                                                                                .width /
+                                                                  child:
+                                                                      Container(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    width: (MediaQuery.of(context).size.width /
                                                                             2.5) -
                                                                         20,
                                                                     margin: EdgeInsets
                                                                         .all(5),
-                                                                    child: Column(
+                                                                    child:
+                                                                        Column(
                                                                       crossAxisAlignment:
                                                                           CrossAxisAlignment
                                                                               .start,
@@ -1841,47 +1757,32 @@ class _ParticularProductsDetailsScreenState
                                                                         Expanded(
                                                                           child: Container(
                                                                               decoration: BoxDecoration(
-                                                                                borderRadius:
-                                                                                    BorderRadius.all(Radius.circular(5)),
-                                                                                image:
-                                                                                    DecorationImage(
-                                                                                  image:
-                                                                                      NetworkImage("$imageBaseUrl$productImage"),
-                                                                                  fit:
-                                                                                      BoxFit.contain,
+                                                                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                                                                                image: DecorationImage(
+                                                                                  image: NetworkImage("$imageBaseUrl$productImage"),
+                                                                                  fit: BoxFit.contain,
                                                                                 ),
                                                                               ),
                                                                               child: null),
                                                                         ),
                                                                         sizedBoxheight5,
                                                                         Padding(
-                                                                          padding: const EdgeInsets
-                                                                                  .only(
-                                                                              left:
-                                                                                  7.0),
+                                                                          padding:
+                                                                              const EdgeInsets.only(left: 7.0),
                                                                           child:
                                                                               Column(
                                                                             crossAxisAlignment:
-                                                                                CrossAxisAlignment
-                                                                                    .start,
+                                                                                CrossAxisAlignment.start,
                                                                             children: [
                                                                               Container(
-                                                                                height:
-                                                                                    15,
-                                                                                width: MediaQuery.of(context)
-                                                                                    .size
-                                                                                    .width,
-                                                                                child:
-                                                                                    Text(
+                                                                                height: 15,
+                                                                                width: MediaQuery.of(context).size.width,
+                                                                                child: Text(
                                                                                   "${productList[index]["name"]}",
-                                                                                  softWrap:
-                                                                                      true,
-                                                                                  maxLines:
-                                                                                      1,
-                                                                                  overflow:
-                                                                                      TextOverflow.ellipsis,
-                                                                                  style:
-                                                                                      TextStyle(
+                                                                                  softWrap: true,
+                                                                                  maxLines: 1,
+                                                                                  overflow: TextOverflow.ellipsis,
+                                                                                  style: TextStyle(
                                                                                     fontSize: 12,
                                                                                     fontWeight: FontWeight.w600,
                                                                                   ),
@@ -1890,14 +1791,10 @@ class _ParticularProductsDetailsScreenState
                                                                               sizedBoxheight5,
                                                                               Text(
                                                                                 "QAR ${double.parse((productList[index]["extension_attributes"]["custom_final_price"])).toStringAsFixed(2).toString()}",
-                                                                                style:
-                                                                                    TextStyle(
-                                                                                  fontSize:
-                                                                                      14,
-                                                                                  color:
-                                                                                      secondaryColor,
-                                                                                  fontWeight:
-                                                                                      FontWeight.w600,
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  color: secondaryColor,
+                                                                                  fontWeight: FontWeight.w600,
                                                                                 ),
                                                                               ),
                                                                             ],
@@ -1912,57 +1809,30 @@ class _ParticularProductsDetailsScreenState
                                                           ),
                                                           onNotification:
                                                               (notification) {
-                                                                if (_scrollController.position.pixels ==
-                                                                    _scrollController.position.maxScrollExtent) {
-                                                                    setState(() {
-                                                                      if (updateProductCount.length == totalPageSize) {
-<<<<<<< HEAD
-                                                                      } else {
-                                                                        if(loader==true){
-=======
-                                                                        print("sucess");
-                                                                      } else {
-                                                                        if(loader==true){
-print("loaderstopped");
->>>>>>> f660247654c5766707855cf91f64c84767364984
-                                                                        }else {
-                                                                          apiupdate =
-                                                                          true;
-                                                                          updateProductList();
-                                                                        }
-                                                                      }
-                                                                    });
+                                                            if (_scrollController
+                                                                    .position
+                                                                    .pixels ==
+                                                                _scrollController
+                                                                    .position
+                                                                    .maxScrollExtent) {
+                                                              setState(() {
+                                                                if (updateProductCount
+                                                                        .length ==
+                                                                    totalPageSize) {
+                                                                } else {
+                                                                  if (loader ==
+                                                                      true) {
+                                                                  } else {
+                                                                    apiupdate =
+                                                                        true;
+                                                                    updateProductList();
+                                                                  }
                                                                 }
-<<<<<<< HEAD
-
-=======
-                                                            // setState(() {
-                                                            //   if (updateProductCount
-                                                            //           .length ==
-                                                            //       totalPageSize) {
-                                                            //     print("sucess");
-                                                            //   } else {
-                                                            //     apiupdate = true;
-                                                            //     updateProductList();
-                                                            //   }
-                                                            // });
-                                                            // if (_scrollController.position.pixels ==
-                                                            //     _scrollController.position.maxScrollExtent) {
-                                                            //   if (!apiupdate) {
-                                                            //     setState(() {
-                                                            //       if (productList.length == totalPageSize) {
-                                                            //       } else {
-                                                            //         apiupdate = true;
-                                                            //          updateProductList();
-                                                            //       }
-                                                            //     });
-                                                            //   }
-                                                            // }
->>>>>>> f660247654c5766707855cf91f64c84767364984
+                                                              });
+                                                            }
                                                           },
                                                         ),
                                                       ),
-
                                                     ],
                                                   ),
                                                 )

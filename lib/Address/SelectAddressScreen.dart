@@ -284,7 +284,9 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
         },
         "shipping_method_code": estimateShippingResponse["method_code"],
         "shipping_carrier_code": estimateShippingResponse["carrier_code"],
-        "extension_attributes": {}
+        "extension_attributes": {
+          "channel":"app"
+        }
       }
     });
     ApiResponseModel responseData = await postApiCall(

@@ -92,13 +92,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
-  convert:
-    dependency: transitive
-    description:
-      name: convert
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.1"
   css_colors:
     dependency: transitive
     description:
@@ -184,44 +177,6 @@ packages:
     source: hosted
     version: "0.7.0"
   firebase_core_platform_interface:
-<<<<<<< HEAD
-=======
-    dependency: transitive
-    description:
-      name: firebase_core_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.1"
-  firebase_core_web:
-    dependency: transitive
-    description:
-      name: firebase_core_web
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.1+3"
-  firebase_messaging:
-    dependency: "direct main"
-    description:
-      name: firebase_messaging
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "8.0.0-dev.15"
-  firebase_messaging_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_messaging_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0-dev.10"
-  firebase_messaging_web:
-    dependency: transitive
-    description:
-      name: firebase_messaging_web
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.0-dev.6"
-  flare_dart:
->>>>>>> f660247654c5766707855cf91f64c84767364984
     dependency: transitive
     description:
       name: firebase_core_platform_interface
@@ -288,11 +243,7 @@ packages:
       name: flutter_html
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "1.3.0"
-=======
-    version: "1.2.0"
->>>>>>> f660247654c5766707855cf91f64c84767364984
   flutter_inappwebview:
     dependency: "direct main"
     description:
@@ -313,11 +264,7 @@ packages:
       name: flutter_local_notifications
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "4.0.1+2"
-=======
-    version: "3.0.3"
->>>>>>> f660247654c5766707855cf91f64c84767364984
   flutter_local_notifications_platform_interface:
     dependency: transitive
     description:
@@ -364,11 +311,7 @@ packages:
       name: flutter_svg
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "0.20.0-nullsafety.3"
-=======
-    version: "0.19.3"
->>>>>>> f660247654c5766707855cf91f64c84767364984
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -519,16 +462,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
-<<<<<<< HEAD
-  overlay_support:
-    dependency: "direct main"
-    description:
-      name: overlay_support
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.2.1"
-=======
->>>>>>> f660247654c5766707855cf91f64c84767364984
   package_info:
     dependency: transitive
     description:
@@ -599,17 +532,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.11.1"
+  percent_indicator:
+    dependency: "direct main"
+    description:
+      name: percent_indicator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.9+1"
   petitparser:
     dependency: transitive
     description:
       name: petitparser
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "4.1.0"
-=======
-    version: "3.1.0"
->>>>>>> f660247654c5766707855cf91f64c84767364984
   pinput:
     dependency: "direct main"
     description:
@@ -665,16 +601,6 @@ packages:
       name: service_worker
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
-=======
-    version: "1.1.2"
-  service_worker:
-    dependency: transitive
-    description:
-      name: service_worker
-      url: "https://pub.dartlang.org"
-    source: hosted
->>>>>>> f660247654c5766707855cf91f64c84767364984
     version: "0.2.4"
   shared_preferences:
     dependency: "direct main"
@@ -806,11 +732,7 @@ packages:
       name: timezone
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "0.6.1"
-=======
-    version: "0.5.9"
->>>>>>> f660247654c5766707855cf91f64c84767364984
   typed_data:
     dependency: transitive
     description:
@@ -880,11 +802,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "2.2.4"
-=======
-    version: "2.1.5"
->>>>>>> f660247654c5766707855cf91f64c84767364984
   xdg_directories:
     dependency: transitive
     description:
@@ -898,14 +816,7 @@ packages:
       name: xml
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "5.1.2"
 sdks:
   dart: ">=2.13.0 <3.0.0"
   flutter: ">=2.0.1"
-=======
-    version: "4.5.1"
-sdks:
-  dart: ">=2.13.0 <3.0.0"
-  flutter: ">=2.0.0"
->>>>>>> f660247654c5766707855cf91f64c84767364984

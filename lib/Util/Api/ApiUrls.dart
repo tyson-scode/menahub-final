@@ -1,11 +1,11 @@
 //base Urls
 var lang = "default";
-//final baseUrl = "https://menahub.com/rest/";
+// final baseUrl = "https://menahub.com/rest/";
 final baseUrl = "https://magento2blog.thestagings.com/rest/";
 final paymentUrl = "https://magento2blog.thestagings.com/";
 // final paymentUrl = "https://menahub.com/";
 
-//final baseUrl = "https://uat2.menahub.com/rest/";
+// final baseUrl = "https://uat2.menahub.com/rest/";
 
 // final bannerSliderBaseUrl =
 //     "https://menahub.com/pub/media/mageplaza/bannerslider/banner/image/";

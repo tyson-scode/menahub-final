@@ -297,7 +297,9 @@ class _SelectbillingAddressScreenState
         },
         "shipping_method_code": widget.paymentMethods["method_code"],
         "shipping_carrier_code": widget.paymentMethods["carrier_code"],
-        "extension_attributes": {}
+        "extension_attributes": {
+          "channel":"app"
+        }
       }
     });
     // print(body);

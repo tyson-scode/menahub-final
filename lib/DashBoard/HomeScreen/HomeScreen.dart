@@ -43,12 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List sampleBlockList7 = [];
   List<String> sliderList1 = [];
   List<String> titleList = [];
-<<<<<<< HEAD
   List mobiletype1 = [];
   List mobiletype2 = [];
-=======
-  List mobiletype = [];
->>>>>>> f660247654c5766707855cf91f64c84767364984
   List mobileLinkId = [];
 
   List<String> sliderList2 = [];
@@ -250,11 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //   }
   // }
 
-<<<<<<< HEAD
   getSlider1() async {
-=======
-  getSlider() async {
->>>>>>> f660247654c5766707855cf91f64c84767364984
     Map<String, String> headers = {
       'Content-Type': 'application/json',
     };
@@ -273,7 +265,6 @@ class _HomeScreenState extends State<HomeScreen> {
         sliderList1 = imageList;
         mobileLinkId =
             bannerImageList.map((e) => e["mobile_link_id"].toString()).toList();
-<<<<<<< HEAD
         mobiletype1 =
             bannerImageList.map((e) => e["mobile_type"].toString()).toList();
         print("mobiletype");
@@ -313,16 +304,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
         print(sliderData1);
         // titleList = titlelist;
-=======
-        mobiletype =
-            bannerImageList.map((e) => e["mobile_type"].toString()).toList();
-        print("mobiletype");
-
-        print(mobiletype);
-
-        print(sliderData1);
-        // titleList = titlelist;
->>>>>>> f660247654c5766707855cf91f64c84767364984
         print(titleList);
       });
     } else {}
@@ -574,11 +555,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 .width,
                                             child: GestureDetector(
                                               onTap: () {
-<<<<<<< HEAD
                                                 var data = mobiletype1[slider1position];
-=======
-                                                var data = mobiletype[slider1position];
->>>>>>> f660247654c5766707855cf91f64c84767364984
                                                 if(data == ""){
                                                 }
                                                 else if(data == "0") {
@@ -914,7 +891,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         .map(
                                           (item) => GestureDetector(
                                             onTap: () {
-<<<<<<< HEAD
                                               var data = mobiletype2[slider2position];
                                               if(data == ""){
                                               }
@@ -927,16 +903,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                               else if(data == "2") {
                                                 print("productlist");
                                               }
-
-=======
-                                              mobiletype[slider2position] !=
-                                                      null
-                                                  ? viewMoreNavigation(
-                                                      productId: mobiletype[
-                                                          slider2position],
-                                                      title: "")
-                                                  : null;
->>>>>>> f660247654c5766707855cf91f64c84767364984
                                             },
                                             child: Container(
                                               height: 150,
