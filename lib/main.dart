@@ -16,6 +16,7 @@ import 'package:menahub/translation/locale_keys.g.dart';
 import 'package:http/http.dart' as http;
 import 'package:menahub/Util/Api/ApiCalls.dart';
 import 'package:menahub/Util/Api/ApiUrls.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Define a top-level named handler which background/terminated messages will
@@ -526,6 +527,28 @@ class _MyAppState extends State<MyApp> {
       //FCM Handling
       if (message.data != null) {
         log('FirebaseMessaging onMessageOpenedApp: ${jsonEncode(message.data)}');
+        showOverlayNotification((context) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: SafeArea(
+              child: ListTile(
+                leading: SizedBox.fromSize(
+                    size: const Size(40, 40),
+                    child: ClipOval(
+                        child: Container(
+                          color: Colors.black,
+                        ))),
+                title: Text(message.notification.title),
+                subtitle: Text(message.notification.body),
+                trailing: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      OverlaySupportEntry.of(context).dismiss();
+                    }),
+              ),
+            ),
+          );
+        }, duration: Duration(milliseconds: 4000));
         showDialog(
             context: context,
             builder: (_) {
@@ -567,13 +590,15 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return OverlaySupport(
+      child: MaterialApp(
 
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: Locale(context.locale.languageCode),
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: Locale(context.locale.languageCode),
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen(),
+      ),
     );
   }
 
@@ -589,3 +614,5 @@ class _MyAppState extends State<MyApp> {
     });
   }
 }
+
+
