@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:menahub/Util/Api/ApiCalls.dart';
+import 'package:menahub/Util/Api/ApiResponseModel.dart';
+import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +9,8 @@ import 'package:menahub/Util/ConstantData.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:menahub/config/CustomLoader.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationScreen extends StatefulWidget {
   @override
@@ -13,7 +18,36 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  List notificationList = ["", ""];
+  List notificationList =[];
+
+  @override
+  void initState() {
+    super.initState();
+    getNewNotification();
+  }
+
+  getNewNotification() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.get("token");
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': "Bearer $token"
+    };
+    ApiResponseModel responseData = await getApiCall(
+      getUrl: getNotification,
+      headers: headers,
+      context: context,
+    );
+    if (responseData.statusCode == 200) {
+      setState(() {
+        notificationList = responseData.responseValue;
+        print("notificationList : $notificationList");
+      });
+    }else {
+      print(responseData);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,14 +56,25 @@ class _NotificationScreenState extends State<NotificationScreen> {
       locale: Locale(context.locale.languageCode),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
+        appBar: AppBar(title: Text("Notifications"),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context),
           ),
           backgroundColor: appBarColor,
         ),
-        body: Container(
+        body:notificationList.isEmpty
+            ? Center(
+          child: CustomerLoader(
+            dotType: DotType.circle,
+            dotOneColor: secondaryColor,
+            dotTwoColor: primaryColor,
+            dotThreeColor: Colors.red,
+            duration: Duration(milliseconds: 1000),
+          ),
+        )
+            :
+        Container(
           color: whiteColor,
           height: double.infinity,
           width: double.infinity,
@@ -38,93 +83,34 @@ class _NotificationScreenState extends State<NotificationScreen> {
             scrollDirection: Axis.vertical,
             itemCount: notificationList.length,
             itemBuilder: (context, index) {
-              return Container(
+              return Card(elevation: 2,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 child: Container(
+                  child: Column(
+                    children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 15.0, right: 15,bottom: 10, top: 5),
                     child: Column(
-                  children: [
-                    Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          image: DecorationImage(
-                            image: AssetImage("assets/image/bannerImage1.png"),
-                            fit: BoxFit.fill,
-                          ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notificationList[index]["order_status"],
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w600),
                         ),
-                        child: null),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 15.0, right: 15, top: 5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Rock Bottom Prices on electronics",
-                                style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: secondaryColor,
-                                    borderRadius: BorderRadius.circular(50)),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 7.0, right: 7, top: 2, bottom: 2),
-                                  child: Text(
-                                    "New",
-                                    style: TextStyle(
-                                        color: whiteColor, fontSize: 12),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          sizedBoxheight5,
-                          Row(
-                            children: [
-                              Text("No Cost emi",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400)),
-                              sizedBoxwidth5,
-                              Container(
-                                width: 1,
-                                height: 10,
-                                color: greyColor,
-                              ),
-                              sizedBoxwidth5,
-                              Text("Exchange offer",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400)),
-                            ],
-                          ),
-                        ],
-                      ),
+                        sizedBoxheight5,
+                        Text(
+                            notificationList[index]["content"],
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400)),
+                      ],
                     ),
-                    sizedBoxheight10,
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 15.0),
-                      child: Card(
-                        elevation: 1,
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Center(
-                                child: Text(
-                              "Buy Now",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            )),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                )),
+                  ),
+                    ],
+                  ),
+                ),
               );
             },
           ),

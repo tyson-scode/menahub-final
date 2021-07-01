@@ -127,3 +127,7 @@ final sortByPriceHigh =
 //guest api
 // create empty cart
 final createEmptyCart = "$baseUrl$lang/V1/guest-carts";
+//New Notification Count
+final notificationCount ="$baseUrl$lang/V1/new/notification/count";
+//get Notification
+final getNotification ="$baseUrl$lang/V1/pushnotification/notifications?page=1";

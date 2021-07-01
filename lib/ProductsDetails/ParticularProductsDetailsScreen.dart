@@ -3,6 +3,7 @@ import 'package:badges/badges.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -1640,6 +1641,9 @@ class _ParticularProductsDetailsScreenState
                                                       Html(
                                                         data:
                                                             productDescription,
+                                                        style:{
+                                                          "html": Style(lineHeight: LineHeight(1.5))
+                                                      },
                                                       ),
                                                     ],
                                                   ),
@@ -1676,6 +1680,9 @@ class _ParticularProductsDetailsScreenState
                                                   ),
                                                   Html(
                                                     data: details,
+                                                    style:{
+                                                      "html": Style(lineHeight: LineHeight(1.5))
+                                                    },
                                                   ),
                                                 ],
                                               ),

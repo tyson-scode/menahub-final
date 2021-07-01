@@ -3,8 +3,12 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:menahub/Notification/NotificationScreen.dart';
 import 'package:menahub/SignIn_SignUp_Flow/SignInScreen/SignInScreen.dart';
+import 'package:menahub/Util/Api/ApiCalls.dart';
+import 'package:menahub/Util/Api/ApiResponseModel.dart';
+import 'package:menahub/Util/Api/ApiUrls.dart';
 import 'package:menahub/Util/ConstantData.dart';
 import 'package:menahub/Util/Widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'CategoriesScreen/CategoriesScreen.dart';
 import 'EnquireNowScreen/EnquireNowScreen.dart';
 import 'HomeScreen/HomeScreen.dart';
@@ -25,6 +29,56 @@ class _DashBoardState extends State<DashBoard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   bool userType;
   int pageIndex = 0;
+  var newNotificationCount=0;
+
+
+  @override
+  void initState() {
+    super.initState();
+    getLocalInformation();
+  }
+
+  getLocalInformation() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String type = prefs.getString("userType");
+
+    if (type == "guest") {
+
+      setState(() {
+        userType = true;
+      });
+    } else {
+      setState(() {
+        userType = false;
+        getNotificationCount();
+      });
+    }
+    print(userType);
+  }
+
+  getNotificationCount() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.get("token");
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': "Bearer $token"
+    };
+    ApiResponseModel responseData = await getApiCall(
+      getUrl: notificationCount,
+      headers: headers,
+      context: context,
+    );
+    if (responseData.statusCode == 200) {
+           setState(() {
+             newNotificationCount=responseData.responseValue;
+print("newNotificationCount : $newNotificationCount");
+           });
+    }else {
+      print(responseData);
+    }
+
+    }
+
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +158,9 @@ class _DashBoardState extends State<DashBoard> {
                   child: Badge(
                     padding: EdgeInsets.all(4.5),
                     badgeColor: redColor,
-                    position: BadgePosition(top: 7, end: 0),
+                    position: BadgePosition(top: 8, start: 11),
                     badgeContent: Text(
-                      '',
+                      '$newNotificationCount',
                       style: TextStyle(
                         fontSize: 10,
                         color: whiteColor,
@@ -187,17 +241,27 @@ class _DashBoardState extends State<DashBoard> {
                     setState(() {
                       pageIndex = value;
                     });
-                    // if (value == 0) {
-                    //   setState(() {});
-                    // } else if (value == 1) {
-                    //   setState(() {});
-                    // } else if (value == 2) {
-                    //   setState(() {});
-                    // } else if (value == 3) {
-                    //   setState(() {});
-                    // } else if (value == 4) {
-                    //   setState(() {});
-                    // }
+                    if (value == 0) {
+                      setState(() {
+                        getLocalInformation();
+                      });
+                    } else if (value == 1) {
+                      setState(() {
+                        getLocalInformation();
+                      });
+                    } else if (value == 2) {
+                      setState(() {
+                        getLocalInformation();
+                      });
+                    } else if (value == 3) {
+                      setState(() {
+                        getLocalInformation();
+                      });
+                    } else if (value == 4) {
+                      setState(() {
+                        getLocalInformation();
+                      });
+                    }
                   },
                   tabs: [
                     Tab(

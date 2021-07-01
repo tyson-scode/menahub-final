@@ -45,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> titleList = [];
   List mobiletype1 = [];
   List mobiletype2 = [];
-  List mobileLinkId = [];
+  List mobileLinkId1 = [];
+  List mobileLinkId2 = [];
 
   List<String> sliderList2 = [];
   //slider indicator
@@ -79,6 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
     getSlider2();
     getProductList();
   }
+
+
 
   paginationApicall() async {
     Map<String, String> headers = {
@@ -263,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
         List imageList =
             bannerImageList.map((e) => e["image"].toString()).toList();
         sliderList1 = imageList;
-        mobileLinkId =
+        mobileLinkId1 =
             bannerImageList.map((e) => e["mobile_link_id"].toString()).toList();
         mobiletype1 =
             bannerImageList.map((e) => e["mobile_type"].toString()).toList();
@@ -282,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'Content-Type': 'application/json',
     };
     ApiResponseModel slider1 = await getApiCall(
-      getUrl: "${sliderblocks}1",
+      getUrl: "${sliderblocks}2",
       headers: headers,
       context: context,
     );
@@ -294,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
         List imageList =
             bannerImageList.map((e) => e["image"].toString()).toList();
         sliderList2 = imageList;
-        mobileLinkId =
+        mobileLinkId2 =
             bannerImageList.map((e) => e["mobile_link_id"].toString()).toList();
         mobiletype2 =
             bannerImageList.map((e) => e["mobile_type"].toString()).toList();
@@ -560,12 +563,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 }
                                                 else if(data == "0") {
                                                   print("product");
+                                                  print("${mobileLinkId1[slider1position]}");
                                                 }
                                                 else if(data == "1") {
                                                   print("category");
+                                                  print("${mobileLinkId1[slider1position]}");
                                                 }
                                                 else if(data == "2") {
                                                   print("productlist");
+                                                  print("${mobileLinkId1[slider1position]}");
                                                 }
 
                                                 // mobiletype[slider1position] !=
@@ -896,12 +902,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                               }
                                               else if(data == "0") {
                                                 print("product");
+                                                print("${mobileLinkId2[slider2position]}");
                                               }
                                               else if(data == "1") {
                                                 print("category");
+                                                print("${mobileLinkId2[slider2position]}");
                                               }
                                               else if(data == "2") {
                                                 print("productlist");
+                                                print("${mobileLinkId2[slider2position]}");
                                               }
                                             },
                                             child: Container(
