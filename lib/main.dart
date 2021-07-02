@@ -520,6 +520,30 @@ class _MyAppState extends State<MyApp> {
       if (notification != null && android != null) {
         if (message.data != null) {
           log('FirebaseMessaging onMessage: ${jsonEncode(message.data)}');
+          showOverlayNotification((context) {
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              child: SafeArea(
+                child: ListTile(
+                  leading: SizedBox.fromSize(
+                      size: const Size(40, 40),
+                      child: ClipOval(
+                          child: Image(
+                            image: AssetImage('assets/Socialmedia/launcher.png'),
+                            fit: BoxFit.contain,
+                          ),
+                      )),
+                  title: Text(message.notification.title),
+                  subtitle: Text(message.notification.body),
+                  trailing: IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: () {
+                        OverlaySupportEntry.of(context).dismiss();
+                      }),
+                ),
+              ),
+            );
+          }, duration: Duration(milliseconds: 4000));
         }
       }
     });
