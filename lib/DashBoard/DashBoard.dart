@@ -37,6 +37,10 @@ class _DashBoardState extends State<DashBoard> {
     super.initState();
     getLocalInformation();
   }
+  onGoBack(dynamic value) {
+    getLocalInformation();
+    setState(() {});
+  }
 
   getLocalInformation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -152,7 +156,7 @@ print("newNotificationCount : $newNotificationCount");
                         MaterialPageRoute(
                           builder: (context) => NotificationScreen(),
                         ),
-                      );
+                      ).then(onGoBack);
                     }
                   },
                   child: Badge(

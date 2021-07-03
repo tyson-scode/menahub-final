@@ -533,7 +533,7 @@ class _MyAppState extends State<MyApp> {
                             fit: BoxFit.contain,
                           ),
                       )),
-                  title: Text(message.notification.title),
+                  title: Text(message.data["type"]),
                   subtitle: Text(message.notification.body),
                   trailing: IconButton(
                       icon: Icon(Icons.close),

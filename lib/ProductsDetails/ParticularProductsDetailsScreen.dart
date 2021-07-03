@@ -1364,7 +1364,7 @@ class _ParticularProductsDetailsScreenState
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        color: orangeColor),
+                                                        color:Colors.blue[900]),
                                                   ),
                                                 ],
                                               ),
