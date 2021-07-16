@@ -113,6 +113,7 @@ class _ParticularProductsDetailsScreenState
     getProductDetails();
     super.initState();
     widget.router == "mycart" ? productCount = int.parse(widget.qty) : 1;
+    print(widget.productSkuId);
   }
 
   getLocalInformation() async {
@@ -158,6 +159,7 @@ class _ParticularProductsDetailsScreenState
     if (response.statusCode == 200) {
       setState(() {
         this.productDetials = productDetails;
+        print(productDetails);
         relatedProduct = productDetails["product_links"];
         for (var i = 0; i < relatedProduct.length; i++) {
           var singleProduct = relatedProduct[i]["linked_product_sku"];
@@ -1369,150 +1371,150 @@ class _ParticularProductsDetailsScreenState
                                                 ],
                                               ),
                                             ),
-                                          Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      20, 10, 20, 0),
-                                              child: Text("Seller Rating")),
-
-                                          Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      14, 0, 20, 10),
-                                              child: Column(
-                                                children: [
-                                                  //Text("Seller Rating"),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        left: 2),
-                                                    child: Row(
-                                                      children: [
-                                                        SmoothStarRating(
-                                                          allowHalfRating: true,
-                                                          isReadOnly: true,
-                                                          starCount: 5,
-                                                          rating: double.parse(
-                                                              sellerRating),
-                                                          size: 18.0,
-                                                          color: orangeColor,
-                                                          borderColor:
-                                                              orangeColor,
-                                                          spacing: 0.0,
-                                                        ),
-                                                        Text(
-                                                            "${double.parse(sellerRating).round() * 20.round()}% of 100"),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              )),
-                                          Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      20, 0, 20, 0),
-                                              child: Text("Response Rate")),
-                                          if (sellerData[0]["response_rate"] ==
-                                              100)
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      14, 0, 20, 0),
-                                              child: LinearPercentIndicator(
-                                                width: 100,
-                                                lineHeight: 6,
-                                                percent: sellerData[0]
-                                                        ["response_rate"] *
-                                                    0.01,
-                                                backgroundColor: Colors.grey,
-                                                progressColor: orangeColor,
-                                              ),
-                                            )
-                                          else
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      14, 0, 20, 0),
-                                              child: LinearPercentIndicator(
-                                                width: 100,
-                                                lineHeight: 6,
-                                                percent: double.parse(sellerData[
-                                                            0]["response_rate"])
-                                                        .toInt() *
-                                                    0.01,
-                                                backgroundColor: Colors.grey,
-                                                progressColor: orangeColor,
-                                              ),
-                                            ),
-
-                                          if (sellerData[0]["response_rate"] ==
-                                              100)
-                                            Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        20, 0, 20, 10),
-                                                child: Text(
-                                                    "${sellerData[0]["response_rate"]}%"))
-                                          else
-                                            Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        20, 0, 20, 10),
-                                                child: Text(
-                                                    "${double.parse(sellerData[0]["response_rate"]).toInt()}%")),
-                                          Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      20, 0, 20, 0),
-                                              child: Text("Always In Stock")),
-                                          if (sellerData[0]
-                                                  ["always_in_stock"] ==
-                                              100)
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      14, 0, 20, 0),
-                                              child: LinearPercentIndicator(
-                                                width: 100,
-                                                lineHeight: 6,
-                                                percent: 1,
-                                                // sellerData[0]["always_in_stock"]*0.01,
-                                                backgroundColor: Colors.grey,
-                                                progressColor: orangeColor,
-                                              ),
-                                            )
-                                          else
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      14, 0, 20, 0),
-                                              child: LinearPercentIndicator(
-                                                width: 100,
-                                                lineHeight: 6,
-                                                percent: double.parse(sellerData[
-                                                                0]
-                                                            ["always_in_stock"])
-                                                        .toInt() *
-                                                    0.01,
-                                                backgroundColor: Colors.grey,
-                                                progressColor: orangeColor,
-                                              ),
-                                            ),
-                                          if (sellerData[0]
-                                                  ["always_in_stock"] ==
-                                              100)
-                                            Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        20, 0, 20, 0),
-                                                child: Text(
-                                                    "${sellerData[0]["always_in_stock"]}%"))
-                                          else
-                                            Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        20, 0, 20, 0),
-                                                child: Text(
-                                                    "${double.parse(sellerData[0]["always_in_stock"]).toInt()}%")),
+                                          // Padding(
+                                          //     padding:
+                                          //         const EdgeInsets.fromLTRB(
+                                          //             20, 10, 20, 0),
+                                          //     child: Text("Seller Rating")),
+                                          //
+                                          // Padding(
+                                          //     padding:
+                                          //         const EdgeInsets.fromLTRB(
+                                          //             14, 0, 20, 10),
+                                          //     child: Column(
+                                          //       children: [
+                                          //         //Text("Seller Rating"),
+                                          //         Padding(
+                                          //           padding: EdgeInsets.only(
+                                          //               left: 2),
+                                          //           child: Row(
+                                          //             children: [
+                                          //               SmoothStarRating(
+                                          //                 allowHalfRating: true,
+                                          //                 isReadOnly: true,
+                                          //                 starCount: 5,
+                                          //                 rating: double.parse(
+                                          //                     sellerRating),
+                                          //                 size: 18.0,
+                                          //                 color: orangeColor,
+                                          //                 borderColor:
+                                          //                     orangeColor,
+                                          //                 spacing: 0.0,
+                                          //               ),
+                                          //               Text(
+                                          //                   "${double.parse(sellerRating).round() * 20.round()}% of 100"),
+                                          //             ],
+                                          //           ),
+                                          //         ),
+                                          //       ],
+                                          //     )),
+                                          // Padding(
+                                          //     padding:
+                                          //         const EdgeInsets.fromLTRB(
+                                          //             20, 0, 20, 0),
+                                          //     child: Text("Response Rate")),
+                                          // if (sellerData[0]["response_rate"] ==
+                                          //     100)
+                                          //   Padding(
+                                          //     padding:
+                                          //         const EdgeInsets.fromLTRB(
+                                          //             14, 0, 20, 0),
+                                          //     child: LinearPercentIndicator(
+                                          //       width: 100,
+                                          //       lineHeight: 6,
+                                          //       percent: sellerData[0]
+                                          //               ["response_rate"] *
+                                          //           0.01,
+                                          //       backgroundColor: Colors.grey,
+                                          //       progressColor: orangeColor,
+                                          //     ),
+                                          //   )
+                                          // else
+                                          //   Padding(
+                                          //     padding:
+                                          //         const EdgeInsets.fromLTRB(
+                                          //             14, 0, 20, 0),
+                                          //     child: LinearPercentIndicator(
+                                          //       width: 100,
+                                          //       lineHeight: 6,
+                                          //       percent: double.parse(sellerData[
+                                          //                   0]["response_rate"])
+                                          //               .toInt() *
+                                          //           0.01,
+                                          //       backgroundColor: Colors.grey,
+                                          //       progressColor: orangeColor,
+                                          //     ),
+                                          //   ),
+                                          //
+                                          // if (sellerData[0]["response_rate"] ==
+                                          //     100)
+                                          //   Padding(
+                                          //       padding:
+                                          //           const EdgeInsets.fromLTRB(
+                                          //               20, 0, 20, 10),
+                                          //       child: Text(
+                                          //           "${sellerData[0]["response_rate"]}%"))
+                                          // else
+                                          //   Padding(
+                                          //       padding:
+                                          //           const EdgeInsets.fromLTRB(
+                                          //               20, 0, 20, 10),
+                                          //       child: Text(
+                                          //           "${double.parse(sellerData[0]["response_rate"]).toInt()}%")),
+                                          // Padding(
+                                          //     padding:
+                                          //         const EdgeInsets.fromLTRB(
+                                          //             20, 0, 20, 0),
+                                          //     child: Text("Always In Stock")),
+                                          // if (sellerData[0]
+                                          //         ["always_in_stock"] ==
+                                          //     100)
+                                          //   Padding(
+                                          //     padding:
+                                          //         const EdgeInsets.fromLTRB(
+                                          //             14, 0, 20, 0),
+                                          //     child: LinearPercentIndicator(
+                                          //       width: 100,
+                                          //       lineHeight: 6,
+                                          //       percent: 1,
+                                          //       // sellerData[0]["always_in_stock"]*0.01,
+                                          //       backgroundColor: Colors.grey,
+                                          //       progressColor: orangeColor,
+                                          //     ),
+                                          //   )
+                                          // else
+                                          //   Padding(
+                                          //     padding:
+                                          //         const EdgeInsets.fromLTRB(
+                                          //             14, 0, 20, 0),
+                                          //     child: LinearPercentIndicator(
+                                          //       width: 100,
+                                          //       lineHeight: 6,
+                                          //       percent: double.parse(sellerData[
+                                          //                       0]
+                                          //                   ["always_in_stock"])
+                                          //               .toInt() *
+                                          //           0.01,
+                                          //       backgroundColor: Colors.grey,
+                                          //       progressColor: orangeColor,
+                                          //     ),
+                                          //   ),
+                                          // if (sellerData[0]
+                                          //         ["always_in_stock"] ==
+                                          //     100)
+                                          //   Padding(
+                                          //       padding:
+                                          //           const EdgeInsets.fromLTRB(
+                                          //               20, 0, 20, 0),
+                                          //       child: Text(
+                                          //           "${sellerData[0]["always_in_stock"]}%"))
+                                          // else
+                                          //   Padding(
+                                          //       padding:
+                                          //           const EdgeInsets.fromLTRB(
+                                          //               20, 0, 20, 0),
+                                          //       child: Text(
+                                          //           "${double.parse(sellerData[0]["always_in_stock"]).toInt()}%")),
 
                                           if (otherSellersData.isNotEmpty ==
                                               true)
